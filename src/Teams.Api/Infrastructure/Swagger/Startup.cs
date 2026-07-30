@@ -1,6 +1,6 @@
 using Asp.Versioning.ApiExplorer;
-using Teams.Api.Infrastructure.Swagger.Examples.V1.Jobs;
 using Swashbuckle.AspNetCore.Filters;
+using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 
 namespace Teams.Api.Infrastructure.Swagger;
 
@@ -17,7 +17,7 @@ public static class Startup
                 apiDesc.GroupName == docName
                 && (apiDesc.ActionDescriptor.AttributeRouteInfo?.Template?.Contains("apiVersion") ?? false));
         });
-        builder.Services.AddSwaggerExamplesFromAssemblyOf<JobResponseDetailModelExample>();
+        builder.Services.AddSwaggerExamplesFromAssemblyOf<CommandValidationProblemDetailsExample>();
 
         return builder;
     }

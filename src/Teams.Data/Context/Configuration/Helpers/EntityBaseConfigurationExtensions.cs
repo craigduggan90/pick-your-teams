@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Teams.Domain.Entities.Abstract;
 using System.Diagnostics.CodeAnalysis;
 using Teams.Data.Context.Converters;
+using Teams.Domain.Entities.Abstract;
 
 namespace Teams.Data.Context.Configuration.Helpers;
 

@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Infrastructure.Errors;
 using Teams.Api.Infrastructure.Swagger;
+using Teams.Api.Infrastructure.Validation;
 using Teams.Api.Infrastructure.Versioning;
 using Teams.Common;
 using Teams.Core;
 using Teams.Data;
-using System.Diagnostics.CodeAnalysis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder
@@ -12,6 +13,7 @@ builder
     .AddCoreServices()
     .AddDataServices()
     .AddVersioning()
+    .AddRequestValidators()
     .AddSwaggerDocumentation()
     .AddErrorHandling();
 

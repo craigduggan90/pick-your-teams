@@ -32,4 +32,8 @@
     <ProjectReference Include="..\Teams.Domain\Teams.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Validation\" />
+  </ItemGroup>
+
 </Project>

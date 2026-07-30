@@ -1,5 +1,5 @@
-﻿using Teams.Common.Extensions;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Teams.Common.Extensions;
 
 namespace Teams.Common.UnitTests.Extensions;
 

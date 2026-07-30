@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Teams.Common;
 using Swashbuckle.AspNetCore.Filters;
+using Teams.Common;
 
 namespace Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 

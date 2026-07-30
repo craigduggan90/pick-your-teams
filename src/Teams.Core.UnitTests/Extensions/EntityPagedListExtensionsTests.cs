@@ -1,7 +1,7 @@
+using System.Globalization;
 using Teams.Common.Pagination;
 using Teams.Core.Extensions;
 using Teams.Domain.Interfaces;
-using System.Globalization;
 
 namespace Teams.Core.UnitTests.Extensions;
 

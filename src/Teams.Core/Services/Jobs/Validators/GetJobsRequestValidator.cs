@@ -1,7 +1,7 @@
 using FluentValidation;
 using Teams.Common.Pagination;
-using Teams.Domain.Enums;
 using Teams.Core.Services.Jobs.Requests;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.Services.Jobs.Validators;
 

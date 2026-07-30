@@ -1,5 +1,5 @@
-﻿using Teams.Common.Extensions;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using Teams.Common.Extensions;
 
 namespace Teams.Common.UnitTests.Extensions;
 

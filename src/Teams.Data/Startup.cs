@@ -4,7 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using Teams.Data.Context;
-using Teams.Data.Repositories.Jobs;
+using Teams.Data.Repositories.Games;
+using Teams.Data.Repositories.Players;
 using Teams.Data.Services;
 
 namespace Teams.Data;
@@ -36,7 +37,8 @@ public static class Startup
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // We register the read only repositories to allow people to access them directly
-        builder.Services.AddScoped<IReadOnlyJobsRepository, ReadOnlyJobsRepository>();
+        builder.Services.AddScoped<IReadOnlyPlayersRepository, ReadOnlyPlayersRepository>();
+        builder.Services.AddScoped<IReadOnlyGamesRepository, ReadOnlyGamesRepository>();
 
         return builder;
     }

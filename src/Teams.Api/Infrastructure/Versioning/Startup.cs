@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Teams.Common;
 using System.Diagnostics.CodeAnalysis;
+using Teams.Common;
 
 namespace Teams.Api.Infrastructure.Versioning;
 

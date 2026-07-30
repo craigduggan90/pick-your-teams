@@ -1,6 +1,6 @@
-using Teams.Common.Pagination;
 using System.Globalization;
 using System.Text;
+using Teams.Common.Pagination;
 
 namespace Teams.Common.UnitTests.Pagination;
 

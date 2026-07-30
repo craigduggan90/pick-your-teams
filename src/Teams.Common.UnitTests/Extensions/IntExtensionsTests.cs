@@ -1,6 +1,6 @@
-﻿using Teams.Common.Exceptions;
+﻿using System.Net;
+using Teams.Common.Exceptions;
 using Teams.Common.Extensions;
-using System.Net;
 
 namespace Teams.Common.UnitTests.Extensions;
 

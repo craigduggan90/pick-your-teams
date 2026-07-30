@@ -1,5 +1,6 @@
 ﻿using Teams.Data.Context;
-using Teams.Data.Repositories.Jobs;
+using Teams.Data.Repositories.Games;
+using Teams.Data.Repositories.Players;
 
 namespace Teams.Data.Services;
 
@@ -20,7 +21,10 @@ public class UnitOfWork(IApiDbContextFactory factory) : IUnitOfWork, IDisposable
     private ApiDbContext Context => _context ??= factory.CreateDbContext(ContextType.ReadWrite);
 
     /// <inheritdoc />
-    public IJobsRepository Jobs => field ??= new JobsRepository(Context);
+    public IPlayersRepository Players => field ??= new PlayersRepository(Context);
+
+    /// <inheritdoc />
+    public IGamesRepository Games => field ??= new GamesRepository(Context);
 
     /// <inheritdoc />
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

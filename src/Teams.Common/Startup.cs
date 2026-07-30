@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Teams.Common.Services;
 using System.Diagnostics.CodeAnalysis;
+using Teams.Common.Services;
 
 namespace Teams.Common;
 

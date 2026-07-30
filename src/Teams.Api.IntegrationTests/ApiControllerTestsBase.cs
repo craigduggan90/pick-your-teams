@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Teams.Common;
 using System.Net.Http.Json;
+using Teams.Common;
 
 namespace Teams.Api.IntegrationTests;
 

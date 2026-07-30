@@ -1,5 +1,5 @@
-using Teams.Api.Infrastructure.Errors.Handlers;
 using System.Diagnostics.CodeAnalysis;
+using Teams.Api.Infrastructure.Errors.Handlers;
 
 namespace Teams.Api.Infrastructure.Errors;
 

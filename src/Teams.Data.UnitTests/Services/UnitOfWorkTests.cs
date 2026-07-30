@@ -3,7 +3,6 @@ using Teams.Data.Context;
 using Teams.Data.Services;
 using Teams.Data.UnitTests.TestHelpers;
 using Teams.Domain.Entities;
-using Teams.Domain.Enums;
 
 namespace Teams.Data.UnitTests.Services;
 
@@ -15,7 +14,7 @@ public static class UnitOfWorkTests
         public void Should_ReturnsRepository_WhenCalledForTheFirstTime()
         {
             var sut = CreateSut(Context);
-            var repository = sut.Jobs;
+            var repository = sut.Players;
             Assert.NotNull(repository);
         }
 
@@ -23,8 +22,8 @@ public static class UnitOfWorkTests
         public void Should_ReusesRepository_ForSubsequentCalls()
         {
             var sut = CreateSut(Context);
-            var firstRepository = sut.Jobs;
-            var secondRepository = sut.Jobs;
+            var firstRepository = sut.Players;
+            var secondRepository = sut.Players;
             Assert.Same(firstRepository, secondRepository);
         }
     }
@@ -35,7 +34,7 @@ public static class UnitOfWorkTests
         public async Task Should_CommitChanges()
         {
             var sut = CreateSut(Context);
-            await sut.Jobs.CreateAsync(new Job("idempotent", JobTypeEnum.ArchiveProjectJob, null), CancellationToken.None);
+            await sut.Players.CreateAsync(new Player("Bobby Tables"), TestContext.Current.CancellationToken);
 
             var initialEntry = Assert.Single(Context.ChangeTracker.Entries());
             Assert.Equal(EntityState.Added, initialEntry.State);
@@ -56,7 +55,7 @@ public static class UnitOfWorkTests
             var sut = CreateSut(Context);
 
             // Call this to make sut initialize the context.
-            _ = sut.Jobs;
+            _ = sut.Players;
 
             // Disposing the sut should dispose the initialized context (in this case `Context`)
             sut.Dispose();
@@ -85,7 +84,7 @@ public static class UnitOfWorkTests
             var sut = CreateSut(Context);
 
             // Call this to make sut initialize the context
-            _ = await sut.Jobs.GetAsync(cancellationToken: TestContext.Current.CancellationToken);
+            _ = await sut.Players.GetAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             // Disposing the sut should dispose the initialized context (in this case `Context`)
             await sut.DisposeAsync();

@@ -5,8 +5,8 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Teams.Data.Context;
 using Teams.Api.IntegrationTests.TestHelpers;
+using Teams.Data.Context;
 
 namespace Teams.Api.IntegrationTests;
 

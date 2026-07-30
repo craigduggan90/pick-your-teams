@@ -1,7 +1,7 @@
+using System.Reflection;
 using Teams.Common.Extensions;
 using Teams.Common.Providers.Identifiers;
 using Teams.Common.Providers.Temporal;
-using System.Reflection;
 using Teams.Domain.Exceptions;
 using Teams.Domain.Interfaces;
 
@@ -45,7 +45,7 @@ public abstract class EntityBase : IHasCursor, IHasCreatedTimestamp, IHasModifie
     /// <exception cref="EntityUpdateException">
     /// When the property does not exist, is not accessible, or is not of a compatible type.
     /// </exception>
-    public virtual bool UpdateProperty(string propertyName, object? value)
+    protected internal virtual bool UpdateProperty(string propertyName, object? value)
     {
         // If the provided value is null, do nothing
         if (value is null)
