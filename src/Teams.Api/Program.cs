@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Infrastructure.Errors;
 using Teams.Api.Infrastructure.Swagger;
-using Teams.Api.Infrastructure.Validation;
 using Teams.Api.Infrastructure.Versioning;
 using Teams.Common;
 using Teams.Core;
@@ -13,12 +12,11 @@ builder
     .AddCoreServices()
     .AddDataServices()
     .AddVersioning()
-    .AddRequestValidators()
     .AddSwaggerDocumentation()
     .AddErrorHandling();
 
 builder.Services.AddControllers();
-builder.Services.AddRouting();
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
 

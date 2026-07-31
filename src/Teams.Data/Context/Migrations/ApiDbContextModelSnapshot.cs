@@ -44,9 +44,9 @@ namespace Teams.Data.Context.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("date_modified");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("end_time");
+                    b.Property<int>("Duration")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("minutes");
 
                     b.Property<int?>("HomeTeamRating")
                         .HasColumnType("INTEGER")
@@ -110,18 +110,36 @@ namespace Teams.Data.Context.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("date_modified");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT")
-                        .HasColumnName("name");
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("GameId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("game_id");
 
                     b.Property<int>("Rating")
                         .HasColumnType("INTEGER")
                         .HasColumnName("rating");
 
+                    b.Property<int?>("RatingChange")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("delta");
+
+                    b.Property<int>("Team")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("team");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("type");
+
                     b.Property<string>("UserId")
-                        .HasMaxLength(100)
+                        .HasMaxLength(36)
                         .HasColumnType("TEXT")
                         .HasColumnName("user_id");
 
@@ -136,7 +154,113 @@ namespace Teams.Data.Context.Migrations
 
                     b.HasIndex("DateModified");
 
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId");
+
                     b.ToTable("players", (string)null);
+                });
+
+            modelBuilder.Entity("Teams.Domain.Entities.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<long>("Cursor")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("cursor");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_created");
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_deleted");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_modified");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("email");
+
+                    b.Property<string>("ExternalId")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("idp_id");
+
+                    b.Property<string>("Mobile")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("phone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("rating");
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("tag");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cursor")
+                        .IsUnique();
+
+                    b.HasIndex("DateCreated");
+
+                    b.HasIndex("DateDeleted");
+
+                    b.HasIndex("DateModified");
+
+                    b.HasIndex("EmailAddress")
+                        .IsUnique();
+
+                    b.HasIndex("Tag")
+                        .IsUnique();
+
+                    b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Teams.Domain.Entities.Player", b =>
+                {
+                    b.HasOne("Teams.Domain.Entities.Game", "Game")
+                        .WithMany("Players")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Teams.Domain.Entities.User", "User")
+                        .WithMany("Participation")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Teams.Domain.Entities.Game", b =>
+                {
+                    b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("Teams.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Participation");
                 });
 #pragma warning restore 612, 618
         }

@@ -73,9 +73,17 @@ public abstract class EntityBase : IHasCursor, IHasCreatedTimestamp, IHasModifie
         IsDirty = true;
     }
 
+    public virtual void Delete() => SoftDelete();
+
     /// <summary>Marks the entity as deleted.</summary>
-    public virtual void SoftDelete()
-        => DateDeleted = DateTimeOffsetProvider.Now.UtcDateTime;
+    protected virtual void SoftDelete()
+    {
+        if (DateDeleted.HasValue)
+            return;
+
+        SetDateModified();
+        DateDeleted = DateTimeOffsetProvider.Now.UtcDateTime;
+    }
 
     /// <inheritdoc />
     public abstract object AsSerializable();

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 using Teams.Data.Context.Configuration.Helpers;
 using Teams.Data.Context.Converters;
 using Teams.Domain.Entities;
@@ -7,6 +8,7 @@ using Teams.Domain.Enums;
 
 namespace Teams.Data.Context.Configuration;
 
+[ExcludeFromCodeCoverage]
 public class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
@@ -22,9 +24,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
             .HasColumnName("start_time")
             .HasConversion<UtcDateTimeConverter>();
 
-        builder.Property(entity => entity.EndTime)
-            .HasColumnName("end_time")
-            .HasConversion<UtcDateTimeConverter>();
+        builder.Property(entity => entity.Duration)
+            .HasColumnName("minutes");
 
         builder.Property(entity => entity.TeamSize)
             .HasColumnName("team_size");

@@ -3,32 +3,37 @@ using Teams.Data.Context;
 using Teams.Data.Filters;
 using Teams.Data.Models;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Data.Repositories.Players;
 
-/// <summary>A read-only repository containing instances of <see cref="Player"/>.</summary>
-public class ReadOnlyPlayersRepository(ApiDbContext context) : RepositoryBase(context), IReadOnlyPlayersRepository
+/// <inheritdoc />
+public class ReadOnlyPlayersRepository(ApiDbContext context)
+    : RepositoryBase(context), IReadOnlyPlayersRepository
 {
     /// <inheritdoc />
-    public async Task<Player?> GetByIdAsync(string id, CancellationToken cancellationToken)
-        => await Context.Players
-            .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+    public async Task<Player?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
+        await Context.Players.SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
     /// <inheritdoc />
     public async Task<IEnumerable<Player>> GetAsync(
-        string? name = null,
+        string? gameId = null,
+        string? displayName = null,
+        string? userId = null,
         RangeFilter<int>? rating = null,
+        GameTeamEnum? team = null,
+        PlayerTypeEnum? type = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
-        CancellationToken cancellationToken = default)
-        => await Context.Players
-            .ApplyNameFilter(name)
-            .ApplyRatingFromFilter(rating?.From)
-            .ApplyRatingToFilter(rating?.To)
-            .ApplyCreatedFromFilter(dateFilter?.Created?.From)
-            .ApplyCreatedToFilter(dateFilter?.Created?.To)
-            .ApplyModifiedFromFilter(dateFilter?.Modified?.From)
-            .ApplyModifiedToFilter(dateFilter?.Modified?.To)
+        CancellationToken cancellationToken = default) =>
+        await Context.Players
+            .ApplyGameIdFilter(gameId)
+            .ApplyDisplayNameFilter(displayName)
+            .ApplyUserIdFilter(userId)
+            .ApplyRatingFilter(rating)
+            .ApplyTeamFilter(team)
+            .ApplyTypeFilter(type)
+            .ApplyBaseEntityDateFilters(dateFilter)
             .ApplyCursor(pagination?.Cursor)
             .ApplyPagination(pagination?.PageSize ?? Constants.DefaultPageSize)
             .ToListAsync(cancellationToken);

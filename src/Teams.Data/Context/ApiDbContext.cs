@@ -10,6 +10,8 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options) : DbContext(op
 {
     public DbSet<Player> Players { get; init; }
 
+    public DbSet<User> Users { get; init; }
+
     public DbSet<Game> Games { get; init; }
 
     /// <inheritdoc />

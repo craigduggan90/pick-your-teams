@@ -3,7 +3,7 @@ using Teams.Domain.Entities;
 
 namespace Teams.Data.Repositories.Players;
 
-/// <summary>A read-write repository containing instances of <see cref="Player"/>.</summary>
+/// <inhertidoc />
 public class PlayersRepository(ApiDbContext context)
     : ReadOnlyPlayersRepository(context), IPlayersRepository
 {

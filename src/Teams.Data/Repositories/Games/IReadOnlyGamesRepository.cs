@@ -9,7 +9,7 @@ public interface IReadOnlyGamesRepository : IReadOnlyRepository<Game>
     /// <summary>Get a collection of players with optional filters applied.</summary>
     /// <param name="location">Limit results to records matching this location filter.</param>
     /// <param name="startTime">Limit results to records matching this start time filter.</param>
-    /// <param name="endTime">Limit results to records matching this end time filter.</param>
+    /// <param name="duration">Limit results to records matching this duration filter.</param>
     /// <param name="teamSize">Limit results to records matching this team size filter.</param>
     /// <param name="dateFilter">Limit results to records matching this date filter.</param>
     /// <param name="pagination">Limit results to a page matching this pagination filter.</param>
@@ -17,7 +17,7 @@ public interface IReadOnlyGamesRepository : IReadOnlyRepository<Game>
     Task<IEnumerable<Game>> GetAsync(
         string? location = null,
         RangeFilter<DateTime>? startTime = null,
-        RangeFilter<DateTime>? endTime = null,
+        RangeFilter<int>? duration = null,
         int? teamSize = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,

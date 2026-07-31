@@ -20,15 +20,15 @@ public static class GamesFilterHelper
             ? queryable
             : queryable.Where(game => game.StartTime > value);
 
-    public static IQueryable<Game> ApplyEndTimeFromFilter(this IQueryable<Game> queryable, DateTime? value)
+    public static IQueryable<Game> ApplyDurationFromFilter(this IQueryable<Game> queryable, int? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.EndTime <= value);
+            : queryable.Where(game => game.Duration <= value);
 
-    public static IQueryable<Game> ApplyEndTimeToFilter(this IQueryable<Game> queryable, DateTime? value)
+    public static IQueryable<Game> ApplyDurationToFilter(this IQueryable<Game> queryable, int? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.EndTime > value);
+            : queryable.Where(game => game.Duration > value);
 
     public static IQueryable<Game> ApplyTeamSizeFilter(this IQueryable<Game> queryable, int? value)
         => value is null

@@ -3,112 +3,80 @@ using Swashbuckle.AspNetCore.Filters;
 using Teams.Api.Controllers.V1.Abstract;
 using Teams.Api.Controllers.V1.Players.Examples;
 using Teams.Api.Controllers.V1.Players.RequestModels;
-using Teams.Api.Controllers.V1.Players.ResponseModels;
+using Teams.Api.Controllers.V1.Players.ResponseModel;
+using Teams.Api.Controllers.V1.Shared;
 using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
-using Teams.Api.Infrastructure.Validation;
-using Teams.Common.Extensions;
 using Teams.Common.Pagination;
-using Teams.Core.Services.Players;
-using Teams.Core.Services.Players.Commands;
-using Teams.Core.Services.Players.Queries;
+using Teams.Core.CQRS;
+using Teams.Core.UseCases.Players.DeletePlayer;
+using Teams.Core.UseCases.Players.GetPlayerById;
+using Teams.Domain.Extensions;
 
 namespace Teams.Api.Controllers.V1.Players;
 
-public class PlayersController(
-    IPlayersService service,
-    IValidationService validators) : ApiControllerBase
+public class PlayersController(IMediator mediator) : ApiControllerBase
 {
     [HttpGet]
-    [ProducesResponseType<PagedList<PlayerResponseModel>>(200)]
-    [ProducesResponseType<ProblemDetails>(400)]
-    [SwaggerResponseExample(200, typeof(PlayerResponseModelPageExample))]
-    [SwaggerResponseExample(400, typeof(QueryValidationProblemDetailsExample))]
+    [ProducesResponseType<PagedList<PlayerModel>>(200)]
+    [SwaggerResponseExample(200, typeof(PlayerModelPageExample))]
     public async Task<IActionResult> GetPlayers(
         [FromQuery] GetPlayersRequestModel request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        await validators.ValidateQueryAsync(request, cancellationToken);
-
-        var query = new GetPlayersQuery(
-            Name: request.Name,
-            RatingFrom: request.RatingFrom,
-            RatingTo: request.RatingTo,
-            CreatedFrom: request.CreatedFrom,
-            CreatedTo: request.CreatedTo,
-            ModifiedFrom: request.ModifiedFrom,
-            ModifiedTo: request.ModifiedTo,
-            Cursor: request.Cursor.TryDecodeCursor(out var cursor) ? cursor : null,
-            PageSize: request.PageSize);
-
-        var result = await service.GetPlayersAsync(query, cancellationToken);
-        return Ok(result.Map(PlayersMapper.ToPlayerResponseModel));
-    }
-
-    [HttpGet("{id}")]
-    [ProducesResponseType<PlayerDetailResponseModel>(200)]
-    [ProducesResponseType<ProblemDetails>(404)]
-    [SwaggerResponseExample(201, typeof(PlayerDetailResponseModelExample))]
-    [SwaggerResponseExample(404, typeof(PlayerNotFoundProblemDetailsExample))]
-    public async Task<IActionResult> GetPlayerById(
-        string id,
-        CancellationToken cancellationToken = default)
-    {
-        var player = await service.GetPlayerByIdAsync(new GetPlayerByIdQuery(id), cancellationToken);
-        return Ok(player.ToPlayerDetailResponseModel());
+        var entities = await mediator.SendAsync(request.ToQuery(), cancellationToken);
+        return Ok(entities.ToPagedList(PlayersMapper.ToPlayerModel));
     }
 
     [HttpPost]
-    [SwaggerRequestExample(typeof(CreatePlayerRequestModel), typeof(CreatePlayerRequestModelExample))]
-    [ProducesResponseType<PlayerResponseModel>(201)]
+    [ProducesResponseType<PlayerModel>(201)]
+    [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
-    [SwaggerResponseExample(201, typeof(PlayerResponseModel))]
+    [SwaggerRequestExample(typeof(CreatePlayerRequestModel), typeof(CreatePlayerRequestModelExample))]
+    [SwaggerResponseExample(201, typeof(PlayerModelExample))]
+    [SwaggerResponseExample(404, typeof(UserNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> CreatePlayer(
-        [FromBody] CreatePlayerRequestModel request,
-        CancellationToken cancellationToken = default)
+        [FromBody] CreatePlayerRequestModel body,
+        CancellationToken cancellationToken)
     {
-        await validators.ValidateCommandAsync(request, cancellationToken);
-
-        var command = new CreatePlayerCommand(request.Name, request.UserId);
-        var created = await service.CreatePlayerAsync(command, cancellationToken);
-
-        return CreatedAtAction(
-            nameof(GetPlayerById),
-            new { id = created.Id },
-            created.ToPlayerResponseModel());
+        var player = await mediator.SendAsync(body.ToCommand(), cancellationToken);
+        return CreatedAtAction(nameof(GetPlayerById), new { id = player.Id }, player.ToPlayerModel());
     }
 
-    [HttpPatch("{id}")]
-    [SwaggerRequestExample(typeof(UpdatePlayerRequestModel), typeof(UpdatePlayerRequestModelExample))]
-    [ProducesResponseType<PlayerResponseModel>(204)]
+    [HttpPost("dummy")]
+    [ProducesResponseType<PlayerModel>(201)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
-    [SwaggerResponseExample(404, typeof(PlayerNotFoundProblemDetailsExample))]
+    [SwaggerRequestExample(typeof(CreateDummyPlayerRequestModel), typeof(CreateDummyPlayerRequestModelExample))]
+    [SwaggerResponseExample(201, typeof(PlayerModelExample))]
+    [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
-    public async Task<IActionResult> UpdatePlayer(
-        string id,
-        [FromBody] UpdatePlayerRequestModel request,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateDummyPlayer(
+        [FromBody] CreateDummyPlayerRequestModel body,
+        CancellationToken cancellationToken)
     {
-        await validators.ValidateCommandAsync(request, cancellationToken);
-
-        var command = new UpdatePlayerCommand(id, request.Name);
-        await service.UpdatePlayerAsync(command, cancellationToken);
-
-        return NoContent();
+        var player = await mediator.SendAsync(body.ToCommand(), cancellationToken);
+        return CreatedAtAction(nameof(GetPlayerById), new { id = player.Id }, player.ToPlayerModel());
     }
 
-    [HttpDelete("{id}")]
-    [ProducesResponseType<PlayerResponseModel>(204)]
+    [HttpGet("id")]
+    [ProducesResponseType<PlayerDetailModel>(200)]
+    [ProducesResponseType<ProblemDetails>(404)]
+    [SwaggerResponseExample(200, typeof(PlayerDetailModelExample))]
+    [SwaggerResponseExample(404, typeof(PlayerNotFoundProblemDetailsExample))]
+    public async Task<IActionResult> GetPlayerById(string id, CancellationToken cancellationToken)
+    {
+        var entity = await mediator.SendAsync(new GetPlayerByIdQuery(id), cancellationToken);
+        return Ok(entity.ToPlayerDetailModel());
+    }
+
+    [HttpDelete("id")]
+    [ProducesResponseType(204)]
     [ProducesResponseType<ProblemDetails>(404)]
     [SwaggerResponseExample(404, typeof(PlayerNotFoundProblemDetailsExample))]
-    public async Task<IActionResult> DeletePlayer(
-        string id,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> DeletePlayer(string id, CancellationToken cancellationToken)
     {
-        var command = new DeletePlayerCommand(id);
-        await service.DeletePlayerAsync(command, cancellationToken);
-
+        _ = await mediator.SendAsync(new DeletePlayerCommand(id), cancellationToken);
         return NoContent();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Teams.Data.Context;
 using Teams.Data.Repositories.Games;
 using Teams.Data.Repositories.Players;
+using Teams.Data.Repositories.Users;
 
 namespace Teams.Data.Services;
 
@@ -25,6 +26,9 @@ public class UnitOfWork(IApiDbContextFactory factory) : IUnitOfWork, IDisposable
 
     /// <inheritdoc />
     public IGamesRepository Games => field ??= new GamesRepository(Context);
+
+    /// <inheritdoc />
+    public IUsersRepository Users => field ??= new UsersRepository(Context);
 
     /// <inheritdoc />
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

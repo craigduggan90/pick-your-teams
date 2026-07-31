@@ -54,7 +54,7 @@ public static class EntityBaseTests
             using var _ = new DateTimeOffsetProviderContext(timestamp);
 
             var entity = new ExampleEntity();
-            entity.SoftDelete();
+            entity.Delete();
             Assert.Equal(timestamp, entity.DateDeleted);
         }
     }
@@ -127,6 +127,8 @@ public static class EntityBaseTests
         public string Name { get; private set; } = name;
 
         public void CallSetModified() => SetDateModified();
+
+        public void Delete() => SoftDelete();
 
         public override object AsSerializable() => new { Property = "Value" };
     }

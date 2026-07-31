@@ -12,13 +12,15 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
     /// <inheritdoc />
     public async Task<Game?> GetByIdAsync(string id, CancellationToken cancellationToken)
         => await Context.Games
+            .Include(g => g.Players)
+                .ThenInclude(gp => gp.User)
             .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
     /// <inheritdoc />
     public async Task<IEnumerable<Game>> GetAsync(
         string? location = null,
         RangeFilter<DateTime>? startTime = null,
-        RangeFilter<DateTime>? endTime = null,
+        RangeFilter<int>? duration = null,
         int? teamSize = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
@@ -27,8 +29,8 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
             .ApplyLocationFilter(location)
             .ApplyStartTimeFromFilter(startTime?.From)
             .ApplyStartTimeToFilter(startTime?.To)
-            .ApplyEndTimeFromFilter(endTime?.From)
-            .ApplyEndTimeToFilter(endTime?.To)
+            .ApplyDurationFromFilter(duration?.From)
+            .ApplyDurationToFilter(duration?.To)
             .ApplyTeamSizeFilter(teamSize)
             .ApplyCreatedFromFilter(dateFilter?.Created?.From)
             .ApplyCreatedToFilter(dateFilter?.Created?.To)

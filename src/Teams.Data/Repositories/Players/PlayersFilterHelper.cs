@@ -1,34 +1,48 @@
+using Teams.Data.Models;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Data.Repositories.Players;
 
-/// <summary>Filter helper for <see cref="Player"/> queries.</summary>
 public static class PlayersFilterHelper
 {
-    /// <summary>Filters a collection of <see cref="Player"/> objects by type.</summary>
-    /// <param name="queryable">The collection to filter.</param>
-    /// <param name="value">The value to filter by.</param>
-    /// <returns>A reference to the queryable after the filter operation.</returns>
-    public static IQueryable<Player> ApplyNameFilter(this IQueryable<Player> queryable, string? value)
-        => value is null
+    public static IQueryable<Player> ApplyGameIdFilter(this IQueryable<Player> queryable, string? value) =>
+        value is null
             ? queryable
-            : queryable.Where(player => player.Name.Contains(value));
+            : queryable.Where(entity => entity.GameId == value);
 
-    /// <summary>Filters a collection of <see cref="Player"/> objects by error code.</summary>
-    /// <param name="queryable">The collection to filter.</param>
-    /// <param name="value">The value to filter by.</param>
-    /// <returns>A reference to the queryable after the filter operation.</returns>
-    public static IQueryable<Player> ApplyRatingFromFilter(this IQueryable<Player> queryable, int? value)
-        => value is null
+    public static IQueryable<Player> ApplyDisplayNameFilter(this IQueryable<Player> queryable, string? value) =>
+        value is null
             ? queryable
-            : queryable.Where(player => player.Rating >= value);
+            : queryable.Where(entity => entity.DisplayName.Contains(value));
 
-    /// <summary>Filters a collection of <see cref="Player"/> objects by error code.</summary>
-    /// <param name="queryable">The collection to filter.</param>
-    /// <param name="value">The value to filter by.</param>
-    /// <returns>A reference to the queryable after the filter operation.</returns>
-    public static IQueryable<Player> ApplyRatingToFilter(this IQueryable<Player> queryable, int? value)
-        => value is null
+    public static IQueryable<Player> ApplyUserIdFilter(this IQueryable<Player> queryable, string? value) =>
+        value is null
             ? queryable
-            : queryable.Where(player => player.Rating < value);
+            : queryable.Where(entity => entity.UserId == value);
+
+    public static IQueryable<Player> ApplyTeamFilter(this IQueryable<Player> queryable, GameTeamEnum? value) =>
+        value is null
+            ? queryable
+            : queryable.Where(entity => entity.Team == value);
+
+    public static IQueryable<Player> ApplyTypeFilter(this IQueryable<Player> queryable, PlayerTypeEnum? value) =>
+        value is null
+            ? queryable
+            : queryable.Where(entity => entity.Type == value);
+
+    public static IQueryable<Player> ApplyRatingFilter(this IQueryable<Player> queryable, RangeFilter<int>? value) =>
+        value is null
+            ? queryable
+            : queryable.ApplyRatingFromFilter(value.From).ApplyRatingToFilter(value.To);
+
+    private static IQueryable<Player> ApplyRatingFromFilter(this IQueryable<Player> queryable, int? value) =>
+        value is null
+            ? queryable
+            : queryable.Where(entity => entity.Rating >= value);
+
+    private static IQueryable<Player> ApplyRatingToFilter(this IQueryable<Player> queryable, int? value) =>
+        value is null
+            ? queryable
+            : queryable.Where(entity => entity.Rating < value);
 }

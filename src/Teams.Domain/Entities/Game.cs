@@ -6,7 +6,7 @@ namespace Teams.Domain.Entities;
 public class Game(
     string? location,
     DateTime startTime,
-    DateTime? endTime,
+    int duration,
     int teamSize)
     : EntityBase
 {
@@ -14,7 +14,7 @@ public class Game(
 
     public DateTime StartTime { get; private set; } = startTime;
 
-    public DateTime? EndTime { get; private set; } = endTime;
+    public int Duration { get; private set; } = duration;
 
     public GameStatusEnum Status { get; private set; } = GameStatusEnum.Scheduled;
 
@@ -28,28 +28,29 @@ public class Game(
 
     public int MaxPlayers => TeamSize * 2;
 
-    public void Update(string? location, DateTime? startTime, DateTime? endTime)
+    public ICollection<Player> Players { get; private set; } = new List<Player>();
+
+    public void Update(string? location, DateTime? startTime, int? duration)
     {
         UpdateProperty(nameof(Location), location);
         UpdateProperty(nameof(StartTime), startTime);
-        UpdateProperty(nameof(EndTime), endTime);
+        UpdateProperty(nameof(Duration), duration);
+    }
+
+    public Player AddDummyPlayer(string displayName, int estimatedRating)
+    {
+        var player = new Player(Id, displayName, estimatedRating);
+        Players.Add(player);
+        return player;
     }
 
     public void SetResult(GameTeamEnum winner)
     {
         if (Status == GameStatusEnum.Finished)
             return;
+
         UpdateProperty(nameof(Status), GameStatusEnum.Finished);
         UpdateProperty(nameof(Winner), winner);
-    }
-
-    public void Delete()
-    {
-        if (DateDeleted.HasValue)
-            return;
-
-        SetDateModified();
-        SoftDelete();
     }
 
     public override object AsSerializable()

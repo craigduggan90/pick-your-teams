@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Teams.Common.Providers.Temporal;
 using Teams.Data.Context;
 using Teams.Data.Services;
 using Teams.Data.UnitTests.TestHelpers;
@@ -8,7 +9,7 @@ namespace Teams.Data.UnitTests.Services;
 
 public static class UnitOfWorkTests
 {
-    public class Customers : DatabaseAwareTestBase
+    public class Players : DatabaseAwareTestBase
     {
         [Fact]
         public void Should_ReturnsRepository_WhenCalledForTheFirstTime()
@@ -28,13 +29,53 @@ public static class UnitOfWorkTests
         }
     }
 
+    public class Games : DatabaseAwareTestBase
+    {
+        [Fact]
+        public void Should_ReturnsRepository_WhenCalledForTheFirstTime()
+        {
+            var sut = CreateSut(Context);
+            var repository = sut.Games;
+            Assert.NotNull(repository);
+        }
+
+        [Fact]
+        public void Should_ReusesRepository_ForSubsequentCalls()
+        {
+            var sut = CreateSut(Context);
+            var firstRepository = sut.Games;
+            var secondRepository = sut.Games;
+            Assert.Same(firstRepository, secondRepository);
+        }
+    }
+
+    public class Users : DatabaseAwareTestBase
+    {
+        [Fact]
+        public void Should_ReturnsRepository_WhenCalledForTheFirstTime()
+        {
+            var sut = CreateSut(Context);
+            var repository = sut.Users;
+            Assert.NotNull(repository);
+        }
+
+        [Fact]
+        public void Should_ReusesRepository_ForSubsequentCalls()
+        {
+            var sut = CreateSut(Context);
+            var firstRepository = sut.Users;
+            var secondRepository = sut.Users;
+            Assert.Same(firstRepository, secondRepository);
+        }
+    }
+
     public class SaveChangesAsync : DatabaseAwareTestBase
     {
         [Fact]
         public async Task Should_CommitChanges()
         {
             var sut = CreateSut(Context);
-            await sut.Players.CreateAsync(new Player("Bobby Tables"), TestContext.Current.CancellationToken);
+            await sut.Games.CreateAsync(new Game(null, DateTimeOffsetProvider.Now.UtcDateTime, 60, 5), TestContext.Current.CancellationToken);
 
             var initialEntry = Assert.Single(Context.ChangeTracker.Entries());
             Assert.Equal(EntityState.Added, initialEntry.State);
