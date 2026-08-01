@@ -5,24 +5,24 @@ using Teams.Domain.Exceptions;
 namespace Teams.Domain.Entities;
 
 /// <summary>Represents a player in a game.</summary>
-/// <param name="gameId"></param>
-/// <param name="userId"></param>
-/// <param name="displayName"></param>
-/// <param name="rating"></param>
-/// <param name="team"></param>
+/// <param name="gameId">The unique identifier of the game in which the player is participating.</param>
+/// <param name="userId">The unique identifier of the user with which this player is associated.</param>
+/// <param name="displayName">The players display name.</param>
+/// <param name="rating">The players rating.</param>
+/// <param name="team">The team to which this player is assigned.</param>
 public class Player(string gameId, string? userId, string displayName, int rating, PlayerTypeEnum type, GameTeamEnum team)
     : EntityBase
 {
     /// <summary>
     /// Create a new instance of the <see cref="Player"/> class representing a non-user player.
     /// </summary>
-    /// <param name="gameId">The unique identifier of the game.</param>
+    /// <param name="game">The game in which this entity is a player.</param>
     /// <param name="displayName">The display name of the dummy user.</param>
     /// <param name="estimatedRating">The estimated rating for the dummy user.</param>
-    public Player(string gameId, string displayName, int estimatedRating)
-        : this(gameId, null, displayName, Constants.StartingElo, PlayerTypeEnum.Dummy, GameTeamEnum.None)
+    public Player(Game game, string displayName, int estimatedRating)
+        : this(game.Id, null, displayName, estimatedRating, PlayerTypeEnum.Dummy, GameTeamEnum.None)
     {
-        Rating = estimatedRating;
+        Game = game;
     }
 
     /// <summary>
@@ -33,6 +33,8 @@ public class Player(string gameId, string? userId, string displayName, int ratin
     public Player(Game game, User user)
         : this(game.Id, user.Id, user.Tag, user.Rating, PlayerTypeEnum.User, GameTeamEnum.None)
     {
+        Game = game;
+        User = user;
     }
 
     /// <summary>
@@ -76,10 +78,32 @@ public class Player(string gameId, string? userId, string displayName, int ratin
         init;
     }
 
-    public void AssignTeam(GameTeamEnum team, int playerRating)
+    /// <summary>Set the player team and fix the player rating at time of assignment.</summary>
+    /// <param name="team">The team to which the player is assigned.</param>
+    /// <param name="rating">The player rating.</param>
+    public void AssignTeam(GameTeamEnum team, int? rating)
     {
-        Team = team;
-        Rating = playerRating;
+        UpdateProperty(nameof(Team), team);
+        UpdateProperty(nameof(Rating), rating);
+    }
+
+    /// <summary>
+    /// Sets the rating change as a result of the game.
+    /// </summary>
+    /// <param name="teamRating">The total rating of the players team.</param>
+    /// <param name="teamChange">The total rating change to apply to the players team.</param>
+    /// <param name="teamSize">The number of players on the team.</param>
+    /// <remarks>
+    /// This does not alter the <see cref="Rating"/> property of this player, but rather serves as a record of the
+    /// change that has been applied to the associated user (if any).
+    /// </remarks>
+    public void SetRatingChange(int teamRating, double teamChange, int teamSize)
+    {
+        var weight = teamChange > 0
+                ? (double)(teamRating - Rating) / (teamRating * (teamSize - 1))
+                : (double)Rating / teamRating;
+        RatingChange = (int)Math.Round(teamChange * weight);
+        SetDateModified();
     }
 
     /// <inheritdoc />

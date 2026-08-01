@@ -18,12 +18,12 @@ public class CreateDummyPlayerCommandHandler(
         CommandValidationException.ThrowIfValidationFailed(await validator.ValidateAsync(request, cancellationToken));
 
         // Check that the game exists
-        _ = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
+        var game = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.GameId);
 
         // Create the player
         var player = await uow.Players.CreateAsync(
-            new Player(request.GameId, request.DisplayName, request.EstimatedRating),
+            new Player(game, request.DisplayName, request.EstimatedRating),
             cancellationToken);
 
         // Commit the changes

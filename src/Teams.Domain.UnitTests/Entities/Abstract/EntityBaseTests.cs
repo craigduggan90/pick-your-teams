@@ -45,7 +45,7 @@ public static class EntityBaseTests
         }
     }
 
-    public class SoftDelete
+    public class Delete
     {
         [Fact]
         public void ShouldSetDateDeleted()
@@ -55,6 +55,21 @@ public static class EntityBaseTests
 
             var entity = new ExampleEntity();
             entity.Delete();
+            Assert.Equal(timestamp, entity.DateDeleted);
+        }
+
+        [Fact]
+        public void ShouldNotSetDateDeleted_WhenAlreadyDeleted()
+        {
+            var timestamp = new DateTime(2025, 5, 12, 12, 53, 1, DateTimeKind.Utc);
+            using var dt1 = new DateTimeOffsetProviderContext(timestamp);
+
+            var entity = new ExampleEntity();
+            entity.Delete();
+
+            using var dt2 = new DateTimeOffsetProviderContext(DateTimeOffset.Now);
+            entity.Delete();
+
             Assert.Equal(timestamp, entity.DateDeleted);
         }
     }
@@ -127,8 +142,6 @@ public static class EntityBaseTests
         public string Name { get; private set; } = name;
 
         public void CallSetModified() => SetDateModified();
-
-        public void Delete() => SoftDelete();
 
         public override object AsSerializable() => new { Property = "Value" };
     }

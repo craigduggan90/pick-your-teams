@@ -15,6 +15,19 @@ public static class EntityPagedListExtensionsTests
     public class Create
     {
         [Fact]
+        public void RetainsOriginalData_WithHighestCursor_AndCount()
+        {
+            IReadOnlyList<CursorEntity> list = [new(1), new(3), new(2)];
+            var expectedCursor = CursorConverter.TryEncodeCursor(3L, out var encoded) ? encoded : null;
+
+            var result = list.ToPagedList();
+
+            Assert.Same(list, result.Data);
+            Assert.Equal(expectedCursor, result.Cursor);
+            Assert.Equal(3, result.Count);
+        }
+
+        [Fact]
         public void ProjectsEachItem_UsingConverter()
         {
             IReadOnlyList<CursorEntity> list = [new(1), new(2), new(3)];

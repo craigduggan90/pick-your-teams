@@ -20,7 +20,7 @@ public static class EntityPagedListExtensions
         return new PagedList<TModel>(mapped, collection.GetCursor(), collection.Count);
     }
 
-    public static string? GetCursor<T>(this IReadOnlyCollection<T> entities)
+    private static string? GetCursor<T>(this IReadOnlyCollection<T> entities)
         where T : IHasCursor
     {
         if (entities is not { Count: > 0 })
