@@ -7,9 +7,9 @@ public class PlayerModelExample : IMultipleExamplesProvider<PlayerModel>
 {
     public IEnumerable<SwaggerExample<PlayerModel>> GetExamples() => [UserExample, DummyExample];
 
-    private static readonly SwaggerExample<PlayerModel> UserExample = 
+    private static readonly SwaggerExample<PlayerModel> UserExample =
         SwaggerExample.Create("User", PlayerModel.UserExample);
 
-    private static readonly SwaggerExample<PlayerModel> DummyExample = 
+    private static readonly SwaggerExample<PlayerModel> DummyExample =
         SwaggerExample.Create("Dummy", PlayerModel.DummyExample);
 }

@@ -17,7 +17,7 @@ public class CreatePlayerCommandHandler(
         var game = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.GameId);
 
-        if (game.Players.Any(player => player.UserId == request.UserId)) 
+        if (game.Players.Any(player => player.UserId == request.UserId))
             throw new CommandValidationException([new ValidationFailure(nameof(CreatePlayerCommand.UserId), "User is already associated with game.")]);
 
         var user = await uow.Users.GetByIdAsync(request.UserId, cancellationToken)
