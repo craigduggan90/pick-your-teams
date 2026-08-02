@@ -1,3 +1,4 @@
+using Teams.Common.Providers.Identifiers;
 using Teams.Domain.Entities;
 using Teams.Domain.UnitTests.TestHelpers;
 
@@ -7,7 +8,6 @@ public static class UserTests
 {
     public abstract class UserTestsBase
     {
-        protected const string DefaultTag = "tag";
         protected const string DefaultDisplayName = "display-name";
         protected const string DefaultExternalId = "external-id-001";
         protected const string DefaultEmailAddress = "user@example.com";
@@ -15,7 +15,7 @@ public static class UserTests
 
         protected static User CreateUser(Action<User>? setup = null)
         {
-            var user = new User(DefaultTag, DefaultDisplayName, DefaultExternalId, DefaultEmailAddress, DefaultMobile);
+            var user = new User(DefaultDisplayName, DefaultExternalId, DefaultEmailAddress, DefaultMobile);
             setup?.Invoke(user);
             return user;
         }
@@ -26,9 +26,11 @@ public static class UserTests
         [Fact]
         public void CreatesUser_FromParameters()
         {
+            const string id = "test-identifier";
+            using var _ = new IdentifierProviderContext(id);
             var user = CreateUser();
 
-            Assert.Equal(DefaultTag, user.Tag);
+            Assert.Equal(id, user.Tag);
             Assert.Equal(DefaultDisplayName, user.DisplayName);
             Assert.Equal(DefaultExternalId, user.ExternalId);
             Assert.Equal(DefaultEmailAddress, user.EmailAddress);
@@ -40,7 +42,7 @@ public static class UserTests
         [Fact]
         public void AllowsNullMobile()
         {
-            var user = new User(DefaultTag, DefaultDisplayName, DefaultExternalId, DefaultEmailAddress, null);
+            var user = new User(DefaultDisplayName, DefaultExternalId, DefaultEmailAddress, null);
 
             Assert.Null(user.Mobile);
         }
@@ -67,7 +69,7 @@ public static class UserTests
 
             user.Update(null, null, null);
 
-            Assert.Equal(DefaultTag, user.Tag);
+            Assert.Equal(user.Id, user.Tag);
             Assert.Equal(DefaultEmailAddress, user.EmailAddress);
             Assert.Equal(DefaultMobile, user.Mobile);
         }

@@ -27,7 +27,7 @@ public static class PlayerTests
             new("location", DateTime.UtcNow, 60, 5);
 
         protected static User CreateUser() =>
-            new("tag", "display name", "external-id", "email@example.com", null);
+            new("display name", "external-id", "email@example.com", null);
 
         protected static Player CreatePlayerWithRating(int rating) =>
             new(DefaultGameId, DefaultUserId, DefaultDisplayName, rating, DefaultType, DefaultTeam);

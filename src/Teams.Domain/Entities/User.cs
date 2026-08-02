@@ -3,22 +3,32 @@ using Teams.Domain.Entities.Abstract;
 namespace Teams.Domain.Entities;
 
 /// <summary>Represents a player/user.</summary>
-public class User(string tag, string displayName, string externalId, string emailAddress, string? mobile) : EntityBase
+public class User : EntityBase
 {
+    /// <summary>Represents a player/user.</summary>
+    public User(string displayName, string externalId, string emailAddress, string? mobile)
+    {
+        ExternalId = externalId;
+        EmailAddress = emailAddress;
+        Mobile = mobile;
+        DisplayName = displayName;
+        Tag = Id;
+    }
+
     /// <summary>The identifier of the user in the external IDP service.</summary>
-    public string? ExternalId { get; } = externalId;
+    public string? ExternalId { get; }
 
     /// <summary> The players email address, optionally used for notifications and reminders.</summary>
-    public string EmailAddress { get; private set; } = emailAddress;
+    public string EmailAddress { get; private set; }
 
     /// <summary> The players mobile phone number, optionally used for notifications and reminders.</summary>
-    public string? Mobile { get; private set; } = mobile;
+    public string? Mobile { get; private set; }
 
     /// <summary>The users tag or handle.</summary>
-    public string Tag { get; private set; } = tag;
+    public string Tag { get; private set; }
 
     /// <summary>The users display name.</summary>
-    public string DisplayName { get; private set; } = displayName;
+    public string DisplayName { get; private set; }
 
     /// <summary>The users current game rating.</summary>
     /// <remarks>Default 1000.</remarks>
