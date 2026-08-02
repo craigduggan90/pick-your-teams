@@ -212,7 +212,7 @@ namespace Teams.Data.Context.Migrations
 
                     b.Property<string>("Tag")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(36)
                         .HasColumnType("TEXT")
                         .HasColumnName("tag");
 

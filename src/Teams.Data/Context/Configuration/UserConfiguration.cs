@@ -17,7 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(entity => entity.Tag)
             .HasColumnName("tag")
-            .HasMaxLength(32);
+            .HasMaxLength(36);
 
         builder.Property(entity => entity.DisplayName)
             .HasColumnName("name")

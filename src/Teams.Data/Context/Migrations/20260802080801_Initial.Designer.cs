@@ -11,7 +11,7 @@ using Teams.Data.Context;
 namespace Teams.Data.Context.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20260801124949_Initial")]
+    [Migration("20260802080801_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -215,7 +215,7 @@ namespace Teams.Data.Context.Migrations
 
                     b.Property<string>("Tag")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(36)
                         .HasColumnType("TEXT")
                         .HasColumnName("tag");
 

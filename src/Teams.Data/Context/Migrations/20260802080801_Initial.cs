@@ -42,7 +42,7 @@ namespace Teams.Data.Context.Migrations
                     idp_id = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     email = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     phone = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    tag = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    tag = table.Column<string>(type: "TEXT", maxLength: 36, nullable: false),
                     name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     rating = table.Column<int>(type: "INTEGER", nullable: false),
                     cursor = table.Column<long>(type: "INTEGER", nullable: false),
