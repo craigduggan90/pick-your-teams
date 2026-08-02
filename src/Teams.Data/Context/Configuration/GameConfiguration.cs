@@ -27,6 +27,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(entity => entity.Duration)
             .HasColumnName("minutes");
 
+        builder.Property(entity => entity.OrganiserId)
+            .HasColumnName("organiser");
+
         builder.Property(entity => entity.TeamSize)
             .HasColumnName("team_size");
 
@@ -47,5 +50,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
             .HasConversion(
                 toProvider => (int?)toProvider,
                 fromProvider => (GameTeamEnum?)fromProvider);
+
+        builder.HasOne(entity => entity.Organiser)
+            .WithMany()
+            .HasForeignKey(entity => entity.OrganiserId);
     }
 }

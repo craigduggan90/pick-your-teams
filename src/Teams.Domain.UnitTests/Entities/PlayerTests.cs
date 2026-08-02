@@ -24,7 +24,7 @@ public static class PlayerTests
         }
 
         protected static Game CreateGame() =>
-            new("location", DateTime.UtcNow, 60, 5);
+            new("location", DateTime.UtcNow, 60, 5, "organiser-id");
 
         protected static User CreateUser() =>
             new("display name", "external-id", "email@example.com", null);

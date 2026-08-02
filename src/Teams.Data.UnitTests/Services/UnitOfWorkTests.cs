@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Teams.Common.Providers.Temporal;
 using Teams.Data.Context;
 using Teams.Data.Services;
 using Teams.Data.UnitTests.TestHelpers;
@@ -75,7 +74,7 @@ public static class UnitOfWorkTests
         public async Task Should_CommitChanges()
         {
             var sut = CreateSut(Context);
-            await sut.Games.CreateAsync(new Game(null, DateTimeOffsetProvider.Now.UtcDateTime, 60, 5), TestContext.Current.CancellationToken);
+            await sut.Users.CreateAsync(new User("displayName", "externalId", "email@address.com", null), TestContext.Current.CancellationToken);
 
             var initialEntry = Assert.Single(Context.ChangeTracker.Entries());
             Assert.Equal(EntityState.Added, initialEntry.State);

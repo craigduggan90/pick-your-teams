@@ -12,29 +12,6 @@ namespace Teams.Data.Context.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "game",
-                columns: table => new
-                {
-                    id = table.Column<string>(type: "TEXT", maxLength: 36, nullable: false),
-                    location = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    start_time = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    minutes = table.Column<int>(type: "INTEGER", nullable: false),
-                    status = table.Column<int>(type: "INTEGER", nullable: false),
-                    home_rating = table.Column<int>(type: "INTEGER", nullable: true),
-                    away_rating = table.Column<int>(type: "INTEGER", nullable: true),
-                    winner = table.Column<int>(type: "INTEGER", nullable: true),
-                    team_size = table.Column<int>(type: "INTEGER", nullable: false),
-                    cursor = table.Column<long>(type: "INTEGER", nullable: false),
-                    date_created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    date_modified = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    date_deleted = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_game", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -53,6 +30,36 @@ namespace Teams.Data.Context.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "game",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "TEXT", maxLength: 36, nullable: false),
+                    location = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    start_time = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    minutes = table.Column<int>(type: "INTEGER", nullable: false),
+                    organiser = table.Column<string>(type: "TEXT", nullable: false),
+                    status = table.Column<int>(type: "INTEGER", nullable: false),
+                    home_rating = table.Column<int>(type: "INTEGER", nullable: true),
+                    away_rating = table.Column<int>(type: "INTEGER", nullable: true),
+                    winner = table.Column<int>(type: "INTEGER", nullable: true),
+                    team_size = table.Column<int>(type: "INTEGER", nullable: false),
+                    cursor = table.Column<long>(type: "INTEGER", nullable: false),
+                    date_created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    date_modified = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    date_deleted = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_game", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_game_users_organiser",
+                        column: x => x.organiser,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -108,6 +115,11 @@ namespace Teams.Data.Context.Migrations
                 name: "IX_game_date_modified",
                 table: "game",
                 column: "date_modified");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_game_organiser",
+                table: "game",
+                column: "organiser");
 
             migrationBuilder.CreateIndex(
                 name: "IX_players_cursor",

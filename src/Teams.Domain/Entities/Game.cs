@@ -1,5 +1,6 @@
 using Teams.Domain.Entities.Abstract;
 using Teams.Domain.Enums;
+using Teams.Domain.Exceptions;
 
 namespace Teams.Domain.Entities;
 
@@ -7,7 +8,8 @@ public class Game(
     string? location,
     DateTime startTime,
     int duration,
-    int teamSize)
+    int teamSize,
+    string organiserId)
     : EntityBase
 {
     public string? Location { get; private set; } = location;
@@ -15,6 +17,14 @@ public class Game(
     public DateTime StartTime { get; private set; } = startTime;
 
     public int Duration { get; private set; } = duration;
+
+    public string OrganiserId { get; private set; } = organiserId;
+
+    public User Organiser
+    {
+        get => field ?? throw UninitializedPropertyException.For(nameof(Organiser));
+        init;
+    }
 
     public GameStatusEnum Status { get; private set; } = GameStatusEnum.Scheduled;
 

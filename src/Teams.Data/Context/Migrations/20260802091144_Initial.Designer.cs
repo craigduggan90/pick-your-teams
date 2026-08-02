@@ -11,7 +11,7 @@ using Teams.Data.Context;
 namespace Teams.Data.Context.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20260802080801_Initial")]
+    [Migration("20260802091144_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -60,6 +60,11 @@ namespace Teams.Data.Context.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("location");
 
+                    b.Property<string>("OrganiserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("organiser");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("TEXT")
                         .HasColumnName("start_time");
@@ -86,6 +91,8 @@ namespace Teams.Data.Context.Migrations
                     b.HasIndex("DateDeleted");
 
                     b.HasIndex("DateModified");
+
+                    b.HasIndex("OrganiserId");
 
                     b.ToTable("game", (string)null);
                 });
@@ -237,6 +244,17 @@ namespace Teams.Data.Context.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Teams.Domain.Entities.Game", b =>
+                {
+                    b.HasOne("Teams.Domain.Entities.User", "Organiser")
+                        .WithMany()
+                        .HasForeignKey("OrganiserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organiser");
                 });
 
             modelBuilder.Entity("Teams.Domain.Entities.Player", b =>

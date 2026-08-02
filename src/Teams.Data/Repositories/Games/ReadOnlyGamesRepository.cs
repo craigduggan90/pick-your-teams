@@ -3,6 +3,7 @@ using Teams.Data.Context;
 using Teams.Data.Filters;
 using Teams.Data.Models;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Data.Repositories.Games;
 
@@ -22,6 +23,7 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
         RangeFilter<DateTime>? startTime = null,
         RangeFilter<int>? duration = null,
         int? teamSize = null,
+        GameStatusEnum? status = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default)
@@ -29,13 +31,10 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
             .ApplyLocationFilter(location)
             .ApplyStartTimeFromFilter(startTime?.From)
             .ApplyStartTimeToFilter(startTime?.To)
-            .ApplyDurationFromFilter(duration?.From)
-            .ApplyDurationToFilter(duration?.To)
+            .ApplyDurationFilter(duration)
             .ApplyTeamSizeFilter(teamSize)
-            .ApplyCreatedFromFilter(dateFilter?.Created?.From)
-            .ApplyCreatedToFilter(dateFilter?.Created?.To)
-            .ApplyModifiedFromFilter(dateFilter?.Modified?.From)
-            .ApplyModifiedToFilter(dateFilter?.Modified?.To)
+            .ApplyStatusFilter(status)
+            .ApplyBaseEntityDateFilters(dateFilter)
             .ApplyCursor(pagination?.Cursor)
             .ApplyPagination(pagination?.PageSize ?? Constants.DefaultPageSize)
             .ToListAsync(cancellationToken);

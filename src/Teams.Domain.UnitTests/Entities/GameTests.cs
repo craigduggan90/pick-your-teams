@@ -1,5 +1,6 @@
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
+using Teams.Domain.Exceptions;
 using Teams.Domain.UnitTests.TestHelpers;
 
 namespace Teams.Domain.UnitTests.Entities;
@@ -12,15 +13,17 @@ public static class GameTests
         protected static readonly DateTime DefaultStartTime = new(2026, 3, 1, 18, 0, 0, DateTimeKind.Utc);
         protected const int DefaultDuration = 60;
         protected const int DefaultTeamSize = 2;
+        protected const string DefaultOrganiserId = "organiser-001";
 
         protected static Game CreateGame(Action<Game>? setup = null)
         {
-            var game = new Game(DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize);
+            var game = new Game(DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId);
             setup?.Invoke(game);
             return game;
         }
 
-        /// <summary>Adds a dummy player to the game, on the given team, with the given rating.</summary>
+        protected static User CreateUser() => new("display-name", "external-id", "user@example.com", null);
+
         protected static Player AddPlayer(Game game, GameTeamEnum team, int rating)
         {
             var player = new Player(game, $"player-{Guid.NewGuid():N}", rating);
@@ -41,6 +44,7 @@ public static class GameTests
             Assert.Equal(DefaultStartTime, game.StartTime);
             Assert.Equal(DefaultDuration, game.Duration);
             Assert.Equal(DefaultTeamSize, game.TeamSize);
+            Assert.Equal(DefaultOrganiserId, game.OrganiserId);
             Assert.Equal(GameStatusEnum.Scheduled, game.Status);
             Assert.Null(game.HomeTeamRating);
             Assert.Null(game.AwayTeamRating);
@@ -51,7 +55,7 @@ public static class GameTests
         [Fact]
         public void AllowsNullLocation()
         {
-            var game = new Game(null, DefaultStartTime, DefaultDuration, DefaultTeamSize);
+            var game = new Game(null, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId);
 
             Assert.Null(game.Location);
         }
@@ -65,7 +69,7 @@ public static class GameTests
         [InlineData(11, 22)]
         public void ReturnsDoubleTeamSize(int teamSize, int expected)
         {
-            var game = new Game("location", DateTime.UtcNow, 60, teamSize);
+            var game = new Game("location", DateTime.UtcNow, 60, teamSize, "organiser-001");
 
             Assert.Equal(expected, game.MaxPlayers);
         }
@@ -107,6 +111,29 @@ public static class GameTests
             Assert.Equal("New Venue", game.Location);
             Assert.Equal(DefaultStartTime, game.StartTime);
             Assert.Equal(DefaultDuration, game.Duration);
+        }
+    }
+
+    public class OrganiserProperty : GameTestsBase
+    {
+        [Fact]
+        public void ThrowsUninitializedPropertyException_WhenOrganiserNotSet()
+        {
+            var game = CreateGame();
+
+            Assert.Throws<UninitializedPropertyException>(() => game.Organiser);
+        }
+
+        [Fact]
+        public void ReturnsAssignedOrganiser_WhenSetViaObjectInitializer()
+        {
+            var organiser = CreateUser();
+            var game = new Game(DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId)
+            {
+                Organiser = organiser
+            };
+
+            Assert.Same(organiser, game.Organiser);
         }
     }
 
@@ -153,8 +180,6 @@ public static class GameTests
             var winnerAfterFirstCall = game.Winner;
             var homeRatingAfterFirstCall = game.HomeTeamRating;
 
-            // A player joins after the game is finished, and we try to overturn the result -
-            // neither should have any effect.
             AddPlayer(game, GameTeamEnum.Home, 5000);
             game.SetResult(GameTeamEnum.Away);
 
@@ -190,8 +215,6 @@ public static class GameTests
         [Fact]
         public void ReturnsLargeNegativeChange_WhenUnderdogAwayTeamWins()
         {
-            // Home is the stronger side on paper (2200 vs 1800) but loses - the swing should be
-            // large, since the result was unexpected.
             var game = CreateGame();
             AddPlayer(game, GameTeamEnum.Home, 1100);
             AddPlayer(game, GameTeamEnum.Home, 1100);
@@ -347,7 +370,7 @@ public static class GameTests
         }
 
         [Fact]
-        public void ExcludesLocationStatusAndTeamRatings_WhenCalled()
+        public void ExcludesLocationStatusOrganiserAndTeamRatings_WhenCalled()
         {
             var game = CreateGame();
 
@@ -357,6 +380,7 @@ public static class GameTests
             Assert.Null(serializable.GetValue(type, "Location"));
             Assert.Null(serializable.GetValue(type, "StartTime"));
             Assert.Null(serializable.GetValue(type, "Duration"));
+            Assert.Null(serializable.GetValue(type, "OrganiserId"));
             Assert.Null(serializable.GetValue(type, "Status"));
             Assert.Null(serializable.GetValue(type, "HomeTeamRating"));
             Assert.Null(serializable.GetValue(type, "AwayTeamRating"));
