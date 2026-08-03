@@ -31,7 +31,7 @@ jobs:
         working-directory: src/api
         run: |
           dotnet test ./Teams.sln --configuration Release --collect "XPlat Code Coverage"
-          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:./../coverage/api -reporttypes:MarkdownSummaryGithub -filefilters:"-*/Migrations/*"
+          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:./../../coverage/api -reporttypes:MarkdownSummaryGithub -filefilters:"-*/Migrations/*"
           
       - name: 💾 publish coverage report
         uses: actions/upload-artifact@v7
