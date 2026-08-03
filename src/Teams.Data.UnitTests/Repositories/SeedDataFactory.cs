@@ -29,7 +29,7 @@ public static class SeedDataFactory
             var user = new User(displayName, externalId, emailAddress, null);
 
             using var updatedDtFix = new DateTimeOffsetProviderContext(BaseDate.AddYears(2).AddDays(index));
-            user.Update(tag, null, mobile);
+            user.Update(tag, null, null, mobile);
             user.ApplyRatingChange(ratingChange);
 
             return user;

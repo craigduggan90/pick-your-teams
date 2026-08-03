@@ -33,7 +33,7 @@ public static class UsersRepositoryTests
         public async Task Should_UpdateEntity_InChangeTracker()
         {
             var entity = Context.Users.Skip(7).First();
-            entity.Update("New Value", null, null);
+            entity.Update("New Value", null, null, null);
 
             var sut = CreateSut();
             _ = await sut.UpdateAsync(entity, TestContext.Current.CancellationToken);

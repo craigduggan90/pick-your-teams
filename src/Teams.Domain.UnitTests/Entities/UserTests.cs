@@ -12,6 +12,7 @@ public static class UserTests
         protected const string DefaultExternalId = "external-id-001";
         protected const string DefaultEmailAddress = "user@example.com";
         protected const string DefaultMobile = "+15551234567";
+        protected const int DefaultRating = 1000;
 
         protected static User CreateUser(Action<User>? setup = null)
         {
@@ -35,7 +36,7 @@ public static class UserTests
             Assert.Equal(DefaultExternalId, user.ExternalId);
             Assert.Equal(DefaultEmailAddress, user.EmailAddress);
             Assert.Equal(DefaultMobile, user.Mobile);
-            Assert.Equal(1000, user.Rating);
+            Assert.Equal(DefaultRating, user.Rating);
             Assert.Empty(user.Participation);
         }
 
@@ -51,15 +52,20 @@ public static class UserTests
     public class Update : UserTestsBase
     {
         [Fact]
-        public void UpdatesTagEmailAndMobile_WhenAllProvided()
+        public void UpdatesTagDisplayNameEmailAndMobile_WhenAllProvided()
         {
+            const string expectedTag = "new-tag";
+            const string expectedDisplayName = "new-display-name";
+            const string expectedEmailAddress = "new@example.com";
+            const string expectedMobile = "+15559876543";
             var user = CreateUser();
 
-            user.Update("new-tag", "new@example.com", "+15559876543");
+            user.Update(expectedTag, expectedDisplayName, expectedEmailAddress, expectedMobile);
 
-            Assert.Equal("new-tag", user.Tag);
-            Assert.Equal("new@example.com", user.EmailAddress);
-            Assert.Equal("+15559876543", user.Mobile);
+            Assert.Equal(expectedTag, user.Tag);
+            Assert.Equal(expectedDisplayName, user.DisplayName);
+            Assert.Equal(expectedEmailAddress, user.EmailAddress);
+            Assert.Equal(expectedMobile, user.Mobile);
         }
 
         [Fact]
@@ -67,9 +73,10 @@ public static class UserTests
         {
             var user = CreateUser();
 
-            user.Update(null, null, null);
+            user.Update(null, null, null, null);
 
             Assert.Equal(user.Id, user.Tag);
+            Assert.Equal(DefaultDisplayName, user.DisplayName);
             Assert.Equal(DefaultEmailAddress, user.EmailAddress);
             Assert.Equal(DefaultMobile, user.Mobile);
         }
@@ -77,11 +84,13 @@ public static class UserTests
         [Fact]
         public void UpdatesOnlyProvidedFields_WhenPartiallySpecified()
         {
+            const string expectedTag = "new-tag";
             var user = CreateUser();
 
-            user.Update("new-tag", null, null);
+            user.Update(expectedTag, null, null, null);
 
-            Assert.Equal("new-tag", user.Tag);
+            Assert.Equal(expectedTag, user.Tag);
+            Assert.Equal(DefaultDisplayName, user.DisplayName);
             Assert.Equal(DefaultEmailAddress, user.EmailAddress);
             Assert.Equal(DefaultMobile, user.Mobile);
         }
@@ -92,32 +101,39 @@ public static class UserTests
         [Fact]
         public void IncreasesRating_WhenChangeIsPositive()
         {
+            const int change = 50;
+            const int expectedRating = DefaultRating + change;
             var user = CreateUser();
 
-            user.ApplyRatingChange(50);
+            user.ApplyRatingChange(change);
 
-            Assert.Equal(1050, user.Rating);
+            Assert.Equal(expectedRating, user.Rating);
         }
 
         [Fact]
         public void DecreasesRating_WhenChangeIsNegative()
         {
+            const int change = -50;
+            const int expectedRating = DefaultRating + change;
             var user = CreateUser();
 
-            user.ApplyRatingChange(-50);
+            user.ApplyRatingChange(change);
 
-            Assert.Equal(950, user.Rating);
+            Assert.Equal(expectedRating, user.Rating);
         }
 
         [Fact]
         public void AccumulatesRating_AcrossMultipleCalls()
         {
+            const int firstChange = 50;
+            const int secondChange = -20;
+            const int expectedRating = DefaultRating + firstChange + secondChange;
             var user = CreateUser();
 
-            user.ApplyRatingChange(50);
-            user.ApplyRatingChange(-20);
+            user.ApplyRatingChange(firstChange);
+            user.ApplyRatingChange(secondChange);
 
-            Assert.Equal(1030, user.Rating);
+            Assert.Equal(expectedRating, user.Rating);
         }
 
         [Fact]
@@ -127,7 +143,7 @@ public static class UserTests
 
             user.ApplyRatingChange(0);
 
-            Assert.Equal(1000, user.Rating);
+            Assert.Equal(DefaultRating, user.Rating);
             Assert.False(user.IsDirty);
         }
     }

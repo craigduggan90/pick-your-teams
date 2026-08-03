@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using Teams.Data.Context;
 using Teams.Data.Repositories.Games;
 using Teams.Data.Repositories.Players;
+using Teams.Data.Repositories.Users;
 using Teams.Data.Services;
 
 namespace Teams.Data;
@@ -39,6 +40,7 @@ public static class Startup
         // We register the read only repositories to allow people to access them directly
         builder.Services.AddScoped<IReadOnlyPlayersRepository, ReadOnlyPlayersRepository>();
         builder.Services.AddScoped<IReadOnlyGamesRepository, ReadOnlyGamesRepository>();
+        builder.Services.AddScoped<IReadOnlyUsersRepository, ReadOnlyUsersRepository>();
 
         return builder;
     }

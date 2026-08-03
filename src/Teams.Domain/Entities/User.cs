@@ -38,12 +38,14 @@ public class User : EntityBase
     public ICollection<Player> Participation { get; private set; } = new List<Player>();
 
     /// <summary>Update the properties of this player.</summary>
-    /// <param name="tag">The users tag, or display name.</param>
+    /// <param name="tag">The users tag, or handle.</param>
+    /// <param name="displayName">The users display name.</param>
     /// <param name="emailAddress">The players email address.</param>
     /// <param name="mobile">The players mobile phone number.</param>
-    public void Update(string? tag, string? emailAddress, string? mobile)
+    public void Update(string? tag, string? displayName, string? emailAddress, string? mobile)
     {
         UpdateProperty(nameof(Tag), tag);
+        UpdateProperty(nameof(DisplayName), displayName);
         UpdateProperty(nameof(EmailAddress), emailAddress);
         UpdateProperty(nameof(Mobile), mobile);
     }

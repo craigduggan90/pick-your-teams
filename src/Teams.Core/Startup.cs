@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using Teams.Core.CQRS;
-using Teams.Core.Services.IdentityProvider;
 
 namespace Teams.Core;
 
@@ -16,8 +15,6 @@ public static class Startup
         builder.Services.AddValidatorsFromAssemblyContaining<IMediator>(
             includeInternalTypes: false,
             lifetime: ServiceLifetime.Singleton);
-
-        builder.AddIdentityProviderServices();
 
         return builder;
     }
