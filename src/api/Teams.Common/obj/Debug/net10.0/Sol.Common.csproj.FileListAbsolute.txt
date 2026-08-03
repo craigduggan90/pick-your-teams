@@ -1,0 +1,12 @@
+/Users/craigduggan/src/api/src/Sol.Common/bin/Debug/net10.0/Sol.Common.deps.json
+/Users/craigduggan/src/api/src/Sol.Common/bin/Debug/net10.0/Sol.Common.dll
+/Users/craigduggan/src/api/src/Sol.Common/bin/Debug/net10.0/Sol.Common.pdb
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.GeneratedMSBuildEditorConfig.editorconfig
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.AssemblyInfoInputs.cache
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.AssemblyInfo.cs
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.csproj.CoreCompileInputs.cache
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.sourcelink.json
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.dll
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/refint/Sol.Common.dll
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/Sol.Common.pdb
+/Users/craigduggan/src/api/src/Sol.Common/obj/Debug/net10.0/ref/Sol.Common.dll

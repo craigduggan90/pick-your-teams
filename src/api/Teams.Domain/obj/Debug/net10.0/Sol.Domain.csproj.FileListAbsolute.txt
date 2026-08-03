@@ -1,0 +1,16 @@
+/Users/craigduggan/src/api/src/Sol.Domain/bin/Debug/net10.0/Sol.Domain.deps.json
+/Users/craigduggan/src/api/src/Sol.Domain/bin/Debug/net10.0/Sol.Domain.dll
+/Users/craigduggan/src/api/src/Sol.Domain/bin/Debug/net10.0/Sol.Domain.pdb
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.AssemblyInfoInputs.cache
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.AssemblyInfo.cs
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.csproj.CoreCompileInputs.cache
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.sourcelink.json
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.dll
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/refint/Sol.Domain.dll
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.pdb
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/ref/Sol.Domain.dll
+/Users/craigduggan/src/api/src/Sol.Domain/bin/Debug/net10.0/Sol.Common.dll
+/Users/craigduggan/src/api/src/Sol.Domain/bin/Debug/net10.0/Sol.Common.pdb
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.csproj.AssemblyReference.cache
+/Users/craigduggan/src/api/src/Sol.Domain/obj/Debug/net10.0/Sol.Domain.csproj.Up2Date

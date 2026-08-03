@@ -1,0 +1,7 @@
+{
+  "Teams.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/craigduggan\/src\/teams\/src\/Teams.Api",
+  "Teams.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/craigduggan\/src\/teams\/src\/Teams.Common",
+  "Teams.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/craigduggan\/src\/teams\/src\/Teams.Core",
+  "Teams.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/craigduggan\/src\/teams\/src\/Teams.Data",
+  "Teams.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/craigduggan\/src\/teams\/src\/Teams.Domain"
+}

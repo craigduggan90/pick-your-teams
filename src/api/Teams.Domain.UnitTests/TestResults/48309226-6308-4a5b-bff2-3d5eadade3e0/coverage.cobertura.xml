@@ -1,0 +1,1344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.7918000000000001" branch-rate="0.7173" version="1.9" timestamp="1785781578" lines-covered="194" lines-valid="245" branches-covered="66" branches-valid="92">
+  <sources>
+    <source>/Users/craigduggan/src/teams/src/</source>
+  </sources>
+  <packages>
+    <package name="Teams.Common" line-rate="0.2608" branch-rate="0.30760000000000004" complexity="45">
+      <classes>
+        <class name="Teams.Common.Services.EnvironmentVariableAccessor" filename="Teams.Common/Services/EnvironmentVariableAccessor.cs" line-rate="0" branch-rate="1" complexity="2">
+          <methods>
+            <method name="Get" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="Set" signature="(System.String,System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="0" branch="False" />
+            <line number="12" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Providers.Temporal.DateTimeOffsetProvider" filename="Teams.Common/Providers/Temporal/DateTimeOffsetProvider.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="get_Now" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="8" hits="194" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="194" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+          </lines>
+        </class>
+        <class name="Teams.Common.Providers.Identifiers.GuidProvider" filename="Teams.Common/Providers/Identifiers/GuidProvider.cs" line-rate="1" branch-rate="0.5" complexity="2">
+          <methods>
+            <method name="get_New" signature="()" line-rate="1" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="8" hits="112" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="112" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+          </lines>
+        </class>
+        <class name="Teams.Common.Providers.Identifiers.IdentifierProvider" filename="Teams.Common/Providers/Identifiers/IdentifierProvider.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="get_Generate" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="8" hits="114" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="100%" />
+                    <condition number="18" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="114" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="6" type="jump" coverage="100%" />
+                <condition number="18" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+          </lines>
+        </class>
+        <class name="Teams.Common.Pagination.CursorConverter" filename="Teams.Common/Pagination/CursorConverter.cs" line-rate="0.2777" branch-rate="0.1666" complexity="6">
+          <methods>
+            <method name="TryDecodeCursor" signature="(System.String,System.Nullable`1&lt;System.Int64&gt;&amp;)" line-rate="0" branch-rate="0" complexity="4">
+              <lines>
+                <line number="14" hits="0" branch="False" />
+                <line number="15" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="16" hits="0" branch="False" />
+                <line number="20" hits="0" branch="False" />
+                <line number="21" hits="0" branch="False" />
+                <line number="23" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="46" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="24" hits="0" branch="False" />
+                <line number="25" hits="0" branch="False" />
+                <line number="27" hits="0" branch="False" />
+                <line number="29" hits="0" branch="False" />
+                <line number="31" hits="0" branch="False" />
+                <line number="33" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="TryEncodeCursor" signature="(System.Nullable`1&lt;System.Int64&gt;,System.String&amp;)" line-rate="0.8332999999999999" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="41" hits="10" branch="False" />
+                <line number="42" hits="10" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="10" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="43" hits="0" branch="False" />
+                <line number="45" hits="10" branch="False" />
+                <line number="46" hits="10" branch="False" />
+                <line number="47" hits="10" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="0" branch="False" />
+            <line number="15" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="8" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="16" hits="0" branch="False" />
+            <line number="20" hits="0" branch="False" />
+            <line number="21" hits="0" branch="False" />
+            <line number="23" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="46" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="24" hits="0" branch="False" />
+            <line number="25" hits="0" branch="False" />
+            <line number="27" hits="0" branch="False" />
+            <line number="29" hits="0" branch="False" />
+            <line number="31" hits="0" branch="False" />
+            <line number="33" hits="0" branch="False" />
+            <line number="41" hits="10" branch="False" />
+            <line number="42" hits="10" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="10" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="43" hits="0" branch="False" />
+            <line number="45" hits="10" branch="False" />
+            <line number="46" hits="10" branch="False" />
+            <line number="47" hits="10" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Pagination.PagedList`1" filename="Teams.Common/Pagination/PagedList.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_Data" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="3" hits="20" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="3" hits="20" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Formatters.StringFormatters" filename="Teams.Common/Formatters/StringFormatters.cs" line-rate="0" branch-rate="1" complexity="1">
+          <methods>
+            <method name="CamelCaseFormatter" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="22" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="22" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.CryptographyExtensions" filename="Teams.Common/Extensions/CryptographyExtensions.cs" line-rate="0" branch-rate="0" complexity="8">
+          <methods>
+            <method name="GetShaDigest" signature="(System.Object)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="GetShaDigestAsync" signature="(System.Object,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="GetMd5Digest" signature="(System.Object)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="42" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="GetMd5DigestAsync" signature="(System.Object,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="54" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="ToByteArray" signature="(System.Object)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="61" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="12" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="GetChecksum" signature="(System.Byte[],System.Func`1&lt;System.Security.Cryptography.HashAlgorithm&gt;)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="65" hits="0" branch="False" />
+                <line number="66" hits="0" branch="False" />
+                <line number="68" hits="0" branch="False" />
+                <line number="69" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="67" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="70" hits="0" branch="False" />
+                <line number="72" hits="0" branch="False" />
+                <line number="73" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="19" hits="0" branch="False" />
+            <line number="31" hits="0" branch="False" />
+            <line number="42" hits="0" branch="False" />
+            <line number="54" hits="0" branch="False" />
+            <line number="61" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="12" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="65" hits="0" branch="False" />
+            <line number="66" hits="0" branch="False" />
+            <line number="68" hits="0" branch="False" />
+            <line number="69" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="67" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="70" hits="0" branch="False" />
+            <line number="72" hits="0" branch="False" />
+            <line number="73" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.CryptographyExtensions/&lt;GetChecksumAsync&gt;d__6" filename="Teams.Common/Extensions/CryptographyExtensions.cs" line-rate="0" branch-rate="0" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="80" hits="0" branch="False" />
+                <line number="81" hits="0" branch="False" />
+                <line number="82" hits="0" branch="False" />
+                <line number="84" hits="0" branch="False" />
+                <line number="85" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="231" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="86" hits="0" branch="False" />
+                <line number="88" hits="0" branch="False" />
+                <line number="89" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="80" hits="0" branch="False" />
+            <line number="81" hits="0" branch="False" />
+            <line number="82" hits="0" branch="False" />
+            <line number="84" hits="0" branch="False" />
+            <line number="85" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="231" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="86" hits="0" branch="False" />
+            <line number="88" hits="0" branch="False" />
+            <line number="89" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.EnumExtensions" filename="Teams.Common/Extensions/EnumExtensions.cs" line-rate="0" branch-rate="1" complexity="1">
+          <methods>
+            <method name="GetName" signature="(TEnum)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="12" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.IntExtensions" filename="Teams.Common/Extensions/IntExtensions.cs" line-rate="0" branch-rate="0" complexity="4">
+          <methods>
+            <method name="ToEnum" signature="(System.Int32)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="15" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="21" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="16" hits="0" branch="False" />
+                <line number="17" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="ToEnum" signature="(System.Nullable`1&lt;System.Int32&gt;)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="25" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="21" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="16" hits="0" branch="False" />
+            <line number="17" hits="0" branch="False" />
+            <line number="25" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.JsonSerializationExtensions" filename="Teams.Common/Extensions/JsonSerializationExtensions.cs" line-rate="0.8181" branch-rate="0" complexity="6">
+          <methods>
+            <method name="Deserialize" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="27" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="Deserialize" signature="(System.String,System.Text.Json.JsonSerializerOptions)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="38" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="2" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="Serialize" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="45" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="Serialize" signature="(T,System.Text.Json.JsonSerializerOptions)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="53" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="1" branch="False" />
+                <line number="12" hits="1" branch="False" />
+                <line number="13" hits="1" branch="False" />
+                <line number="14" hits="1" branch="False" />
+                <line number="15" hits="1" branch="False" />
+                <line number="16" hits="1" branch="False" />
+                <line number="17" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="27" hits="0" branch="False" />
+            <line number="38" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="2" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="45" hits="2" branch="False" />
+            <line number="53" hits="2" branch="False" />
+            <line number="11" hits="1" branch="False" />
+            <line number="12" hits="1" branch="False" />
+            <line number="13" hits="1" branch="False" />
+            <line number="14" hits="1" branch="False" />
+            <line number="15" hits="1" branch="False" />
+            <line number="16" hits="1" branch="False" />
+            <line number="17" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.PagedListExtensions" filename="Teams.Common/Extensions/PagedListExtensions.cs" line-rate="0" branch-rate="1" complexity="1">
+          <methods>
+            <method name="Map" signature="(Teams.Common.Pagination.PagedList`1&lt;TSource&gt;,System.Func`2&lt;TSource,TTarget&gt;)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Extensions.StringExtensions" filename="Teams.Common/Extensions/StringExtensions.cs" line-rate="0" branch-rate="1" complexity="2">
+          <methods>
+            <method name="ToCamelCase" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="ToKebabCaseLower" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="12" hits="0" branch="False" />
+            <line number="20" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Common.Exceptions.EnumConversionException" filename="Teams.Common/Exceptions/EnumConversionException.cs" line-rate="0" branch-rate="1" complexity="3">
+          <methods>
+            <method name="ForUndefinedValue" signature="(System.Type,TValue)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="29" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="0" branch="False" />
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="0" branch="False" />
+                <line number="21" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="29" hits="0" branch="False" />
+            <line number="10" hits="0" branch="False" />
+            <line number="12" hits="0" branch="False" />
+            <line number="19" hits="0" branch="False" />
+            <line number="21" hits="0" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="Teams.Domain" line-rate="1" branch-rate="0.8787" complexity="130">
+      <classes>
+        <class name="Teams.Domain.Extensions.EntityPagedListExtensions" filename="Teams.Domain/Extensions/EntityPagedListExtensions.cs" line-rate="1" branch-rate="0.7" complexity="12">
+          <methods>
+            <method name="ToPagedList" signature="(System.Collections.Generic.IReadOnlyCollection`1&lt;TEntity&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="ToPagedList" signature="(System.Collections.Generic.IReadOnlyCollection`1&lt;TEntity&gt;,System.Func`2&lt;TEntity,TModel&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="8" branch="False" />
+                <line number="20" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="GetCursor" signature="(System.Collections.Generic.IReadOnlyCollection`1&lt;T&gt;)" line-rate="1" branch-rate="0.7" complexity="10">
+              <lines>
+                <line number="26" hits="9" branch="True" condition-coverage="75% (3/4)">
+                  <conditions>
+                    <condition number="1" type="jump" coverage="50%" />
+                    <condition number="10" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="27" hits="3" branch="False" />
+                <line number="29" hits="23" branch="True" condition-coverage="66.66% (4/6)">
+                  <conditions>
+                    <condition number="21" type="jump" coverage="100%" />
+                    <condition number="65" type="jump" coverage="50%" />
+                    <condition number="102" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="30" hits="6" branch="False" />
+                <line number="31" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="11" hits="1" branch="False" />
+            <line number="19" hits="8" branch="False" />
+            <line number="20" hits="8" branch="False" />
+            <line number="26" hits="9" branch="True" condition-coverage="75% (3/4)">
+              <conditions>
+                <condition number="1" type="jump" coverage="50%" />
+                <condition number="10" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="27" hits="3" branch="False" />
+            <line number="29" hits="23" branch="True" condition-coverage="66.66% (4/6)">
+              <conditions>
+                <condition number="21" type="jump" coverage="100%" />
+                <condition number="65" type="jump" coverage="50%" />
+                <condition number="102" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="30" hits="6" branch="False" />
+            <line number="31" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Exceptions.EntityUpdateException" filename="Teams.Domain/Exceptions/EntityUpdateException.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="ForMissingProperty" signature="(System.Type,System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="33" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="ForIncorrectType" signature="(System.Type,System.String,System.Type,System.Type)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="41" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="1" branch="False" />
+                <line number="9" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="5" branch="False" />
+                <line number="17" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.Exception)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="1" branch="False" />
+                <line number="27" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="33" hits="2" branch="False" />
+            <line number="41" hits="2" branch="False" />
+            <line number="7" hits="1" branch="False" />
+            <line number="9" hits="1" branch="False" />
+            <line number="15" hits="5" branch="False" />
+            <line number="17" hits="5" branch="False" />
+            <line number="25" hits="1" branch="False" />
+            <line number="27" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Exceptions.UninitializedPropertyException" filename="Teams.Domain/Exceptions/UninitializedPropertyException.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="For" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="32" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="1" branch="False" />
+                <line number="9" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="4" branch="False" />
+                <line number="17" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.Exception)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="1" branch="False" />
+                <line number="27" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="32" hits="3" branch="False" />
+            <line number="7" hits="1" branch="False" />
+            <line number="9" hits="1" branch="False" />
+            <line number="15" hits="4" branch="False" />
+            <line number="17" hits="4" branch="False" />
+            <line number="25" hits="1" branch="False" />
+            <line number="27" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Entities.Game" filename="Teams.Domain/Entities/Game.cs" line-rate="1" branch-rate="0.9166" complexity="53">
+          <methods>
+            <method name="get_Location" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="40" branch="False" />
+              </lines>
+            </method>
+            <method name="get_StartTime" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="17" hits="37" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Duration" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="37" branch="False" />
+              </lines>
+            </method>
+            <method name="get_OrganiserId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="21" hits="32" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Organiser" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="25" hits="2" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="set_Organiser" signature="(Teams.Domain.Entities.User)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="26" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Status" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="29" hits="23" branch="False" />
+              </lines>
+            </method>
+            <method name="get_HomeTeamRating" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="31" branch="False" />
+              </lines>
+            </method>
+            <method name="get_HomeTeamRatingChange" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="33" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="get_HomeTeamPlayerCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="35" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AwayTeamRating" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="37" hits="27" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AwayTeamRatingChange" signature="()" line-rate="1" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="39" hits="4" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="get_AwayTeamPlayerCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="41" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Winner" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="43" hits="28" branch="False" />
+              </lines>
+            </method>
+            <method name="get_TeamSize" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="45" hits="35" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MaxPlayers" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="47" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Players" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="49" hits="99" branch="False" />
+              </lines>
+            </method>
+            <method name="Update" signature="(System.String,System.Nullable`1&lt;System.DateTime&gt;,System.Nullable`1&lt;System.Int32&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="53" hits="3" branch="False" />
+                <line number="54" hits="3" branch="False" />
+                <line number="55" hits="3" branch="False" />
+                <line number="56" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="SetResult" signature="(Teams.Domain.Enums.GameTeamEnum)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="60" hits="11" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="61" hits="1" branch="False" />
+                <line number="63" hits="10" branch="False" />
+                <line number="64" hits="10" branch="False" />
+                <line number="67" hits="61" branch="False" />
+                <line number="68" hits="60" branch="False" />
+                <line number="70" hits="10" branch="False" />
+                <line number="71" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="AsSerializable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="74" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="CalculateHomeTeamRatingChange" signature="()" line-rate="1" branch-rate="0.9166" complexity="12">
+              <lines>
+                <line number="78" hits="5" branch="True" condition-coverage="83.33% (5/6)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                    <condition number="30" type="jump" coverage="50%" />
+                    <condition number="46" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="79" hits="1" branch="False" />
+                <line number="81" hits="4" branch="True" condition-coverage="100% (6/6)">
+                  <conditions>
+                    <condition number="72" type="jump" coverage="100%" />
+                    <condition number="86" type="jump" coverage="100%" />
+                    <condition number="91" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="82" hits="4" branch="False" />
+                <line number="83" hits="2" branch="False" />
+                <line number="84" hits="1" branch="False" />
+                <line number="85" hits="1" branch="False" />
+                <line number="86" hits="4" branch="False" />
+                <line number="88" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="CalculateAwayTeamRatingChange" signature="()" line-rate="1" branch-rate="0.9166" complexity="12">
+              <lines>
+                <line number="93" hits="4" branch="True" condition-coverage="83.33% (5/6)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                    <condition number="30" type="jump" coverage="50%" />
+                    <condition number="46" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="94" hits="1" branch="False" />
+                <line number="96" hits="3" branch="True" condition-coverage="100% (6/6)">
+                  <conditions>
+                    <condition number="72" type="jump" coverage="100%" />
+                    <condition number="86" type="jump" coverage="100%" />
+                    <condition number="91" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="97" hits="3" branch="False" />
+                <line number="98" hits="1" branch="False" />
+                <line number="99" hits="1" branch="False" />
+                <line number="100" hits="1" branch="False" />
+                <line number="101" hits="3" branch="False" />
+                <line number="103" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="GetTeamRatingChange" signature="(System.Int32,System.Int32,Teams.Domain.Enums.GameResultEnum)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="110" hits="7" branch="False" />
+                <line number="113" hits="7" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="50" type="jump" coverage="100%" />
+                    <condition number="54" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="114" hits="7" branch="False" />
+                <line number="115" hits="3" branch="False" />
+                <line number="116" hits="2" branch="False" />
+                <line number="117" hits="2" branch="False" />
+                <line number="118" hits="7" branch="False" />
+                <line number="122" hits="7" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.String,System.DateTime,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="31" branch="False" />
+                <line number="8" hits="31" branch="False" />
+                <line number="9" hits="31" branch="False" />
+                <line number="10" hits="31" branch="False" />
+                <line number="11" hits="31" branch="False" />
+                <line number="12" hits="31" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="40" branch="False" />
+            <line number="17" hits="37" branch="False" />
+            <line number="19" hits="37" branch="False" />
+            <line number="21" hits="32" branch="False" />
+            <line number="25" hits="2" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="26" hits="1" branch="False" />
+            <line number="29" hits="23" branch="False" />
+            <line number="31" hits="31" branch="False" />
+            <line number="33" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="35" hits="6" branch="False" />
+            <line number="37" hits="27" branch="False" />
+            <line number="39" hits="4" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="14" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="41" hits="6" branch="False" />
+            <line number="43" hits="28" branch="False" />
+            <line number="45" hits="35" branch="False" />
+            <line number="47" hits="3" branch="False" />
+            <line number="49" hits="99" branch="False" />
+            <line number="53" hits="3" branch="False" />
+            <line number="54" hits="3" branch="False" />
+            <line number="55" hits="3" branch="False" />
+            <line number="56" hits="3" branch="False" />
+            <line number="60" hits="11" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="61" hits="1" branch="False" />
+            <line number="63" hits="10" branch="False" />
+            <line number="64" hits="10" branch="False" />
+            <line number="67" hits="61" branch="False" />
+            <line number="68" hits="60" branch="False" />
+            <line number="70" hits="10" branch="False" />
+            <line number="71" hits="10" branch="False" />
+            <line number="74" hits="2" branch="False" />
+            <line number="78" hits="5" branch="True" condition-coverage="83.33% (5/6)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+                <condition number="30" type="jump" coverage="50%" />
+                <condition number="46" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="79" hits="1" branch="False" />
+            <line number="81" hits="4" branch="True" condition-coverage="100% (6/6)">
+              <conditions>
+                <condition number="72" type="jump" coverage="100%" />
+                <condition number="86" type="jump" coverage="100%" />
+                <condition number="91" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="82" hits="4" branch="False" />
+            <line number="83" hits="2" branch="False" />
+            <line number="84" hits="1" branch="False" />
+            <line number="85" hits="1" branch="False" />
+            <line number="86" hits="4" branch="False" />
+            <line number="88" hits="4" branch="False" />
+            <line number="93" hits="4" branch="True" condition-coverage="83.33% (5/6)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+                <condition number="30" type="jump" coverage="50%" />
+                <condition number="46" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="94" hits="1" branch="False" />
+            <line number="96" hits="3" branch="True" condition-coverage="100% (6/6)">
+              <conditions>
+                <condition number="72" type="jump" coverage="100%" />
+                <condition number="86" type="jump" coverage="100%" />
+                <condition number="91" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="97" hits="3" branch="False" />
+            <line number="98" hits="1" branch="False" />
+            <line number="99" hits="1" branch="False" />
+            <line number="100" hits="1" branch="False" />
+            <line number="101" hits="3" branch="False" />
+            <line number="103" hits="3" branch="False" />
+            <line number="110" hits="7" branch="False" />
+            <line number="113" hits="7" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="50" type="jump" coverage="100%" />
+                <condition number="54" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="114" hits="7" branch="False" />
+            <line number="115" hits="3" branch="False" />
+            <line number="116" hits="2" branch="False" />
+            <line number="117" hits="2" branch="False" />
+            <line number="118" hits="7" branch="False" />
+            <line number="122" hits="7" branch="False" />
+            <line number="7" hits="31" branch="False" />
+            <line number="8" hits="31" branch="False" />
+            <line number="9" hits="31" branch="False" />
+            <line number="10" hits="31" branch="False" />
+            <line number="11" hits="31" branch="False" />
+            <line number="12" hits="31" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Entities.Player" filename="Teams.Domain/Entities/Player.cs" line-rate="1" branch-rate="1" complexity="18">
+          <methods>
+            <method name="get_GameId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="43" hits="66" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DisplayName" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="48" hits="63" branch="False" />
+              </lines>
+            </method>
+            <method name="get_UserId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="53" hits="66" branch="False" />
+              </lines>
+            </method>
+            <method name="get_User" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="58" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Rating" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="109" branch="False" />
+              </lines>
+            </method>
+            <method name="get_RatingChange" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="64" hits="16" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Type" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="66" hits="63" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Team" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="71" hits="231" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Game" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="77" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="set_Game" signature="(Teams.Domain.Entities.Game)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="78" hits="46" branch="False" />
+              </lines>
+            </method>
+            <method name="AssignTeam" signature="(Teams.Domain.Enums.GameTeamEnum,System.Nullable`1&lt;System.Int32&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="86" hits="45" branch="False" />
+                <line number="87" hits="45" branch="False" />
+                <line number="88" hits="45" branch="False" />
+              </lines>
+            </method>
+            <method name="SetRatingChange" signature="(System.Int32,System.Double,System.Int32)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="102" hits="8" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="10" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="103" hits="8" branch="False" />
+                <line number="104" hits="8" branch="False" />
+                <line number="105" hits="8" branch="False" />
+                <line number="106" hits="8" branch="False" />
+                <line number="107" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="AsSerializable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="111" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.String,System.String,System.Int32,Teams.Domain.Enums.PlayerTypeEnum,Teams.Domain.Enums.GameTeamEnum)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="60" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Teams.Domain.Entities.Game,System.String,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="23" hits="44" branch="False" />
+                <line number="25" hits="44" branch="False" />
+                <line number="26" hits="44" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Teams.Domain.Entities.Game,Teams.Domain.Entities.User)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="34" hits="1" branch="False" />
+                <line number="36" hits="1" branch="False" />
+                <line number="37" hits="1" branch="False" />
+                <line number="38" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="43" hits="66" branch="False" />
+            <line number="48" hits="63" branch="False" />
+            <line number="53" hits="66" branch="False" />
+            <line number="58" hits="4" branch="False" />
+            <line number="61" hits="109" branch="False" />
+            <line number="64" hits="16" branch="False" />
+            <line number="66" hits="63" branch="False" />
+            <line number="71" hits="231" branch="False" />
+            <line number="77" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="78" hits="46" branch="False" />
+            <line number="86" hits="45" branch="False" />
+            <line number="87" hits="45" branch="False" />
+            <line number="88" hits="45" branch="False" />
+            <line number="102" hits="8" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="10" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="103" hits="8" branch="False" />
+            <line number="104" hits="8" branch="False" />
+            <line number="105" hits="8" branch="False" />
+            <line number="106" hits="8" branch="False" />
+            <line number="107" hits="8" branch="False" />
+            <line number="111" hits="2" branch="False" />
+            <line number="13" hits="60" branch="False" />
+            <line number="23" hits="44" branch="False" />
+            <line number="25" hits="44" branch="False" />
+            <line number="26" hits="44" branch="False" />
+            <line number="34" hits="1" branch="False" />
+            <line number="36" hits="1" branch="False" />
+            <line number="37" hits="1" branch="False" />
+            <line number="38" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Entities.User" filename="Teams.Domain/Entities/User.cs" line-rate="1" branch-rate="1" complexity="11">
+          <methods>
+            <method name="get_ExternalId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EmailAddress" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="22" hits="19" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Mobile" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Tag" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="28" hits="23" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DisplayName" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="19" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Rating" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="35" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Participation" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="38" hits="14" branch="False" />
+              </lines>
+            </method>
+            <method name="Update" signature="(System.String,System.String,System.String,System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="47" hits="3" branch="False" />
+                <line number="48" hits="3" branch="False" />
+                <line number="49" hits="3" branch="False" />
+                <line number="50" hits="3" branch="False" />
+                <line number="51" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="ApplyRatingChange" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="55" hits="5" branch="False" />
+                <line number="56" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="AsSerializable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="60" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.String,System.String,System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="13" branch="False" />
+                <line number="11" hits="13" branch="False" />
+                <line number="12" hits="13" branch="False" />
+                <line number="13" hits="13" branch="False" />
+                <line number="14" hits="13" branch="False" />
+                <line number="15" hits="13" branch="False" />
+                <line number="16" hits="13" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="19" hits="1" branch="False" />
+            <line number="22" hits="19" branch="False" />
+            <line number="25" hits="20" branch="False" />
+            <line number="28" hits="23" branch="False" />
+            <line number="31" hits="19" branch="False" />
+            <line number="35" hits="34" branch="False" />
+            <line number="38" hits="14" branch="False" />
+            <line number="47" hits="3" branch="False" />
+            <line number="48" hits="3" branch="False" />
+            <line number="49" hits="3" branch="False" />
+            <line number="50" hits="3" branch="False" />
+            <line number="51" hits="3" branch="False" />
+            <line number="55" hits="5" branch="False" />
+            <line number="56" hits="5" branch="False" />
+            <line number="60" hits="2" branch="False" />
+            <line number="9" hits="13" branch="False" />
+            <line number="11" hits="13" branch="False" />
+            <line number="12" hits="13" branch="False" />
+            <line number="13" hits="13" branch="False" />
+            <line number="14" hits="13" branch="False" />
+            <line number="15" hits="13" branch="False" />
+            <line number="16" hits="13" branch="False" />
+          </lines>
+        </class>
+        <class name="Teams.Domain.Entities.Abstract.EntityBase" filename="Teams.Domain/Entities/Abstract/EntityBase.cs" line-rate="1" branch-rate="0.875" complexity="27">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="24" hits="73" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Cursor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="27" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DateCreated" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="30" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DateModified" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="33" hits="204" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DateDeleted" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="36" hits="7" branch="False" />
+              </lines>
+            </method>
+            <method name="get_IsDirty" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="39" hits="86" branch="False" />
+              </lines>
+            </method>
+            <method name="UpdateProperty" signature="(System.String,System.Object)" line-rate="1" branch-rate="1" complexity="6">
+              <lines>
+                <line number="51" hits="121" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="1" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="52" hits="57" branch="False" />
+                <line number="55" hits="64" branch="False" />
+                <line number="56" hits="63" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="30" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="57" hits="1" branch="False" />
+                <line number="60" hits="62" branch="False" />
+                <line number="61" hits="62" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="72" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="62" hits="5" branch="False" />
+                <line number="65" hits="57" branch="False" />
+                <line number="66" hits="57" branch="False" />
+              </lines>
+            </method>
+            <method name="SetDateModified" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="72" hits="78" branch="False" />
+                <line number="73" hits="78" branch="False" />
+                <line number="74" hits="78" branch="False" />
+              </lines>
+            </method>
+            <method name="Delete" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="76" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="SoftDelete" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="81" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="82" hits="1" branch="False" />
+                <line number="84" hits="2" branch="False" />
+                <line number="85" hits="2" branch="False" />
+                <line number="86" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="ToString" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="92" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="GetProperty" signature="(System.String)" line-rate="1" branch-rate="0.75" complexity="8">
+              <lines>
+                <line number="100" hits="64" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="44" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="101" hits="64" branch="False" />
+                <line number="102" hits="430" branch="True" condition-coverage="66.66% (4/6)">
+                  <conditions>
+                    <condition number="18" type="jump" coverage="100%" />
+                    <condition number="21" type="jump" coverage="50%" />
+                    <condition number="29" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="103" hits="430" branch="False" />
+                <line number="104" hits="64" branch="False" />
+              </lines>
+            </method>
+            <method name="SetProperty" signature="(System.Reflection.PropertyInfo,System.Object)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="111" hits="57" branch="False" />
+                <line number="112" hits="57" branch="False" />
+                <line number="113" hits="57" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="114" branch="False" />
+                <line number="16" hits="114" branch="False" />
+                <line number="17" hits="114" branch="False" />
+                <line number="18" hits="114" branch="False" />
+                <line number="19" hits="114" branch="False" />
+                <line number="20" hits="114" branch="False" />
+                <line number="21" hits="114" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="24" hits="73" branch="False" />
+            <line number="27" hits="1" branch="False" />
+            <line number="30" hits="10" branch="False" />
+            <line number="33" hits="204" branch="False" />
+            <line number="36" hits="7" branch="False" />
+            <line number="39" hits="86" branch="False" />
+            <line number="51" hits="121" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="1" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="52" hits="57" branch="False" />
+            <line number="55" hits="64" branch="False" />
+            <line number="56" hits="63" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="30" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="57" hits="1" branch="False" />
+            <line number="60" hits="62" branch="False" />
+            <line number="61" hits="62" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="72" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="62" hits="5" branch="False" />
+            <line number="65" hits="57" branch="False" />
+            <line number="66" hits="57" branch="False" />
+            <line number="72" hits="78" branch="False" />
+            <line number="73" hits="78" branch="False" />
+            <line number="74" hits="78" branch="False" />
+            <line number="76" hits="3" branch="False" />
+            <line number="81" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="82" hits="1" branch="False" />
+            <line number="84" hits="2" branch="False" />
+            <line number="85" hits="2" branch="False" />
+            <line number="86" hits="2" branch="False" />
+            <line number="92" hits="1" branch="False" />
+            <line number="100" hits="64" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="44" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="101" hits="64" branch="False" />
+            <line number="102" hits="430" branch="True" condition-coverage="66.66% (4/6)">
+              <conditions>
+                <condition number="18" type="jump" coverage="100%" />
+                <condition number="21" type="jump" coverage="50%" />
+                <condition number="29" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="103" hits="430" branch="False" />
+            <line number="104" hits="64" branch="False" />
+            <line number="111" hits="57" branch="False" />
+            <line number="112" hits="57" branch="False" />
+            <line number="113" hits="57" branch="False" />
+            <line number="14" hits="114" branch="False" />
+            <line number="16" hits="114" branch="False" />
+            <line number="17" hits="114" branch="False" />
+            <line number="18" hits="114" branch="False" />
+            <line number="19" hits="114" branch="False" />
+            <line number="20" hits="114" branch="False" />
+            <line number="21" hits="114" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
