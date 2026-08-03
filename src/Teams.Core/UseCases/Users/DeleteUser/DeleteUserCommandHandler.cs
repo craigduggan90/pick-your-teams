@@ -15,8 +15,6 @@ public class DeleteUserCommandHandler(IUnitOfWork uow, ILogger<DeleteUserCommand
                    ?? throw new NotFoundException(typeof(User), request.Id);
 
         user.Delete();
-        if (!user.IsDirty)
-            return user;
 
         await uow.Users.UpdateAsync(user, cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);

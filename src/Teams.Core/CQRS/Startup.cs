@@ -1,9 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Diagnostics.CodeAnalysis;
 using Teams.Core.CQRS.Concrete;
 
 namespace Teams.Core.CQRS;
 
+[ExcludeFromCodeCoverage]
 public static class Startup
 {
     public static IHostApplicationBuilder AddMediatorServices(this IHostApplicationBuilder builder)

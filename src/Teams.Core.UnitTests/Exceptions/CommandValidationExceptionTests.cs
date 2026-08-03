@@ -1,5 +1,6 @@
 using FluentValidation.Results;
 using Teams.Core.Exceptions;
+using Teams.Domain.Entities;
 
 namespace Teams.Core.UnitTests.Exceptions;
 
@@ -66,6 +67,19 @@ public static class CommandValidationExceptionTests
                 () => CommandValidationException.ThrowIfValidationFailed(result));
 
             Assert.Equivalent(failures, exception.Errors);
+        }
+    }
+
+    public class ForTagConflict
+    {
+        [Fact]
+        public void ReturnsCommandValidationException_WithSingleErrorOnTag()
+        {
+            var exception = CommandValidationException.ForTagConflict();
+
+            var error = Assert.Single(exception.Errors);
+            Assert.Equal(nameof(User.Tag), error.PropertyName);
+            Assert.Equal("Tag not available.", error.ErrorMessage);
         }
     }
 }

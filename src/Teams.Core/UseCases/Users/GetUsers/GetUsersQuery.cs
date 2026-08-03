@@ -5,7 +5,6 @@ namespace Teams.Core.UseCases.Users.GetUsers;
 
 public record GetUsersQuery(
     string? EmailAddress = null,
-    string? Mobile = null,
     string? Tag = null,
     string? DisplayName = null,
     int? RatingFrom = null,
