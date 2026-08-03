@@ -17,7 +17,7 @@ public static class GameTests
 
         protected static Game CreateGame(Action<Game>? setup = null)
         {
-            var game = new Game(DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId);
+            var game = new Game(DefaultOrganiserId, DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize);
             setup?.Invoke(game);
             return game;
         }
@@ -55,7 +55,7 @@ public static class GameTests
         [Fact]
         public void AllowsNullLocation()
         {
-            var game = new Game(null, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId);
+            var game = new Game(DefaultOrganiserId, null, DefaultStartTime, DefaultDuration, DefaultTeamSize);
 
             Assert.Null(game.Location);
         }
@@ -69,7 +69,7 @@ public static class GameTests
         [InlineData(11, 22)]
         public void ReturnsDoubleTeamSize(int teamSize, int expected)
         {
-            var game = new Game("location", DateTime.UtcNow, 60, teamSize, "organiser-001");
+            var game = new Game("organiser-001", "location", DateTime.UtcNow, 60, teamSize);
 
             Assert.Equal(expected, game.MaxPlayers);
         }
@@ -128,7 +128,7 @@ public static class GameTests
         public void ReturnsAssignedOrganiser_WhenSetViaObjectInitializer()
         {
             var organiser = CreateUser();
-            var game = new Game(DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize, DefaultOrganiserId)
+            var game = new Game(DefaultOrganiserId, DefaultLocation, DefaultStartTime, DefaultDuration, DefaultTeamSize)
             {
                 Organiser = organiser
             };

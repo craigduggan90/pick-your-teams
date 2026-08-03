@@ -35,7 +35,8 @@ public static class GamesMapper
         Location: model.Location,
         StartTime: model.StartTime,
         Duration: model.Duration,
-        TeamSize: model.TeamSize);
+        TeamSize: model.TeamSize,
+        OrganiserId: model.OrganiserId);
 
     public static UpdateGameCommand ToCommand(this UpdateGameRequestModel model, string id) => new(
         Id: id,

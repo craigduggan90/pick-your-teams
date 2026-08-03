@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
-using Teams.Core.UseCases.Games.DeleteGame;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 
@@ -11,7 +10,7 @@ namespace Teams.Core.UseCases.Games.UpdateGame;
 public class UpdateGameCommandHandler(
     IUnitOfWork uow,
     IValidator<UpdateGameCommand> validator,
-    ILogger<DeleteGameCommandHandler> logger) : IRequestHandler<UpdateGameCommand, Game>
+    ILogger<UpdateGameCommandHandler> logger) : IRequestHandler<UpdateGameCommand, Game>
 {
     public async Task<Game> HandleAsync(UpdateGameCommand request, CancellationToken cancellationToken)
     {
@@ -22,6 +21,8 @@ public class UpdateGameCommandHandler(
                    ?? throw new NotFoundException(typeof(Game), request.Id);
 
         game.Update(request.Location, request.StartTime, request.Duration);
+        if (!game.IsDirty)
+            return game;
 
         await uow.Games.UpdateAsync(game, cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);

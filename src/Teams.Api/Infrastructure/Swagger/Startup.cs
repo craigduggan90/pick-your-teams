@@ -33,7 +33,7 @@ public static class Startup
             {
                 options.SwaggerEndpoint(
                     $"/swagger/{description.GroupName}/swagger.json",
-                    $"Sol API {description.GroupName}");
+                    description.GroupName);
             }
         });
 

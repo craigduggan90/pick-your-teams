@@ -56,7 +56,7 @@ public static class SeedDataFactory
             var startTime = BaseDate.UtcDateTime.AddDays(index);
 
             // Create the base game in a state that we know will be modified
-            var game = new Game(location, startTime, 999, teamSize, organiser.Id)
+            var game = new Game(organiser.Id, location, startTime, 999, teamSize)
             {
                 Organiser = organiser
             };

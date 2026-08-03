@@ -14,7 +14,7 @@ public static class PlayersFilterHelperTests
     private static readonly PlayerTypeEnum[] Types = [PlayerTypeEnum.Dummy, PlayerTypeEnum.User];
     private static readonly GameTeamEnum[] TeamValues = [GameTeamEnum.None, GameTeamEnum.Home, GameTeamEnum.Away];
 
-    private static readonly Game PlaceholderGame = new(null, DateTime.UtcNow, 60, 5, "organiser-id");
+    private static readonly Game PlaceholderGame = new("organiser-id", null, DateTime.UtcNow, 60, 5);
 
     private static IQueryable<Player> GetSeedData(int count) => Enumerable.Range(1, count)
         .Select(i =>

@@ -17,6 +17,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
           
+      - name: ☁️ install tools
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+        
       - name: 🔨 build solution
         working-directory: src
         run: |
@@ -27,4 +30,5 @@ jobs:
       - name: 🧪 run tests
         working-directory: src
         run: |
-          dotnet test --no-build
+          dotnet test ./Teams.sln --configuration Release --collect "XPlat Code Coverage"
+          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:../coverage -reporttypes:MarkdownSummaryGithub -filefilters:"-*/Migrations/*"          

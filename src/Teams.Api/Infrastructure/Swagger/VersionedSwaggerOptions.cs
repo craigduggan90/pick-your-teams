@@ -14,7 +14,7 @@ public class VersionedSwaggerOptions(IApiVersionDescriptionProvider provider)
         {
             options.SwaggerDoc(description.GroupName, new OpenApiInfo
             {
-                Title = "Sol API",
+                Title = "Team Picker API",
                 Version = description.ApiVersion.ToString(),
                 Description = "A facade API for enqueuing and tracking long-running jobs."
                               + (description.IsDeprecated ? " This version is deprecated." : string.Empty)

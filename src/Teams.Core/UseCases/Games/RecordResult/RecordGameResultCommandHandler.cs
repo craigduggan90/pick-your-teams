@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
@@ -7,20 +8,29 @@ using Teams.Domain.Enums;
 
 namespace Teams.Core.UseCases.Games.RecordResult;
 
-public class RecordGameResultCommandHandler(IUnitOfWork uow, ILogger<RecordGameResultCommandHandler> logger)
+public class RecordGameResultCommandHandler(
+    IUnitOfWork uow,
+    IValidator<RecordGameResultCommand> validator,
+    ILogger<RecordGameResultCommandHandler> logger)
     : IRequestHandler<RecordGameResultCommand, Game>
 {
     public async Task<Game> HandleAsync(RecordGameResultCommand request, CancellationToken cancellationToken)
     {
+        CommandValidationException.ThrowIfValidationFailed(await validator.ValidateAsync(request, cancellationToken));
+
         var game = await uow.Games.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.Id);
 
         // Set the result & mark the game as updated
-        game.SetResult(request.Winner);
+        Enum.TryParse<GameTeamEnum>(request.Winner, true, out var winner);
+        game.SetResult(winner);
         await uow.Games.UpdateAsync(game, cancellationToken);
 
         foreach (var player in game.Players)
             await UpdatePlayerAsync(game, player, cancellationToken);
+
+        await uow.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Game result recorded: {game}", game);
 
         return game;
     }
@@ -31,19 +41,12 @@ public class RecordGameResultCommandHandler(IUnitOfWork uow, ILogger<RecordGameR
         if (player.Team == GameTeamEnum.None)
             return;
 
-        var teamRating = player.Team == GameTeamEnum.Home ? game.HomeTeamRating : game.AwayTeamRating;
-        if (teamRating is null)
-            return;
-
-        var teamRatingChange = player.Team == GameTeamEnum.Home ? game.HomeTeamRatingChange : game.AwayTeamRatingChange;
-        if (teamRatingChange is null)
-            return;
-
+        // These values cannot be null, a they are all set by Game.SetResult, which is called before this method 
         var teamSize = player.Team == GameTeamEnum.Home ? game.HomeTeamPlayerCount : game.AwayTeamPlayerCount;
-        if (teamSize <= 0)
-            return;
+        var teamRating = player.Team == GameTeamEnum.Home ? game.HomeTeamRating : game.AwayTeamRating;
+        var teamRatingChange = player.Team == GameTeamEnum.Home ? game.HomeTeamRatingChange : game.AwayTeamRatingChange;
 
-        player.SetRatingChange(teamRating.Value, teamRatingChange.Value, teamSize);
+        player.SetRatingChange(teamRating!.Value, teamRatingChange!.Value, teamSize);
         await uow.Players.UpdateAsync(player, cancellationToken);
 
         if (player is { RatingChange: { } ratingChange, User: not null })

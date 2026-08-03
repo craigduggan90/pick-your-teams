@@ -17,9 +17,15 @@ public class CreateGameCommandHandler(
         var validation = await validator.ValidateAsync(request, cancellationToken);
         CommandValidationException.ThrowIfValidationFailed(validation);
 
-        // TODO: use context user, or should that come from the presentation layer once it's built in (yes)?
-        var game = new Game(request.Location, request.StartTime, request.Duration, request.TeamSize, "");
-        await uow.Games.CreateAsync(game, cancellationToken);
+        var organiser = await uow.Users.GetByIdAsync(request.OrganiserId, cancellationToken)
+            ?? throw new NotFoundException(nameof(CreateGameCommand.OrganiserId), request.OrganiserId);
+
+        var game = await uow.Games.CreateAsync(new Game(
+            organiser.Id,
+            request.Location,
+            request.StartTime,
+            request.Duration,
+            request.TeamSize), cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("Game created: {game}", game);

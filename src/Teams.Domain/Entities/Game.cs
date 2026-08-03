@@ -5,11 +5,11 @@ using Teams.Domain.Exceptions;
 namespace Teams.Domain.Entities;
 
 public class Game(
+    string organiserId,
     string? location,
     DateTime startTime,
     int duration,
-    int teamSize,
-    string organiserId)
+    int teamSize)
     : EntityBase
 {
     public string? Location { get; private set; } = location;
