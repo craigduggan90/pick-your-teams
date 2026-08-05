@@ -5,7 +5,7 @@ using Teams.Domain.UnitTests.TestHelpers;
 
 namespace Teams.Domain.UnitTests.Entities;
 
-public static class GameTests
+public static partial class GameTests
 {
     public abstract class GameTestsBase
     {
