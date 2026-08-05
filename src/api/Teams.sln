@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Husky", "Husky", "{F80D6B44-7CB5-4411-B2BD-43F0942C49AC}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\.husky\commit-msg = ..\.husky\commit-msg
+		..\..\.husky\commit-msg = ..\..\.husky\commit-msg
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Teams.Api", "Teams.Api\Teams.Api.csproj", "{9259308F-D1A4-46A0-9CE7-A7CCAA25D0B9}"
