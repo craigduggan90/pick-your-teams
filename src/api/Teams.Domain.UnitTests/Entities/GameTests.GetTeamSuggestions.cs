@@ -217,7 +217,7 @@ public static partial class GameTests
             Assert.Equal([home1, home2], suggestion.Home);
             Assert.Equal([away1, away2], suggestion.Away);
         }
-        
+
         [Fact]
         public void ShouldExcludeCombinations_ThatExceedTheDifferentialThreshold()
         {

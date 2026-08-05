@@ -111,8 +111,8 @@ public class Game(
         {
             var fullySeededSuggestion = TryBuildFromFullySeededTeams(
                 homeTeam, awayTeam, homeSeedRating, awaySeedRating, differentialThreshold);
-            return fullySeededSuggestion is null 
-                ? [] 
+            return fullySeededSuggestion is null
+                ? []
                 : [fullySeededSuggestion.Value];
         }
 
@@ -167,7 +167,7 @@ public class Game(
 
         return [.. reservoir.Take(reservoirCount)];
     }
-    
+
     private static double GetTeamRatingChange(int teamRatingSum, int opponentRatingSum, GameResultEnum outcome)
     {
         // Probability this team was expected to win, based on the ratings gap between the two teams (standard ELO
@@ -235,7 +235,7 @@ public class Game(
                 homeRating += unassigned[i].Rating;
                 continue;
             }
-            
+
             away.Add(unassigned[i]);
         }
 
