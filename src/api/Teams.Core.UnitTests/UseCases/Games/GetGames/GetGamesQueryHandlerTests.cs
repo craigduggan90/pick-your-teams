@@ -1,6 +1,7 @@
 using Teams.Core.UseCases.Games.GetGames;
 using Teams.Data.Models;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.UnitTests.UseCases.Games.GetGames;
 
@@ -19,6 +20,7 @@ public static class GetGamesQueryHandlerTests
             var createdTo = new DateTime(2026, 4, 1);
             var modifiedFrom = new DateTime(2026, 5, 1);
             var modifiedTo = new DateTime(2026, 6, 1);
+            const GameStatusEnum status = GameStatusEnum.Scheduled;
             var query = new GetGamesQuery(
                 Location: "location",
                 StartTimeFrom: startTimeFrom,
@@ -26,6 +28,7 @@ public static class GetGamesQueryHandlerTests
                 DurationFrom: 30,
                 DurationTo: 90,
                 TeamSize: 5,
+                Status: status,
                 CreatedFrom: createdFrom,
                 CreatedTo: createdTo,
                 ModifiedFrom: modifiedFrom,
@@ -41,7 +44,7 @@ public static class GetGamesQueryHandlerTests
                 startTime: new RangeFilter<DateTime>(startTimeFrom, startTimeTo),
                 duration: new RangeFilter<int>(30, 90),
                 teamSize: 5,
-                status: Arg.Any<Teams.Domain.Enums.GameStatusEnum?>(),
+                status: status,
                 dateFilter: new DateFilter(
                     new RangeFilter<DateTime>(createdFrom, createdTo),
                     new RangeFilter<DateTime>(modifiedFrom, modifiedTo)),
@@ -61,11 +64,24 @@ public static class GetGamesQueryHandlerTests
                 startTime: Arg.Any<RangeFilter<DateTime>?>(),
                 duration: Arg.Any<RangeFilter<int>?>(),
                 teamSize: Arg.Any<int?>(),
-                status: Arg.Any<Teams.Domain.Enums.GameStatusEnum?>(),
+                status: Arg.Any<GameStatusEnum?>(),
                 dateFilter: Arg.Any<DateFilter?>(),
                 pagination: Arg.Any<PaginationFilter?>(),
                 cancellationToken: Arg.Any<CancellationToken>()).Returns(entities);
-            var query = new GetGamesQuery(null, null, null, null, null, null, null, null, null, null, null, null);
+            var query = new GetGamesQuery(
+                Location: null,
+                StartTimeFrom: null,
+                StartTimeTo: null,
+                DurationFrom: null,
+                DurationTo: null,
+                TeamSize: null,
+                Status: null,
+                CreatedFrom: null,
+                CreatedTo: null,
+                ModifiedFrom: null,
+                ModifiedTo: null,
+                PageSize: null,
+                Cursor: null);
             var sut = CreateSut();
 
             var result = await sut.HandleAsync(query, TestContext.Current.CancellationToken);
@@ -81,11 +97,24 @@ public static class GetGamesQueryHandlerTests
                 startTime: Arg.Any<RangeFilter<DateTime>?>(),
                 duration: Arg.Any<RangeFilter<int>?>(),
                 teamSize: Arg.Any<int?>(),
-                status: Arg.Any<Teams.Domain.Enums.GameStatusEnum?>(),
+                status: Arg.Any<GameStatusEnum?>(),
                 dateFilter: Arg.Any<DateFilter?>(),
                 pagination: Arg.Any<PaginationFilter?>(),
                 cancellationToken: Arg.Any<CancellationToken>()).Returns([]);
-            var query = new GetGamesQuery(null, null, null, null, null, null, null, null, null, null, null, null);
+            var query = new GetGamesQuery(
+                Location: null,
+                StartTimeFrom: null,
+                StartTimeTo: null,
+                DurationFrom: null,
+                DurationTo: null,
+                TeamSize: null,
+                Status: null,
+                CreatedFrom: null,
+                CreatedTo: null,
+                ModifiedFrom: null,
+                ModifiedTo: null,
+                PageSize: null,
+                Cursor: null);
             var sut = CreateSut();
 
             var result = await sut.HandleAsync(query, TestContext.Current.CancellationToken);

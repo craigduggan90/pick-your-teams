@@ -93,6 +93,7 @@ public static class GamesMapper
         model.DurationFrom,
         model.DurationTo,
         model.TeamSize,
+        Enum.TryParse<GameStatusEnum>(model.Status, true, out var s) ? s : null,
         model.CreatedFrom,
         model.CreatedTo,
         model.ModifiedFrom,

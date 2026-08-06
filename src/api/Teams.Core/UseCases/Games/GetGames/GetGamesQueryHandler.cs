@@ -15,6 +15,7 @@ public class GetGamesQueryHandler(IReadOnlyGamesRepository repository)
             startTime: new RangeFilter<DateTime>(request.StartTimeFrom, request.StartTimeTo),
             duration: new RangeFilter<int>(request.DurationFrom, request.DurationTo),
             teamSize: request.TeamSize,
+            status: request.Status,
             dateFilter: new DateFilter(
                 new RangeFilter<DateTime>(request.CreatedFrom, request.CreatedTo),
                 new RangeFilter<DateTime>(request.ModifiedFrom, request.ModifiedTo)),
