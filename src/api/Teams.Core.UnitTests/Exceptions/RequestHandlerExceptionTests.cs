@@ -4,55 +4,55 @@ namespace Teams.Core.UnitTests.Exceptions;
 
 public static class RequestHandlerExceptionTests
 {
-    public class Constructor
+    public class ForCommandRequest
     {
         [Fact]
-        public void ShouldInitialiseObject_WithNoParameters()
+        public void ReturnsRequestHandlerException_WithMessageAndStatusCode422()
         {
-            var actual = new RequestHandlerException();
-            Assert.NotNull(actual);
+            const string message = "Something went wrong.";
+
+            var exception = RequestHandlerException.ForCommandRequest(message);
+
+            Assert.Equal(message, exception.Message);
+            Assert.Equal(422, exception.StatusCode);
+            Assert.Null(exception.InnerException);
         }
 
         [Fact]
-        public void ShouldInitialiseObject_WithMessage()
+        public void ReturnsRequestHandlerException_WithInnerException_WhenProvided()
         {
-            const string message = "expected message";
-            var actual = new RequestHandlerException(message);
-            Assert.Equal(message, actual.Message);
-        }
+            const string message = "Something went wrong.";
+            var inner = new InvalidOperationException("inner failure");
 
-        [Fact]
-        public void ShouldInitialiseObject_WithMessage_AndInnerException()
-        {
-            const string message = "expected message";
-            var innerException = new InvalidOperationException("this is an invalid operation.");
-            var actual = new RequestHandlerException(message, innerException);
-            Assert.Equal(message, actual.Message);
-            Assert.Same(innerException, actual.InnerException);
+            var exception = RequestHandlerException.ForCommandRequest(message, inner);
+
+            Assert.Same(inner, exception.InnerException);
         }
     }
 
-    public class ForRequest
+    public class ForQueryRequest
     {
         [Fact]
-        public void ShouldCreateException_WithExpectedMessage()
+        public void ReturnsRequestHandlerException_WithMessageAndStatusCode400()
         {
-            var type = typeof(string);
-            var expected = $"Unable to resolve handler for '{type.Name}' request.";
-            var actual = RequestHandlerException.ForRequest(type);
-            Assert.Equal(expected, actual.Message);
-        }
-    }
+            const string message = "Something went wrong.";
 
-    public class ForFailedInstantiation
-    {
+            var exception = RequestHandlerException.ForQueryRequest(message);
+
+            Assert.Equal(message, exception.Message);
+            Assert.Equal(400, exception.StatusCode);
+            Assert.Null(exception.InnerException);
+        }
+
         [Fact]
-        public void ShouldCreateException_WithExpectedMessage()
+        public void ReturnsRequestHandlerException_WithInnerException_WhenProvided()
         {
-            var type = typeof(string);
-            var expected = $"Unable to instantiate handler for '{type.Name}' request.";
-            var actual = RequestHandlerException.ForFailedInstantiation(type);
-            Assert.Equal(expected, actual.Message);
+            const string message = "Something went wrong.";
+            var inner = new InvalidOperationException("inner failure");
+
+            var exception = RequestHandlerException.ForQueryRequest(message, inner);
+
+            Assert.Same(inner, exception.InnerException);
         }
     }
 }

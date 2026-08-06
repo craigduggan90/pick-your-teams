@@ -18,7 +18,7 @@ public static class MediatorTests
             var provider = new ServiceCollection().BuildServiceProvider();
             var sut = CreateSut(provider);
 
-            await Assert.ThrowsAsync<RequestHandlerException>(()
+            await Assert.ThrowsAsync<RequestHandlerRegistrationException>(()
                 => sut.SendAsync(new ThrowIfNullRequest("has value"), CancellationToken.None));
         }
 
@@ -43,7 +43,7 @@ public static class MediatorTests
             var provider = new ServiceCollection().BuildServiceProvider();
             var sut = CreateSut(provider);
 
-            await Assert.ThrowsAsync<RequestHandlerException>(()
+            await Assert.ThrowsAsync<RequestHandlerRegistrationException>(()
                 => sut.SendAsync(new ReturnIfNotNullRequest("has value"), CancellationToken.None));
         }
 

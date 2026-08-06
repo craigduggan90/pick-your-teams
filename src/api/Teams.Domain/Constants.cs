@@ -2,6 +2,8 @@ namespace Teams.Domain;
 
 public static class Constants
 {
+    public const int MaximumGeneratedTeamSuggestionCount = 5;
+
     public const int StartingElo = 1000;
 
     /// <summary>

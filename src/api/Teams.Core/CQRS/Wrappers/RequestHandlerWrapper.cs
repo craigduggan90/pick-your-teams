@@ -23,7 +23,7 @@ internal class RequestHandlerWrapper<TRequest> : RequestHandlerWrapperBase
     {
         var handler = provider.GetService(typeof(IRequestHandler<TRequest>))
                           as IRequestHandler<TRequest>
-            ?? throw RequestHandlerException.ForRequest(typeof(TRequest));
+            ?? throw RequestHandlerRegistrationException.ForRequest(typeof(TRequest));
 
         await handler.HandleAsync((TRequest)request, cancellationToken).ConfigureAwait(false);
 
@@ -51,7 +51,7 @@ internal class RequestHandlerWrapper<TRequest, TResponse> : RequestHandlerWrappe
     {
         var handler = provider.GetService(typeof(IRequestHandler<TRequest, TResponse>))
                           as IRequestHandler<TRequest, TResponse>
-                      ?? throw RequestHandlerException.ForRequest(typeof(TRequest));
+                      ?? throw RequestHandlerRegistrationException.ForRequest(typeof(TRequest));
 
         return await handler.HandleAsync((TRequest)request, cancellationToken).ConfigureAwait(false);
     }

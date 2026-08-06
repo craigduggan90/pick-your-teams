@@ -13,6 +13,7 @@ public static class Startup
             .AddExceptionHandler<MissingScopeExceptionHandler>()
             .AddExceptionHandler<NotFoundExceptionHandler>()
             .AddExceptionHandler<ValidationExceptionHandler>()
+            .AddExceptionHandler<RequestHandlerExceptionHandler>()
             .AddExceptionHandler<ConcurrencyTokenMismatchExceptionHandler>()
             .AddExceptionHandler<UnhandledExceptionHandler>()
             .AddProblemDetails();

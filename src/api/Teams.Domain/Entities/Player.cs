@@ -87,6 +87,12 @@ public class Player(string gameId, string? userId, string displayName, int ratin
         UpdateProperty(nameof(Rating), rating);
     }
 
+    /// <summary>Clears the player team assignment.</summary>
+    public void UnassignTeam()
+    {
+        UpdateProperty(nameof(Team), GameTeamEnum.None);
+    }
+
     /// <summary>
     /// Sets the rating change as a result of the game.
     /// </summary>

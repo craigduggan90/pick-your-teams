@@ -31,7 +31,7 @@ public class UnhandledExceptionHandler(ILogger<UnhandledExceptionHandler> logger
         {
             Title = "Unexpected Error",
             Detail = "An unexpected error has occurred.",
-            Type = "https://www.Teams.api/errors/unhandled",
+            Type = $"{Constants.ErrorUrlBase}/unhandled",
             Status = StatusCode
         };
 }

@@ -19,7 +19,7 @@ internal class Mediator(IServiceProvider serviceProvider) : IMediator
         // Since we can't pass wrapperType as a generic type parameter, we have to create an instance of wrapperType
         // but box as its base type, RequestHandlerWrapperBase.
         var handler = Activator.CreateInstance(wrapperType) as RequestHandlerWrapperBase
-                      ?? throw RequestHandlerException.ForFailedInstantiation(requestType);
+                      ?? throw RequestHandlerRegistrationException.ForFailedInstantiation(requestType);
 
         // Then we can call the HandleAsync(IRequest, IServiceProvider, CancellationToken) method that is abstract in
         // the base type, but defined in the derived implementation type.
@@ -32,7 +32,7 @@ internal class Mediator(IServiceProvider serviceProvider) : IMediator
         var requestType = request.GetType();
         var wrapperType = typeof(RequestHandlerWrapper<,>).MakeGenericType(requestType, typeof(TResponse));
         var handler = Activator.CreateInstance(wrapperType) as RequestHandlerWrapperBase<TResponse>
-                      ?? throw RequestHandlerException.ForFailedInstantiation(requestType);
+                      ?? throw RequestHandlerRegistrationException.ForFailedInstantiation(requestType);
         return handler.HandleAsync(request, serviceProvider, cancellationToken);
     }
 }

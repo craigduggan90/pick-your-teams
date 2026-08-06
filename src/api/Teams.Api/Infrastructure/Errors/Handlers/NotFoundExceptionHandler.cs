@@ -7,7 +7,7 @@ namespace Teams.Api.Infrastructure.Errors.Handlers;
 public class NotFoundExceptionHandler : IExceptionHandler
 {
     private const string Title = "Resource Not Found";
-    private const string Type = "https://www.Teams.api/errors/not-found";
+    private const string Type = $"{Constants.ErrorUrlBase}/not-found";
     internal const int StatusCode = 404;
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

@@ -8,7 +8,7 @@ public class ValidationExceptionHandler : IExceptionHandler
 {
     private const string Title = "Validation Error";
     private const string Detail = "One or more validation failures occurred.";
-    private const string Type = "https://www.Teams.api/errors/validation";
+    private const string Type = $"{Constants.ErrorUrlBase}/validation";
     internal const int CommandValidationStatusCode = 422;
     internal const int QueryValidationStatusCode = 400;
 

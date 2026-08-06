@@ -387,4 +387,84 @@ public static partial class GameTests
             Assert.Null(serializable.GetValue(type, "Winner"));
         }
     }
+
+    public class UpdateHomeTeamRating : GameTestsBase
+    {
+        [Fact]
+        public void SetsHomeTeamRating_ToSumOfHomeTeamPlayerRatings()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Home, 1000);
+            AddPlayer(game, GameTeamEnum.Home, 1100);
+            AddPlayer(game, GameTeamEnum.Away, 1000);
+
+            game.UpdateHomeTeamRating();
+
+            Assert.Equal(2100, game.HomeTeamRating);
+        }
+
+        [Fact]
+        public void SetsHomeTeamRatingToZero_WhenNoPlayersOnHomeTeam()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Away, 1000);
+
+            game.UpdateHomeTeamRating();
+
+            Assert.Equal(0, game.HomeTeamRating);
+        }
+
+        [Fact]
+        public void ReflectsCurrentRoster_WhenCalledAgainAfterPlayersChange()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Home, 1000);
+            game.UpdateHomeTeamRating();
+
+            AddPlayer(game, GameTeamEnum.Home, 1100);
+            game.UpdateHomeTeamRating();
+
+            Assert.Equal(2100, game.HomeTeamRating);
+        }
+    }
+
+    public class UpdateAwayTeamRating : GameTestsBase
+    {
+        [Fact]
+        public void SetsAwayTeamRating_ToSumOfAwayTeamPlayerRatings()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Away, 1000);
+            AddPlayer(game, GameTeamEnum.Away, 1100);
+            AddPlayer(game, GameTeamEnum.Home, 1000);
+
+            game.UpdateAwayTeamRating();
+
+            Assert.Equal(2100, game.AwayTeamRating);
+        }
+
+        [Fact]
+        public void SetsAwayTeamRatingToZero_WhenNoPlayersOnAwayTeam()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Home, 1000);
+
+            game.UpdateAwayTeamRating();
+
+            Assert.Equal(0, game.AwayTeamRating);
+        }
+
+        [Fact]
+        public void ReflectsCurrentRoster_WhenCalledAgainAfterPlayersChange()
+        {
+            var game = CreateGame();
+            AddPlayer(game, GameTeamEnum.Away, 1000);
+            game.UpdateAwayTeamRating();
+
+            AddPlayer(game, GameTeamEnum.Away, 1100);
+            game.UpdateAwayTeamRating();
+
+            Assert.Equal(2100, game.AwayTeamRating);
+        }
+    }
 }

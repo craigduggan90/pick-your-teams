@@ -7,7 +7,7 @@ namespace Teams.Api.Infrastructure.Errors.Handlers;
 public class MissingHeaderExceptionHandler : IExceptionHandler
 {
     private const string Title = "Precondition Required";
-    private const string Type = "https://www.Teams.api/errors/missing-header";
+    private const string Type = $"{Constants.ErrorUrlBase}/missing-header";
     internal const int StatusCode = 428;
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

@@ -7,7 +7,7 @@ namespace Teams.Api.Infrastructure.Errors.Handlers;
 public class ConcurrencyTokenMismatchExceptionHandler : IExceptionHandler
 {
     private const string Title = "Precondition Failed";
-    private const string Type = "https://www.Teams.api/errors/concurrency";
+    private const string Type = $"{Constants.ErrorUrlBase}/concurrency";
     internal const int StatusCode = 412;
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

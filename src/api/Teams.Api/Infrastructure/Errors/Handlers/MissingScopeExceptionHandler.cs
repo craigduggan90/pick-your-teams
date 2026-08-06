@@ -7,7 +7,7 @@ namespace Teams.Api.Infrastructure.Errors.Handlers;
 public class MissingScopeExceptionHandler : IExceptionHandler
 {
     private const string Title = "Forbidden";
-    private const string Type = "https://www.Teams.api/errors/missing-scope";
+    private const string Type = $"{Constants.ErrorUrlBase}/missing-scope";
     internal const int StatusCode = 403;
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

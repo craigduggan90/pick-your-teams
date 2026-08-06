@@ -65,19 +65,31 @@ public class Game(
         Winner = winner;
 
         // Sum the ratings since we'll use them a couple of times
-        HomeTeamRating = GetSumOfPlayerRatings(Players.Where(player => player.Team == GameTeamEnum.Home));
-        AwayTeamRating = GetSumOfPlayerRatings(Players.Where(player => player.Team == GameTeamEnum.Away));
+        UpdateHomeTeamRating();
+        UpdateAwayTeamRating();
 
         SetDateModified();
     }
 
+    public void UpdateHomeTeamRating()
+    {
+        var rating = GetSumOfPlayerRatings(Players.Where(player => player.Team == GameTeamEnum.Home));
+        UpdateProperty(nameof(HomeTeamRating), rating);
+    }
+
+    public void UpdateAwayTeamRating()
+    {
+        var rating = GetSumOfPlayerRatings(Players.Where(player => player.Team == GameTeamEnum.Away));
+        UpdateProperty(nameof(AwayTeamRating), rating);
+    }
+
     public IReadOnlyCollection<TeamSuggestion> GetTeamSuggestions(
-        string[] homeTeamSeedIds,
-        string[] awayTeamSeedIds,
+        IReadOnlyCollection<string> homeTeamSeedIds,
+        IReadOnlyCollection<string> awayTeamSeedIds,
         int differentialThreshold,
         int maxSuggestions)
     {
-        if (maxSuggestions is <= 0 or > 5)
+        if (maxSuggestions is <= 0 or > Constants.MaximumGeneratedTeamSuggestionCount)
             throw TeamGenerationException.ForInvalidNumberOfSuggestionsRequested();
 
         if (Players.Count <= 1)

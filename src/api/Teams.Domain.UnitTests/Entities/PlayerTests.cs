@@ -221,4 +221,37 @@ public static class PlayerTests
             Assert.Null(serializable.GetValue(type, "Type"));
         }
     }
+
+    public class UnassignTeam : PlayerTestsBase
+    {
+        [Fact]
+        public void SetsTeamToNone_WhenCalled()
+        {
+            var player = CreatePlayer(p => p.AssignTeam(GameTeamEnum.Home, null));
+
+            player.UnassignTeam();
+
+            Assert.Equal(GameTeamEnum.None, player.Team);
+        }
+
+        [Fact]
+        public void DoesNotAlterRating()
+        {
+            var player = CreatePlayer(p => p.AssignTeam(GameTeamEnum.Home, 1350));
+
+            player.UnassignTeam();
+
+            Assert.Equal(1350, player.Rating);
+        }
+
+        [Fact]
+        public void LeavesTeamAsNone_WhenAlreadyUnassigned()
+        {
+            var player = CreatePlayer(p => p.AssignTeam(GameTeamEnum.None, null));
+
+            player.UnassignTeam();
+
+            Assert.Equal(GameTeamEnum.None, player.Team);
+        }
+    }
 }
