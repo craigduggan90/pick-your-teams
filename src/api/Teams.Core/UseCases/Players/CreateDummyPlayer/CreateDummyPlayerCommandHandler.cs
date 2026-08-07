@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
+using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 
@@ -9,6 +10,7 @@ namespace Teams.Core.UseCases.Players.CreateDummyPlayer;
 
 public class CreateDummyPlayerCommandHandler(
     IUnitOfWork uow,
+    IActorAccessor actor,
     IValidator<CreateDummyPlayerCommand> validator,
     ILogger<CreateDummyPlayerCommandHandler> logger) : IRequestHandler<CreateDummyPlayerCommand, Player>
 {
@@ -20,6 +22,8 @@ public class CreateDummyPlayerCommandHandler(
         // Check that the game exists
         var game = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.GameId);
+
+        actor.Current.ThrowIfNotOrganiser(game.OrganiserId);
 
         // Create the player
         var player = await uow.Players.CreateAsync(

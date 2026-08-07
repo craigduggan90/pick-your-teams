@@ -13,7 +13,9 @@ public class ReadOnlyPlayersRepository(ApiDbContext context)
 {
     /// <inheritdoc />
     public async Task<Player?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
-        await Context.Players.SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+        await Context.Players
+            .Include(p => p.Game)
+            .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
     /// <inheritdoc />
     public async Task<IEnumerable<Player>> GetAsync(

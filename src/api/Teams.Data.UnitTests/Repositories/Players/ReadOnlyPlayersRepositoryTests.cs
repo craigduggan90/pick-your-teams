@@ -77,8 +77,7 @@ public static class ReadOnlyPlayersRepositoryTests
         [Fact]
         public async Task ShouldReturnFilteredPage_WhenUserIdProvided()
         {
-            // Organisers are the only players with a UserId - this matches every game one of them organises.
-            var value = Context.Users.First(u => Context.Games.Any(g => g.OrganiserId == u.Id)).Id;
+            var value = GetUser(1).Id;
             var expected = Context.Players.Where(p => p.UserId == value)
                 .OrderBy(p => p.Cursor)
                 .Take(Constants.DefaultPageSize);

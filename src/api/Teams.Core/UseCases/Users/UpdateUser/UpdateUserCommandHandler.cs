@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
+using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 
@@ -9,12 +10,15 @@ namespace Teams.Core.UseCases.Users.UpdateUser;
 
 public class UpdateUserCommandHandler(
     IUnitOfWork uow,
+    IActorAccessor actor,
     IValidator<UpdateUserCommand> validator,
     ILogger<UpdateUserCommandHandler> logger)
     : IRequestHandler<UpdateUserCommand, User>
 {
     public async Task<User> HandleAsync(UpdateUserCommand request, CancellationToken cancellationToken)
     {
+        actor.Current.ThrowIfNotUser(request.Id);
+
         CommandValidationException.ThrowIfValidationFailed(await validator.ValidateAsync(request, cancellationToken));
 
         var user = await uow.Users.GetByIdAsync(request.Id, cancellationToken)

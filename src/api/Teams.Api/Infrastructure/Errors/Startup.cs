@@ -14,6 +14,7 @@ public static class Startup
             .AddExceptionHandler<NotFoundExceptionHandler>()
             .AddExceptionHandler<ValidationExceptionHandler>()
             .AddExceptionHandler<RequestHandlerExceptionHandler>()
+            .AddExceptionHandler<AccessDeniedExceptionHandler>()
             .AddExceptionHandler<ConcurrencyTokenMismatchExceptionHandler>()
             .AddExceptionHandler<UnhandledExceptionHandler>()
             .AddProblemDetails();

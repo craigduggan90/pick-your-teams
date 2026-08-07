@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Players.DeletePlayer;
 using Teams.Domain.Entities;
 
@@ -8,11 +9,17 @@ public static class DeletePlayerCommandHandlerTests
 {
     public class HandleAsync : UseCaseTestBase<DeletePlayerCommand>
     {
-        private static Player CreateExistingPlayer() =>
-            new("game-id", null, "display-name", 1000, Teams.Domain.Enums.PlayerTypeEnum.Dummy, Teams.Domain.Enums.GameTeamEnum.None);
+        private static Game CreateExistingGame() =>
+            new("organiser-id", "location", DateTime.UtcNow, 60, 5);
+
+        private static Player CreateDummyPlayer(Game game) =>
+            new(game, "dummy-display-name", 1000);
+
+        private static Player CreateUserPlayer(Game game, User user) =>
+            new(game, user);
 
         private DeletePlayerCommandHandler CreateSut() =>
-            new(UnitOfWork, new FakeLogger<DeletePlayerCommandHandler>());
+            new(UnitOfWork, ActorAccessor, new FakeLogger<DeletePlayerCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowNotFoundException_WhenPlayerDoesNotExist()
@@ -29,18 +36,91 @@ public static class DeletePlayerCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldPersistDeletionAndReturnThePlayer_WhenPlayerExists()
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenDummyPlayerAndActorIsNotOrganiser()
         {
-            var existingPlayer = CreateExistingPlayer();
-            PlayersRepository.GetByIdAsync(existingPlayer.Id, Arg.Any<CancellationToken>()).Returns(existingPlayer);
-            var command = new DeletePlayerCommand(existingPlayer.Id);
+            var game = CreateExistingGame();
+            var player = CreateDummyPlayer(game);
+            PlayersRepository.GetByIdAsync(player.Id, Arg.Any<CancellationToken>()).Returns(player);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new DeletePlayerCommand(player.Id);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await PlayersRepository.DidNotReceive().UpdateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldPersistDeletionAndReturnThePlayer_WhenDummyPlayerAndActorIsOrganiser()
+        {
+            var game = CreateExistingGame();
+            var player = CreateDummyPlayer(game);
+            PlayersRepository.GetByIdAsync(player.Id, Arg.Any<CancellationToken>()).Returns(player);
+            var command = new DeletePlayerCommand(player.Id);
             var sut = CreateSut();
 
             var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            Assert.Same(existingPlayer, result);
+            Assert.Same(player, result);
             Assert.NotNull(result.DateDeleted);
-            await PlayersRepository.Received(1).UpdateAsync(existingPlayer, Arg.Any<CancellationToken>());
+            await PlayersRepository.Received(1).UpdateAsync(player, Arg.Any<CancellationToken>());
+            await UnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenUserPlayerAndActorIsNeitherOrganiserNorSelf()
+        {
+            var game = CreateExistingGame();
+            var user = new User("display-name", "external-id", "user@example.com", null);
+            var player = CreateUserPlayer(game, user);
+            PlayersRepository.GetByIdAsync(player.Id, Arg.Any<CancellationToken>()).Returns(player);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new DeletePlayerCommand(player.Id);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await PlayersRepository.DidNotReceive().UpdateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldPersistDeletionAndReturnThePlayer_WhenUserPlayerAndActorIsOrganiser()
+        {
+            var game = CreateExistingGame();
+            var user = new User("display-name", "external-id", "user@example.com", null);
+            var player = CreateUserPlayer(game, user);
+            PlayersRepository.GetByIdAsync(player.Id, Arg.Any<CancellationToken>()).Returns(player);
+            var command = new DeletePlayerCommand(player.Id);
+            var sut = CreateSut();
+
+            var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            Assert.Same(player, result);
+            Assert.NotNull(result.DateDeleted);
+            await PlayersRepository.Received(1).UpdateAsync(player, Arg.Any<CancellationToken>());
+            await UnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldPersistDeletionAndReturnThePlayer_WhenUserPlayerAndActorIsSelf()
+        {
+            var game = CreateExistingGame();
+            var user = new User("display-name", "external-id", "user@example.com", null);
+            var player = CreateUserPlayer(game, user);
+            PlayersRepository.GetByIdAsync(player.Id, Arg.Any<CancellationToken>()).Returns(player);
+            ActorAccessor.Current.Returns(new Actor(user.Id, user.Tag, user.DisplayName));
+            var command = new DeletePlayerCommand(player.Id);
+            var sut = CreateSut();
+
+            var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            Assert.Same(player, result);
+            Assert.NotNull(result.DateDeleted);
+            await PlayersRepository.Received(1).UpdateAsync(player, Arg.Any<CancellationToken>());
             await UnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         }
     }

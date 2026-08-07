@@ -14,7 +14,7 @@ public class RepositoryTestBase : DatabaseAwareTestBase
 
     public override async ValueTask InitializeAsync()
     {
-        // Lets start with 30 users
+        // Let's start with 30 users
         Users = Enumerable.Range(1, 30).Select(SeedDataFactory.Users.Create).ToArray();
         await Context.Users.AddRangeAsync(Users, TestContext.Current.CancellationToken);
 
@@ -31,14 +31,25 @@ public class RepositoryTestBase : DatabaseAwareTestBase
             .ToArray();
         await Context.Games.AddRangeAsync(games, TestContext.Current.CancellationToken);
 
-        // Fill the games with dummy players, organiser is always on the home team for the tests
+        // Every game also gets a genuine non-organiser participant on Away, cycling through the
+        // remaining 28 users - pulled from a pool that structurally excludes both organisers, so
+        // there's no way for a game's organiser and its away participant to collide.
+        var organiserIds = new[] { SeedDataFactory.Users.GetIdentifier(5), SeedDataFactory.Users.GetIdentifier(8) };
+        var nonOrganiserUsers = Users.Where(u => !organiserIds.Contains(u.Id)).ToArray();
+
+        var counter = 0;
         var players = games.SelectMany(game =>
         {
             var userPlayer = new Player(game, game.Organiser);
             userPlayer.AssignTeam(GameTeamEnum.Home, game.Organiser.Rating);
+
+            var awayUser = nonOrganiserUsers[counter++ % nonOrganiserUsers.Length];
+            var awayPlayer = new Player(game, awayUser);
+            awayPlayer.AssignTeam(GameTeamEnum.Away, awayPlayer.Rating);
+
             var homeTeam = Enumerable.Range(100, game.TeamSize - 1).Select(i => SeedDataFactory.Players.CreateDummy(i, game, GameTeamEnum.Home)).ToArray();
-            var awayTeam = Enumerable.Range(200, game.TeamSize).Select(i => SeedDataFactory.Players.CreateDummy(i, game, GameTeamEnum.Away)).ToArray();
-            return homeTeam.Union([userPlayer]).Union(awayTeam);
+            var awayTeam = Enumerable.Range(200, game.TeamSize - 1).Select(i => SeedDataFactory.Players.CreateDummy(i, game, GameTeamEnum.Away)).ToArray();
+            return homeTeam.Union([userPlayer]).Union([awayPlayer]).Union(awayTeam);
         });
 
         await Context.Players.AddRangeAsync(players, TestContext.Current.CancellationToken);

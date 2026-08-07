@@ -56,9 +56,11 @@ public class GamesController(IMediator mediator) : ApiControllerBase
 
     [HttpPatch("{id}")]
     [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
     [SwaggerRequestExample(typeof(UpdateGameRequestModel), typeof(UpdateGameRequestModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> UpdateGame(
@@ -72,13 +74,51 @@ public class GamesController(IMediator mediator) : ApiControllerBase
 
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     public async Task<IActionResult> DeleteGame(
         string id,
         CancellationToken cancellationToken)
     {
         _ = await mediator.SendAsync(new DeleteGameCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id}/invite")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
+    [ProducesResponseType<ProblemDetails>(404)]
+    [ProducesResponseType<ProblemDetails>(422)]
+    [SwaggerRequestExample(typeof(InvitePlayersRequestModel), typeof(InvitePlayersRequestModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
+    [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
+    [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
+    public async Task<IActionResult> InvitePlayers(
+        string id,
+        [FromBody] InvitePlayersRequestModel body,
+        CancellationToken cancellationToken)
+    {
+        _ = await mediator.SendAsync(body.ToCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id}/result")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
+    [ProducesResponseType<ProblemDetails>(404)]
+    [ProducesResponseType<ProblemDetails>(422)]
+    [SwaggerRequestExample(typeof(RecordResultRequestModel), typeof(RecordResultRequestModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
+    [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
+    [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
+    public async Task<IActionResult> RecordResult(
+        string id,
+        [FromBody] RecordResultRequestModel body,
+        CancellationToken cancellationToken)
+    {
+        _ = await mediator.SendAsync(body.ToCommand(id), cancellationToken);
         return NoContent();
     }
 
@@ -116,9 +156,11 @@ public class GamesController(IMediator mediator) : ApiControllerBase
 
     [HttpPut("{id}/teams")]
     [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
     [SwaggerRequestExample(typeof(SetTeamsRequestModel), typeof(SetTeamsRequestModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> SetTeams(
@@ -132,9 +174,11 @@ public class GamesController(IMediator mediator) : ApiControllerBase
 
     [HttpDelete("{id}/teams")]
     [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
     [SwaggerRequestExample(typeof(SetTeamsRequestModel), typeof(SetTeamsRequestModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> ClearTeams(

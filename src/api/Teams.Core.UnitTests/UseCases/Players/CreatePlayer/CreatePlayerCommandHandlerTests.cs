@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Players.CreatePlayer;
 using Teams.Domain.Entities;
 
@@ -14,7 +15,7 @@ public static class CreatePlayerCommandHandlerTests
             new("display-name", "external-id", "user@example.com", null);
 
         private CreatePlayerCommandHandler CreateSut() =>
-            new(UnitOfWork, new FakeLogger<CreatePlayerCommandHandler>());
+            new(UnitOfWork, ActorAccessor, new FakeLogger<CreatePlayerCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowNotFoundException_WhenGameDoesNotExist()
@@ -31,13 +32,47 @@ public static class CreatePlayerCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldThrowCommandValidationException_WhenUserAlreadyAssociatedWithGame()
+        public async Task ShouldThrowAccessDeniedExceptionAndNotCreatePlayer_WhenActorIsNeitherOrganiserNorSubjectUser()
+        {
+            var game = CreateExistingGame();
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new CreatePlayerCommand(game.Id, "user-id");
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldThrowCommandValidationException_WhenUserAlreadyAssociatedWithGame_AndActorIsOrganiser()
         {
             var game = CreateExistingGame();
             var existingPlayer = new Player(game.Id, "user-id", "existing-display-name", 1000,
                 Teams.Domain.Enums.PlayerTypeEnum.User, Teams.Domain.Enums.GameTeamEnum.None);
             game.Players.Add(existingPlayer);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            var command = new CreatePlayerCommand(game.Id, "user-id");
+            var sut = CreateSut();
+
+            var exception = await Assert.ThrowsAsync<CommandValidationException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            Assert.Contains(exception.Errors, error => error.PropertyName == nameof(CreatePlayerCommand.UserId));
+        }
+
+        [Fact]
+        public async Task ShouldThrowCommandValidationException_WhenUserAlreadyAssociatedWithGame_AndActorIsSelf()
+        {
+            var game = CreateExistingGame();
+            var existingPlayer = new Player(game.Id, "user-id", "existing-display-name", 1000,
+                Teams.Domain.Enums.PlayerTypeEnum.User, Teams.Domain.Enums.GameTeamEnum.None);
+            game.Players.Add(existingPlayer);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            ActorAccessor.Current.Returns(new Actor("user-id", "tag", "display-name"));
             var command = new CreatePlayerCommand(game.Id, "user-id");
             var sut = CreateSut();
 
@@ -65,7 +100,7 @@ public static class CreatePlayerCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldThrowNotFoundException_WhenUserDoesNotExist()
+        public async Task ShouldThrowNotFoundException_WhenUserDoesNotExist_AndActorIsOrganiser()
         {
             var game = CreateExistingGame();
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
@@ -81,14 +116,14 @@ public static class CreatePlayerCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldCreatePlayer_FromGameAndUser_WhenBothExist()
+        public async Task ShouldCreatePlayer_FromGameAndUser_WhenActorIsOrganiser()
         {
             var game = CreateExistingGame();
             var user = CreateExistingUser();
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             UsersRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
             PlayersRepository.CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>())
-                .Returns(callInfo => callInfo.Arg<Player>()!);
+                .Returns(callInfo => callInfo.Arg<Player>());
             var command = new CreatePlayerCommand(game.Id, user.Id);
             var sut = CreateSut();
 
@@ -101,7 +136,26 @@ public static class CreatePlayerCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldPersistChangesAndReturnTheCreatedPlayer_WhenBothExist()
+        public async Task ShouldCreatePlayer_FromGameAndUser_WhenActorIsSelf()
+        {
+            var game = CreateExistingGame();
+            var user = CreateExistingUser();
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            UsersRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
+            PlayersRepository.CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>())
+                .Returns(callInfo => callInfo.Arg<Player>());
+            ActorAccessor.Current.Returns(new Actor(user.Id, user.Tag, user.DisplayName));
+            var command = new CreatePlayerCommand(game.Id, user.Id);
+            var sut = CreateSut();
+
+            var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            Assert.Equal(game.Id, result.GameId);
+            Assert.Equal(user.Id, result.UserId);
+        }
+
+        [Fact]
+        public async Task ShouldPersistChangesAndReturnTheCreatedPlayer_WhenActorIsOrganiser()
         {
             var game = CreateExistingGame();
             var user = CreateExistingUser();

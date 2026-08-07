@@ -1,9 +1,10 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Games.RecordResult;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
 
-namespace Teams.Core.UnitTests.UseCases.Games.RecordGameResult;
+namespace Teams.Core.UnitTests.UseCases.Games.RecordResult;
 
 public static class RecordGameResultCommandHandlerTests
 {
@@ -28,7 +29,7 @@ public static class RecordGameResultCommandHandlerTests
         }
 
         private RecordGameResultCommandHandler CreateSut() =>
-            new(UnitOfWork, Validator, new FakeLogger<RecordGameResultCommandHandler>());
+            new(UnitOfWork, ActorAccessor, Validator, new FakeLogger<RecordGameResultCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowCommandValidationException_WhenValidationFails()
@@ -69,6 +70,24 @@ public static class RecordGameResultCommandHandlerTests
         }
 
         [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenActorIsNotOrganiser()
+        {
+            var game = CreateGame();
+            AddDummyPlayer(game, GameTeamEnum.Home, 1000);
+            AddDummyPlayer(game, GameTeamEnum.Away, 1000);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new RecordGameResultCommand(game.Id, "Home");
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await GamesRepository.DidNotReceive().UpdateAsync(Arg.Any<Game>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
         public async Task ShouldSetResultAndPersistGame_WhenGameExists()
         {
             var game = CreateGame();
@@ -89,8 +108,6 @@ public static class RecordGameResultCommandHandlerTests
         [Fact]
         public async Task ShouldDistributeRatingChange_AcrossPlayersOnATeam()
         {
-            // 2v2, evenly rated (1000 each) - a home win splits the +16/-16 team swing evenly:
-            // +8 per home player, -8 per away player.
             var game = CreateGame();
             var home1 = AddDummyPlayer(game, GameTeamEnum.Home, 1000);
             var home2 = AddDummyPlayer(game, GameTeamEnum.Home, 1000);

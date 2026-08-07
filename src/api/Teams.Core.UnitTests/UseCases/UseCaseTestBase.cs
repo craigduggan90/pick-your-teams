@@ -1,5 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
+using Teams.Core.Models;
+using Teams.Core.Services;
 using Teams.Data.Repositories.Games;
 using Teams.Data.Repositories.Players;
 using Teams.Data.Repositories.Users;
@@ -19,6 +21,8 @@ public abstract class UseCaseTestBase<TRequest>
 
     protected IValidator<TRequest> Validator { get; } = Substitute.For<IValidator<TRequest>>();
 
+    protected IActorAccessor ActorAccessor { get; } = Substitute.For<IActorAccessor>();
+
     protected UseCaseTestBase()
     {
         UnitOfWork = Substitute.For<IUnitOfWork>();
@@ -26,15 +30,32 @@ public abstract class UseCaseTestBase<TRequest>
         UnitOfWork.Games.Returns(GamesRepository);
         UnitOfWork.Players.Returns(PlayersRepository);
 
-        // Passes validation by default - call SetupValidator again in a test to override this.
+        UsersRepository.CreateAsync(Arg.Any<Domain.Entities.User>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.User>(0));
+
+        UsersRepository.UpdateAsync(Arg.Any<Domain.Entities.User>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.User>(0));
+
+        GamesRepository.CreateAsync(Arg.Any<Domain.Entities.Game>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Game>(0));
+
+        GamesRepository.UpdateAsync(Arg.Any<Domain.Entities.Game>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Game>(0));
+
+        PlayersRepository.CreateAsync(Arg.Any<Domain.Entities.Player>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Player>(0));
+
+        PlayersRepository.UpdateAsync(Arg.Any<Domain.Entities.Player>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Player>(0));
+
+        ActorAccessor.Current.Returns(new Actor("organiser-id", "organiser-tag", "organiser-display-name"));
+
         SetupValidator();
     }
 
-    /// <summary>Configures <see cref="Validator"/> to return <paramref name="result"/>.</summary>
     protected void SetupValidator(ValidationResult? result = null) =>
         Validator.ValidateAsync(Arg.Any<TRequest>(), Arg.Any<CancellationToken>()).Returns(result ?? new ValidationResult());
 
-    /// <summary>A single-error <see cref="ValidationResult"/>, for exercising the validation-failure path.</summary>
     protected static ValidationResult InvalidResult(string propertyName = "PropertyName", string errorMessage = "Error message") =>
         new([new ValidationFailure(propertyName, errorMessage)]);
 }

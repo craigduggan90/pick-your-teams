@@ -29,10 +29,12 @@ public class PlayersController(IMediator mediator) : ApiControllerBase
 
     [HttpPost]
     [ProducesResponseType<PlayerModel>(201)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
     [SwaggerRequestExample(typeof(CreatePlayerRequestModel), typeof(CreatePlayerRequestModelExample))]
     [SwaggerResponseExample(201, typeof(PlayerModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(UserNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> CreatePlayer(
@@ -45,10 +47,12 @@ public class PlayersController(IMediator mediator) : ApiControllerBase
 
     [HttpPost("dummy")]
     [ProducesResponseType<PlayerModel>(201)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType<ProblemDetails>(422)]
     [SwaggerRequestExample(typeof(CreateDummyPlayerRequestModel), typeof(CreateDummyPlayerRequestModelExample))]
     [SwaggerResponseExample(201, typeof(PlayerModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
     [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
     public async Task<IActionResult> CreateDummyPlayer(
@@ -59,7 +63,7 @@ public class PlayersController(IMediator mediator) : ApiControllerBase
         return CreatedAtAction(nameof(GetPlayerById), new { id = player.Id }, player.ToPlayerModel());
     }
 
-    [HttpGet("id")]
+    [HttpGet("{id}")]
     [ProducesResponseType<PlayerDetailModel>(200)]
     [ProducesResponseType<ProblemDetails>(404)]
     [SwaggerResponseExample(200, typeof(PlayerDetailModelExample))]
@@ -70,9 +74,11 @@ public class PlayersController(IMediator mediator) : ApiControllerBase
         return Ok(entity.ToPlayerDetailModel());
     }
 
-    [HttpDelete("id")]
+    [HttpDelete("{id}")]
     [ProducesResponseType(204)]
+    [ProducesResponseType<ProblemDetails>(403)]
     [ProducesResponseType<ProblemDetails>(404)]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
     [SwaggerResponseExample(404, typeof(PlayerNotFoundProblemDetailsExample))]
     public async Task<IActionResult> DeletePlayer(string id, CancellationToken cancellationToken)
     {

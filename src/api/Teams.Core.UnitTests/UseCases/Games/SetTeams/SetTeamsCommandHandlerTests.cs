@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Games.SetTeams;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
@@ -20,13 +21,7 @@ public static class SetTeamsCommandHandlerTests
         }
 
         private SetTeamsCommandHandler CreateSut() =>
-            new(UnitOfWork, Validator, new FakeLogger<SetTeamsCommandHandler>());
-
-        public HandleAsync()
-        {
-            PlayersRepository.UpdateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>())
-                .Returns(callInfo => callInfo.ArgAt<Player>(0));
-        }
+            new(UnitOfWork, ActorAccessor, Validator, new FakeLogger<SetTeamsCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowCommandValidationExceptionAndNotLoadGame_WhenValidationFails()
@@ -53,6 +48,23 @@ public static class SetTeamsCommandHandlerTests
 
             Assert.Equal(nameof(Game), exception.ResourceType);
             Assert.Equal("missing-game", exception.ResourceIdentifier);
+        }
+
+        [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenActorIsNotOrganiser()
+        {
+            var game = CreateExistingGame();
+            var home = AddPlayer(game);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new SetTeamsCommand(game.Id, [home.Id], []);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await PlayersRepository.DidNotReceive().UpdateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
 
         [Fact]
@@ -147,7 +159,7 @@ public static class SetTeamsCommandHandlerTests
         public async Task ShouldUpdateTeamRatings_ToReflectNewAssignments()
         {
             var game = CreateExistingGame();
-            var home1 = AddPlayer(game, 1000);
+            var home1 = AddPlayer(game);
             var home2 = AddPlayer(game, 1100);
             var away1 = AddPlayer(game, 950);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
@@ -192,6 +204,26 @@ public static class SetTeamsCommandHandlerTests
             await sut.HandleAsync(command, TestContext.Current.CancellationToken);
 
             await PlayersRepository.DidNotReceive().UpdateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldUnassignAllPlayers_WhenBothTeamListsAreEmpty()
+        {
+            var game = CreateExistingGame();
+            var home = AddPlayer(game);
+            home.AssignTeam(GameTeamEnum.Home, null);
+            var away = AddPlayer(game);
+            away.AssignTeam(GameTeamEnum.Away, null);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            var command = new SetTeamsCommand(game.Id, [], []);
+            var sut = CreateSut();
+
+            await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            Assert.Equal(GameTeamEnum.None, home.Team);
+            Assert.Equal(GameTeamEnum.None, away.Team);
+            Assert.Equal(0, game.HomeTeamRating);
+            Assert.Equal(0, game.AwayTeamRating);
         }
     }
 }

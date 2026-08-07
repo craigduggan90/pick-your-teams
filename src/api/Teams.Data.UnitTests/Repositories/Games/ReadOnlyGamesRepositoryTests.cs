@@ -136,6 +136,36 @@ public static class ReadOnlyGamesRepositoryTests
         }
 
         [Fact]
+        public async Task ShouldReturnFilteredPage_WhenOrganiserIdProvided()
+        {
+            var value = GetUser(5).Id;
+            var expected = Context.Games.Where(g => g.OrganiserId == value)
+                .OrderBy(g => g.Cursor)
+                .Take(Constants.DefaultPageSize);
+
+            var sut = CreateSut();
+            var actual = await sut.GetAsync(organiserId: value, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.Equal(Constants.DefaultPageSize, actual.Count());
+            Assert.Equivalent(expected, actual, true);
+        }
+
+        [Fact]
+        public async Task ShouldReturnFilteredPage_WhenUserIdProvided()
+        {
+            var value = GetUser(5).Id;
+            var expected = Context.Games.Where(g => g.Players.Any(p => p.UserId == value))
+                .OrderBy(g => g.Cursor)
+                .Take(Constants.DefaultPageSize);
+
+            var sut = CreateSut();
+            var actual = await sut.GetAsync(userId: value, cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.Equal(Constants.DefaultPageSize, actual.Count());
+            Assert.Equivalent(expected, actual, true);
+        }
+
+        [Fact]
         public async Task ShouldReturnFilteredPage_WhenCreatedFromProvided()
         {
             var value = Context.Games.OrderBy(g => g.DateCreated).Skip(89).First().DateCreated;

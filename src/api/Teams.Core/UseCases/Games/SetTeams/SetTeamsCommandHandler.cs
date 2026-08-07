@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
+using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
@@ -10,6 +11,7 @@ namespace Teams.Core.UseCases.Games.SetTeams;
 
 public class SetTeamsCommandHandler(
     IUnitOfWork uow,
+    IActorAccessor actor,
     IValidator<SetTeamsCommand> validator,
     ILogger<SetTeamsCommandHandler> logger)
     : IRequestHandler<SetTeamsCommand, Game>
@@ -20,6 +22,8 @@ public class SetTeamsCommandHandler(
 
         var game = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
                    ?? throw new NotFoundException(typeof(Game), request.GameId);
+
+        actor.Current.ThrowIfNotOrganiser(game.OrganiserId);
 
         if (game.Status == GameStatusEnum.Finished)
             throw RequestHandlerException.ForCommandRequest("Teams cannot be changed for a completed game.");

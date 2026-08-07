@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Games.UpdateGame;
 using Teams.Domain.Entities;
 
@@ -12,7 +13,7 @@ public static class UpdateGameCommandHandlerTests
             new("organiser-id", "existing-location", DateTime.UtcNow, 60, 5);
 
         private UpdateGameCommandHandler CreateSut() =>
-            new(UnitOfWork, Validator, new FakeLogger<UpdateGameCommandHandler>());
+            new(UnitOfWork, ActorAccessor, Validator, new FakeLogger<UpdateGameCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowCommandValidationException_WhenValidationFails()
@@ -50,6 +51,22 @@ public static class UpdateGameCommandHandlerTests
 
             Assert.Equal(nameof(Game), exception.ResourceType);
             Assert.Equal("missing-game", exception.ResourceIdentifier);
+        }
+
+        [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenActorIsNotOrganiser()
+        {
+            var existingGame = CreateExistingGame();
+            GamesRepository.GetByIdAsync(existingGame.Id, Arg.Any<CancellationToken>()).Returns(existingGame);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new UpdateGameCommand(existingGame.Id, "new-location", null, null);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await GamesRepository.DidNotReceive().UpdateAsync(Arg.Any<Game>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
 
         [Fact]

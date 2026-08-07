@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
+using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
@@ -10,6 +11,7 @@ namespace Teams.Core.UseCases.Games.RecordResult;
 
 public class RecordGameResultCommandHandler(
     IUnitOfWork uow,
+    IActorAccessor actor,
     IValidator<RecordGameResultCommand> validator,
     ILogger<RecordGameResultCommandHandler> logger)
     : IRequestHandler<RecordGameResultCommand, Game>
@@ -20,6 +22,8 @@ public class RecordGameResultCommandHandler(
 
         var game = await uow.Games.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.Id);
+
+        actor.Current.ThrowIfNotOrganiser(game.OrganiserId);
 
         // Set the result & mark the game as updated
         Enum.TryParse<GameTeamEnum>(request.Winner, true, out var winner);

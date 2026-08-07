@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Players.CreateDummyPlayer;
 using Teams.Domain.Entities;
 
@@ -14,7 +15,7 @@ public static class CreateDummyPlayerCommandHandlerTests
             new(gameId, "display-name", 1000);
 
         private CreateDummyPlayerCommandHandler CreateSut() =>
-            new(UnitOfWork, Validator, new FakeLogger<CreateDummyPlayerCommandHandler>());
+            new(UnitOfWork, ActorAccessor, Validator, new FakeLogger<CreateDummyPlayerCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowCommandValidationException_WhenValidationFails()
@@ -62,6 +63,22 @@ public static class CreateDummyPlayerCommandHandlerTests
             var sut = CreateSut();
 
             await Assert.ThrowsAsync<NotFoundException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotCreatePlayer_WhenActorIsNotOrganiser()
+        {
+            var game = CreateExistingGame();
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = CreateValidCommand(game.Id);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
                 () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
 
             await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());

@@ -163,4 +163,64 @@ public static class GamesFilterHelperTests
             Assert.Equivalent(expected, filtered, true);
         }
     }
+
+    public class ApplyOrganiserIdFilter
+    {
+        [Fact]
+        public void ShouldNotApplyFilter_WhenNoValueProvided()
+        {
+            var data = GetSeedData(30);
+            var filtered = data.ApplyOrganiserIdFilter(null);
+            Assert.Same(data, filtered);
+        }
+
+        [Fact]
+        public void ShouldApplyFilter_WhenValueProvided()
+        {
+            var value = DummyUsers[3].Id;
+            var data = GetSeedData(30);
+            var expected = data.Where(game => game.OrganiserId == value);
+            var filtered = data.ApplyOrganiserIdFilter(value);
+            Assert.Equivalent(expected, filtered, true);
+        }
+    }
+
+    public class ApplyUserIdFilter
+    {
+        [Fact]
+        public void ShouldNotApplyFilter_WhenNoValueProvided()
+        {
+            var data = GetSeedData(30);
+            var filtered = data.ApplyUserIdFilter(null);
+            Assert.Same(data, filtered);
+        }
+
+        [Fact]
+        public void ShouldApplyFilter_WhenValueProvided()
+        {
+            const string value = "u-participant-001";
+            var data = GetSeedData(10).ToArray();
+
+            // Add the target user as a player on two of the ten seeded games only.
+            data[2].Players.Add(new Player(data[2].Id, value, "player-1", 1000, PlayerTypeEnum.User, GameTeamEnum.None));
+            data[7].Players.Add(new Player(data[7].Id, value, "player-2", 1000, PlayerTypeEnum.User, GameTeamEnum.None));
+
+            var queryable = data.AsQueryable();
+            var expected = queryable.Where(game => game.Players.Any(player => player.UserId == value));
+            var filtered = queryable.ApplyUserIdFilter(value);
+            Assert.Equivalent(expected, filtered, true);
+        }
+
+        [Fact]
+        public void ShouldNotMatchGame_WhenAnotherPlayerIsPresentButNotTheRequestedUser()
+        {
+            const string value = "u-participant-001";
+            var data = GetSeedData(5).ToArray();
+            data[0].Players.Add(new Player(data[0].Id, "some-other-user", "player-1", 1000, PlayerTypeEnum.User, GameTeamEnum.None));
+
+            var filtered = data.AsQueryable().ApplyUserIdFilter(value);
+
+            Assert.Empty(filtered);
+        }
+    }
 }

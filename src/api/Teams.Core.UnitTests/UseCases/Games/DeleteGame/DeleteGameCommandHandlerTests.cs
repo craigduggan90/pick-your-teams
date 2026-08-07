@@ -1,4 +1,5 @@
 using Teams.Core.Exceptions;
+using Teams.Core.Models;
 using Teams.Core.UseCases.Games.DeleteGame;
 using Teams.Domain.Entities;
 
@@ -12,7 +13,7 @@ public static class DeleteGameCommandHandlerTests
             new("organiser-id", "existing-location", DateTime.UtcNow, 60, 5);
 
         private DeleteGameCommandHandler CreateSut() =>
-            new(UnitOfWork, new FakeLogger<DeleteGameCommandHandler>());
+            new(UnitOfWork, ActorAccessor, new FakeLogger<DeleteGameCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowNotFoundException_WhenGameDoesNotExist()
@@ -26,6 +27,22 @@ public static class DeleteGameCommandHandlerTests
 
             Assert.Equal(nameof(Game), exception.ResourceType);
             Assert.Equal("missing-game", exception.ResourceIdentifier);
+        }
+
+        [Fact]
+        public async Task ShouldThrowAccessDeniedExceptionAndNotPersistChanges_WhenActorIsNotOrganiser()
+        {
+            var existingGame = CreateExistingGame();
+            GamesRepository.GetByIdAsync(existingGame.Id, Arg.Any<CancellationToken>()).Returns(existingGame);
+            ActorAccessor.Current.Returns(new Actor("some-other-actor", "tag", "display-name"));
+            var command = new DeleteGameCommand(existingGame.Id);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await GamesRepository.DidNotReceive().UpdateAsync(Arg.Any<Game>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
 
         [Fact]

@@ -2,6 +2,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
+using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
 
@@ -9,6 +10,7 @@ namespace Teams.Core.UseCases.Players.CreatePlayer;
 
 public class CreatePlayerCommandHandler(
     IUnitOfWork uow,
+    IActorAccessor actor,
     ILogger<CreatePlayerCommandHandler> logger) : IRequestHandler<CreatePlayerCommand, Player>
 {
     public async Task<Player> HandleAsync(CreatePlayerCommand request, CancellationToken cancellationToken)
@@ -16,6 +18,8 @@ public class CreatePlayerCommandHandler(
         // Check that the game exists
         var game = await uow.Games.GetByIdAsync(request.GameId, cancellationToken)
             ?? throw new NotFoundException(typeof(Game), request.GameId);
+
+        actor.Current.ThrowIfNotOrganiserOrUser(request.UserId, game.OrganiserId);
 
         if (game.Players.Any(player => player.UserId == request.UserId))
             throw new CommandValidationException([new ValidationFailure(nameof(CreatePlayerCommand.UserId), "User is already associated with game.")]);

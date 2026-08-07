@@ -2,8 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Infrastructure.Errors;
 using Teams.Api.Infrastructure.Swagger;
 using Teams.Api.Infrastructure.Versioning;
+using Teams.Api.Services;
 using Teams.Common;
 using Teams.Core;
+using Teams.Core.Services;
 using Teams.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,9 @@ builder
     .AddVersioning()
     .AddSwaggerDocumentation()
     .AddErrorHandling();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IActorAccessor, ActorAccessor>();
 
 builder.Services.AddControllers();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
