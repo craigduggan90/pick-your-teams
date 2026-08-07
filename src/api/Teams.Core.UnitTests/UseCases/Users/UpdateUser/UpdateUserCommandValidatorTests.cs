@@ -103,9 +103,9 @@ public static class UpdateUserCommandValidatorTests
         [Theory]
         [InlineData("abc")] // at minimum length
         [InlineData("_ab")]
-        [InlineData("e_")]
-        [InlineData("e-")]
-        [InlineData("e.")]
+        [InlineData("ae_")]
+        [InlineData("ae-")]
+        [InlineData("ae.")]
         public async Task ShouldSucceed_WhenTagIsValid(string tag)
         {
             var sut = CreateSut();
