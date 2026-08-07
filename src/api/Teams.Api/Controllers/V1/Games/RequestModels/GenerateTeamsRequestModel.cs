@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Teams.Api.Controllers.V1.Games.RequestModels;
 
 public record GenerateTeamsRequestModel(
@@ -5,6 +7,7 @@ public record GenerateTeamsRequestModel(
     IEnumerable<string> AwayTeamSeedIds,
     int Differential)
 {
+    [ExcludeFromCodeCoverage]
     public static GenerateTeamsRequestModel Example => new(
         HomeTeamSeedIds:
         [

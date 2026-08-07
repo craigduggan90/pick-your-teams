@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Teams.Api.Controllers.V1.Games.RequestModels;
 
 public record InvitePlayersRequestModel(IReadOnlyCollection<string> UserIdentifiers)
 {
+    [ExcludeFromCodeCoverage]
     public static InvitePlayersRequestModel Example => new(
         UserIdentifiers:
         [

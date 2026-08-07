@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Infrastructure.Errors.Handlers;
 using Teams.Core.Exceptions;
 
-namespace Teams.Api.Controllers.V1.Shared;
+namespace Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 
 [ExcludeFromCodeCoverage]
 public class AccessDeniedProblemDetailsExample : IExamplesProvider<ProblemDetails>

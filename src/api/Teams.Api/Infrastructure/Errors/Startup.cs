@@ -15,7 +15,6 @@ public static class Startup
             .AddExceptionHandler<ValidationExceptionHandler>()
             .AddExceptionHandler<RequestHandlerExceptionHandler>()
             .AddExceptionHandler<AccessDeniedExceptionHandler>()
-            .AddExceptionHandler<ConcurrencyTokenMismatchExceptionHandler>()
             .AddExceptionHandler<UnhandledExceptionHandler>()
             .AddProblemDetails();
 

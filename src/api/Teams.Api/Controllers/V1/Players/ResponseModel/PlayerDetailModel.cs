@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Teams.Domain.Enums;
 
 namespace Teams.Api.Controllers.V1.Players.ResponseModel;
@@ -14,6 +15,7 @@ public record PlayerDetailModel(
     DateTime Created,
     DateTime Modified)
 {
+    [ExcludeFromCodeCoverage]
     public static PlayerDetailModel UserExample => new(
         "2f735c4a01f14fcc8b310117f58730ef",
         "c6a893da2b2d4b6b83f82a8e3573f861",
@@ -26,6 +28,7 @@ public record PlayerDetailModel(
         new DateTime(2026, 8, 1, 14, 05, 12, DateTimeKind.Utc),
         new DateTime(2026, 8, 1, 14, 05, 12, DateTimeKind.Utc));
 
+    [ExcludeFromCodeCoverage]
     public static PlayerDetailModel DummyExample => new(
         "3c883ef7ae9e446d828530a1490fe580",
         "c6a893da2b2d4b6b83f82a8e3573f861",

@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Teams.Api.Controllers.V1.Games.RequestModels;
 
 public record SetTeamsRequestModel(
     IReadOnlyCollection<string> HomeTeamIds,
     IReadOnlyCollection<string> AwayTeamIds)
 {
+    [ExcludeFromCodeCoverage]
     public static SetTeamsRequestModel Example => new(
         HomeTeamIds:
         [

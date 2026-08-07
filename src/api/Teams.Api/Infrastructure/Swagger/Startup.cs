@@ -1,9 +1,11 @@
 using Asp.Versioning.ApiExplorer;
 using Swashbuckle.AspNetCore.Filters;
+using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 
 namespace Teams.Api.Infrastructure.Swagger;
 
+[ExcludeFromCodeCoverage]
 public static class Startup
 {
     public static WebApplicationBuilder AddSwaggerDocumentation(this WebApplicationBuilder builder)

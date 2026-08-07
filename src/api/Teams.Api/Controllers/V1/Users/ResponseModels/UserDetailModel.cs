@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Teams.Api.Controllers.V1.Users.ResponseModels;
 
 public record UserDetailModel(
@@ -10,6 +12,7 @@ public record UserDetailModel(
     DateTime Created,
     DateTime Modified)
 {
+    [ExcludeFromCodeCoverage]
     public static UserDetailModel Example => new(
         Id: "2d83bedc6fb7457283eedfa020cbb41f",
         Tag: "jane_smith",

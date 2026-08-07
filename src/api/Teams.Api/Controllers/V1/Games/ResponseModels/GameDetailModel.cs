@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Teams.Domain.Enums;
 
 namespace Teams.Api.Controllers.V1.Games.ResponseModels;
@@ -15,6 +16,7 @@ public record GameDetailModel(
     DateTime Created,
     DateTime Modified)
 {
+    [ExcludeFromCodeCoverage]
     public static GameDetailModel Example => new(
         Id: "1e688dad723844f3b453b925157f05c4",
         Location: "Oak Leaf Leisure Centre",

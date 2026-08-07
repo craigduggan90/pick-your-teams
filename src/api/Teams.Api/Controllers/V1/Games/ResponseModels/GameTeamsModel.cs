@@ -1,12 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Teams.Api.Controllers.V1.Games.ResponseModels;
 
 public record GameTeamsModel(string Id, GameTeamModel? Home, GameTeamModel? Away)
 {
+    [ExcludeFromCodeCoverage]
     public static GameTeamsModel Example => new(
         "d40b639aa73b427f9eb47da3491b9097",
         GameTeamModel.HomeTeamExample,
         GameTeamModel.AwayTeamExample);
 
+    [ExcludeFromCodeCoverage]
     public static GameTeamsModel Empty => new(
         "d40b639aa73b427f9eb47da3491b9097",
         null,
@@ -15,6 +19,7 @@ public record GameTeamsModel(string Id, GameTeamModel? Home, GameTeamModel? Away
 
 public record GameTeamModel(IReadOnlyCollection<GameTeamPlayerModel> Players, int TeamRating)
 {
+    [ExcludeFromCodeCoverage]
     public static GameTeamModel HomeTeamExample => new(
         Players:
         [
@@ -26,6 +31,7 @@ public record GameTeamModel(IReadOnlyCollection<GameTeamPlayerModel> Players, in
         ],
         TeamRating: 4884);
 
+    [ExcludeFromCodeCoverage]
     public static GameTeamModel AwayTeamExample => new(
     Players: [
         new GameTeamPlayerModel("6034b2566e5940d48e9a97f040e58ea6", "Freddie Bennett", 1034),
