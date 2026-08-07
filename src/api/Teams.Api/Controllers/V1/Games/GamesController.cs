@@ -142,7 +142,7 @@ public class GamesController(IMediator mediator) : ApiControllerBase
     }
 
     [HttpGet("{id}/teams")]
-    [ProducesResponseType(204)]
+    [ProducesResponseType(200)]
     [ProducesResponseType<ProblemDetails>(404)]
     [SwaggerResponseExample(200, typeof(GameTeamsModelExample))]
     [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]

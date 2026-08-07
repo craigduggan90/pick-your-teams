@@ -1,8 +1,10 @@
 using Swashbuckle.AspNetCore.Filters;
+using System.Diagnostics.CodeAnalysis;
 using Teams.Api.Controllers.V1.Players.ResponseModel;
 
 namespace Teams.Api.Controllers.V1.Players.Examples;
 
+[ExcludeFromCodeCoverage]
 public class PlayerDetailModelExample : IMultipleExamplesProvider<PlayerDetailModel>
 {
     public IEnumerable<SwaggerExample<PlayerDetailModel>> GetExamples() => [UserExample, DummyExample];
