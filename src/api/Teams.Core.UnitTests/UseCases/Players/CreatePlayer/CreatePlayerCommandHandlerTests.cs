@@ -123,7 +123,7 @@ public static class CreatePlayerCommandHandlerTests
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             UsersRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
             PlayersRepository.CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>())
-                .Returns(callInfo => callInfo.Arg<Player>());
+                .Returns(callInfo => callInfo.ArgAt<Player>(0));
             var command = new CreatePlayerCommand(game.Id, user.Id);
             var sut = CreateSut();
 
@@ -143,7 +143,7 @@ public static class CreatePlayerCommandHandlerTests
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             UsersRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
             PlayersRepository.CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>())
-                .Returns(callInfo => callInfo.Arg<Player>());
+                .Returns(callInfo => callInfo.ArgAt<Player>(0));
             ActorAccessor.Current.Returns(new Actor(user.Id, user.Tag, user.DisplayName));
             var command = new CreatePlayerCommand(game.Id, user.Id);
             var sut = CreateSut();
