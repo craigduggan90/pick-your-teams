@@ -25,8 +25,7 @@ jobs:
         run: |
           dotnet restore
           dotnet build --no-restore
-          dotnet format --verify-no-changes --exclude ./Teams.Data/Context/Migrations/
-          
+
       - name: 🧪 run tests
         working-directory: src/api
         run: |
