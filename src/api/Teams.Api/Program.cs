@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Teams.Api.Infrastructure.Converters;
 using Teams.Api.Infrastructure.Errors;
 using Teams.Api.Infrastructure.Swagger;
 using Teams.Api.Infrastructure.Versioning;
@@ -20,7 +21,13 @@ builder
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IActorAccessor, ActorAccessor>();
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new UtcNullableDateTimeConverter());
+    });
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
