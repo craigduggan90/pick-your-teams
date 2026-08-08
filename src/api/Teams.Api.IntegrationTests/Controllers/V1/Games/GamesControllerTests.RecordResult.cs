@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Teams.Api.Controllers.V1.Games.RequestModels;
@@ -106,7 +107,7 @@ public static partial class GamesControllerTests
         {
             var existingGame = SeedGames[0];
             var organiser = SeedOrganisers.Single(u => u.Id == existingGame.OrganiserId);
-            var invalidRequest = new RecordResultRequestModel(Winner: "NotARealTeam");
+            var invalidRequest = ValidRequest with { Winner = "NotARealTeam" };
 
             var request = CreateJsonRequest(HttpMethod.Post, $"{Url}/{existingGame.Id}/result", invalidRequest);
             WithActorHeaders(request, organiser);
@@ -124,7 +125,7 @@ public static partial class GamesControllerTests
         {
             var finishedGame = SeedGames[1]; // seed game 2 - even index, already finished (winner: Away)
             var organiser = SeedOrganisers.Single(u => u.Id == finishedGame.OrganiserId);
-            var conflictingRequest = new RecordResultRequestModel(Winner: nameof(GameTeamEnum.Home));
+            var conflictingRequest = ValidRequest with { Winner = nameof(GameTeamEnum.Home) };
 
             var request = CreateJsonRequest(HttpMethod.Post, $"{Url}/{finishedGame.Id}/result", conflictingRequest);
             WithActorHeaders(request, organiser);
@@ -143,15 +144,21 @@ public static partial class GamesControllerTests
 
         private async Task<(User LinkedUser, Game Game, Player HomePlayer, Player AwayPlayer)> SeedGameWithPlayersAsync(User organiser)
         {
-            var linkedUser = EntityFactory.CreateUser(displayName: "Linked Player");
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
+            var now = DateTimeOffset.UtcNow;
+            var linkedUser = EntityFactory.CreateUser(displayName: "Linked Player", dateCreated: now);
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3, dateCreated: now.Add(TimeSpan.FromMicroseconds(1)));
             var homePlayer = EntityFactory.CreatePlayer(
                 game.Id, userId: linkedUser.Id, displayName: linkedUser.DisplayName, rating: linkedUser.Rating,
-                type: PlayerTypeEnum.User, team: GameTeamEnum.Home);
-            var homeTeammate = EntityFactory.CreatePlayer(game.Id, displayName: "Dummy Home Player", rating: 1000, team: GameTeamEnum.Home);
+                type: PlayerTypeEnum.User, team: GameTeamEnum.Home, dateCreated: now.Add(TimeSpan.FromMicroseconds(2)));
+            var homeTeammate = EntityFactory.CreatePlayer(
+                game.Id, displayName: "Dummy Home Player", rating: 1000, team: GameTeamEnum.Home,
+                dateCreated: now.Add(TimeSpan.FromMicroseconds(3)));
             var awayPlayer = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Dummy Away Player", rating: 900, team: GameTeamEnum.Away);
-            var awayTeammate = EntityFactory.CreatePlayer(game.Id, displayName: "Dummy Away Player 2", rating: 900, team: GameTeamEnum.Away);
+                game.Id, displayName: "Dummy Away Player", rating: 900, team: GameTeamEnum.Away,
+                dateCreated: now.Add(TimeSpan.FromMicroseconds(4)));
+            var awayTeammate = EntityFactory.CreatePlayer(
+                game.Id, displayName: "Dummy Away Player 2", rating: 900, team: GameTeamEnum.Away,
+                dateCreated: now.Add(TimeSpan.FromMicroseconds(5)));
 
             await using var scope = Factory.Services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();

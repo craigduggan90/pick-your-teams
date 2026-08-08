@@ -36,3 +36,7 @@ GAME }o--|| USER : "organised by"
 We have used generative AI as an assistant to handle repetitive coding tasks in this project.  We have also leveraged 
 LLMs for code review and for fast feedback.  The structures, patterns, and algorthms in this project are all developed
 "by hand".
+
+## TODO
+
+- Separate flag: single-player teams aren't blocked by validation anywhere (teamSize on Game is just a max), so SetRatingChange can genuinely hit this NaN in production, not just in a bad test fixture. Worth a look at Player.cs's weight formula.

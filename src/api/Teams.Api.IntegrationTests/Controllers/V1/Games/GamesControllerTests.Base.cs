@@ -77,5 +77,25 @@ public static partial class GamesControllerTests
                 externalId: $"external-organiser-{index:D3}",
                 email: $"organiser{index:D3}@test.net",
                 dateCreated: BaseDate.AddDays(index));
+
+        /// <summary>Seeds a dedicated game with unassigned players, for tests that need to exercise team assignment.</summary>
+        protected async Task<(Game Game, IReadOnlyList<Player> Players)> SeedGameWithUnassignedPlayersAsync(
+            User organiser, int playerCount = 4, int teamSize = 3)
+        {
+            var now = DateTimeOffset.UtcNow;
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: teamSize, dateCreated: now);
+            var players = Enumerable.Range(1, playerCount)
+                .Select(i => EntityFactory.CreatePlayer(
+                    game.Id, displayName: $"Player {i}", rating: 1000, dateCreated: now.Add(TimeSpan.FromMicroseconds(i))))
+                .ToList();
+
+            await using var scope = Factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+            await context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+            await context.Players.AddRangeAsync(players, TestContext.Current.CancellationToken);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            return (game, players);
+        }
     }
 }

@@ -62,10 +62,24 @@ public abstract class ApiControllerTestsBase(ApiWebApplicationFactory factory)
     /// <summary>Extracts the validation error messages for a given field from the problem details "errors" extension.</summary>
     protected static IReadOnlyList<string> GetValidationErrors(ProblemDetails problemDetails, string propertyName) =>
         ((JsonElement)problemDetails.Extensions["errors"]!)
-        .GetProperty(propertyName)
-        .EnumerateArray()
-        .Select(error => error.GetString()!)
-        .ToList();
+            .GetProperty(propertyName)
+            .EnumerateArray()
+            .Select(error => error.GetString()!)
+            .ToList();
+
+    /// <summary>Extracts every validation error message from the problem details "errors" extension, regardless of
+    /// which field it's keyed under - useful for RuleForEach failures, whose keys include an indexer (e.g.
+    /// "AwayTeamIds[0]") that callers can't predict.</summary>
+    protected static IReadOnlyList<string> GetAllValidationErrors(ProblemDetails problemDetails) =>
+        ((JsonElement)problemDetails.Extensions["errors"]!)
+            .EnumerateObject()
+            .SelectMany(property => property.Value.EnumerateArray().Select(error => error.GetString()!))
+            .ToList();
+
+    protected static IEnumerable<string> GetHeaderValues(HttpResponseMessage response, string headerName) =>
+        response.Headers.TryGetValues(headerName, out var values) ? values : [];
+
+    protected static string ToETagValue(string concurrencyToken) => $"\"{concurrencyToken}\"";
 
     /// <summary>Attaches the actor headers required by any endpoint that resolves <c>IActorAccessor.Current</c>.</summary>
     protected static HttpRequestMessage WithActorHeaders(HttpRequestMessage request, User actor) =>
