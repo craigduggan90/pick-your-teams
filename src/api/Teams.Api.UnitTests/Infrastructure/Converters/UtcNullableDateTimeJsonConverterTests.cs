@@ -5,7 +5,7 @@ namespace Teams.Api.UnitTests.Infrastructure.Converters;
 
 public static class UtcNullableDateTimeConverterTests
 {
-    private record TestModel(DateTime? Value);
+    private sealed record TestModel(DateTime? Value);
 
     private static JsonSerializerOptions CreateOptions()
     {

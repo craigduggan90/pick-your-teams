@@ -5,7 +5,7 @@ namespace Teams.Api.UnitTests.Infrastructure.Converters;
 
 public static class UtcDateTimeJsonConverterTests
 {
-    private record TestModel(DateTime Value);
+    private sealed record TestModel(DateTime Value);
 
     private static JsonSerializerOptions CreateOptions()
     {

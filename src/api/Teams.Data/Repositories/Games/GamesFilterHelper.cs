@@ -15,12 +15,12 @@ public static class GamesFilterHelper
     public static IQueryable<Game> ApplyStartTimeFromFilter(this IQueryable<Game> queryable, DateTime? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.StartTime <= value);
+            : queryable.Where(game => game.StartTime >= value);
 
     public static IQueryable<Game> ApplyStartTimeToFilter(this IQueryable<Game> queryable, DateTime? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.StartTime > value);
+            : queryable.Where(game => game.StartTime < value);
 
     public static IQueryable<Game> ApplyDurationFilter(this IQueryable<Game> queryable, RangeFilter<int>? value)
         => value is null
@@ -40,12 +40,12 @@ public static class GamesFilterHelper
     private static IQueryable<Game> ApplyDurationFromFilter(this IQueryable<Game> queryable, int? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.Duration <= value);
+            : queryable.Where(game => game.Duration >= value);
 
     private static IQueryable<Game> ApplyDurationToFilter(this IQueryable<Game> queryable, int? value)
         => value is null
             ? queryable
-            : queryable.Where(game => game.Duration > value);
+            : queryable.Where(game => game.Duration < value);
 
     public static IQueryable<Game> ApplyOrganiserIdFilter(this IQueryable<Game> queryable, string? value)
         => value is null

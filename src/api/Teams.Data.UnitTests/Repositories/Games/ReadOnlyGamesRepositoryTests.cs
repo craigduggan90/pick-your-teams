@@ -64,7 +64,7 @@ public static class ReadOnlyGamesRepositoryTests
         public async Task ShouldReturnFilteredPage_WhenStartTimeFromProvided()
         {
             var value = Context.Games.OrderBy(g => g.StartTime).Skip(59).First().StartTime;
-            var expected = Context.Games.Where(g => g.StartTime <= value)
+            var expected = Context.Games.Where(g => g.StartTime >= value)
                 .OrderBy(g => g.Cursor)
                 .Take(Constants.DefaultPageSize);
 
@@ -80,7 +80,7 @@ public static class ReadOnlyGamesRepositoryTests
         public async Task ShouldReturnFilteredPage_WhenStartTimeToProvided()
         {
             var value = Context.Games.OrderBy(g => g.StartTime).Skip(59).First().StartTime;
-            var expected = Context.Games.Where(g => g.StartTime > value)
+            var expected = Context.Games.Where(g => g.StartTime < value)
                 .OrderBy(g => g.Cursor)
                 .Take(Constants.DefaultPageSize);
 
@@ -95,13 +95,13 @@ public static class ReadOnlyGamesRepositoryTests
         [Fact]
         public async Task ShouldReturnFilteredPage_WhenDurationProvided()
         {
-            var expected = Context.Games.Where(g => g.Duration <= 90 && g.Duration > 30)
+            var expected = Context.Games.Where(g => g.Duration >= 30 && g.Duration < 90)
                 .OrderBy(g => g.Cursor)
                 .Take(Constants.DefaultPageSize);
 
             var sut = CreateSut();
             var actual = await sut.GetAsync(
-                duration: new RangeFilter<int>(90, 30),
+                duration: new RangeFilter<int>(30, 90),
                 cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equivalent(expected, actual, true);

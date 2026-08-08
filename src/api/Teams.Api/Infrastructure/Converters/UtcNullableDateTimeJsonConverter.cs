@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Teams.Api.Infrastructure.Converters;
 
-public class UtcNullableDateTimeConverter : UtcDateTimeJsonConverterBase<DateTime?> 
+public class UtcNullableDateTimeConverter : UtcDateTimeJsonConverterBase<DateTime?>
 {
     public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
         reader.TokenType == JsonTokenType.Null ? null : EnsureUtcDateTime(reader.GetDateTime());

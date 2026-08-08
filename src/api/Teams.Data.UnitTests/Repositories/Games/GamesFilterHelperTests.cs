@@ -57,7 +57,7 @@ public static class GamesFilterHelperTests
         {
             var data = GetSeedData(30);
             var value = data.Skip(14).First().StartTime;
-            var expected = data.Where(game => game.StartTime <= value);
+            var expected = data.Where(game => game.StartTime >= value);
             var filtered = data.ApplyStartTimeFromFilter(value);
             Assert.Equivalent(expected, filtered, true);
         }
@@ -78,7 +78,7 @@ public static class GamesFilterHelperTests
         {
             var data = GetSeedData(30);
             var value = data.Skip(14).First().StartTime;
-            var expected = data.Where(game => game.StartTime > value);
+            var expected = data.Where(game => game.StartTime < value);
             var filtered = data.ApplyStartTimeToFilter(value);
             Assert.Equivalent(expected, filtered, true);
         }
@@ -98,7 +98,7 @@ public static class GamesFilterHelperTests
         public void ShouldApplyFromFilter_WhenOnlyFromProvided()
         {
             var data = GetSeedData(30);
-            var expected = data.Where(game => game.Duration <= 60);
+            var expected = data.Where(game => game.Duration >= 60);
             var filtered = data.ApplyDurationFilter(new RangeFilter<int>(60, null));
             Assert.Equivalent(expected, filtered, true);
         }
@@ -107,7 +107,7 @@ public static class GamesFilterHelperTests
         public void ShouldApplyToFilter_WhenOnlyToProvided()
         {
             var data = GetSeedData(30);
-            var expected = data.Where(game => game.Duration > 60);
+            var expected = data.Where(game => game.Duration < 60);
             var filtered = data.ApplyDurationFilter(new RangeFilter<int>(null, 60));
             Assert.Equivalent(expected, filtered, true);
         }
@@ -116,8 +116,8 @@ public static class GamesFilterHelperTests
         public void ShouldApplyBothFilters_WhenFromAndToProvided()
         {
             var data = GetSeedData(30);
-            var expected = data.Where(game => game.Duration <= 90 && game.Duration > 30);
-            var filtered = data.ApplyDurationFilter(new RangeFilter<int>(90, 30));
+            var expected = data.Where(game => game.Duration >= 30 && game.Duration < 90);
+            var filtered = data.ApplyDurationFilter(new RangeFilter<int>(30, 90));
             Assert.Equivalent(expected, filtered, true);
         }
     }
