@@ -2,12 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http.Json;
 using Teams.Common;
+using Teams.Domain.Entities;
 
 namespace Teams.Api.IntegrationTests;
 
 public abstract class ApiControllerTestsBase(ApiWebApplicationFactory factory)
     : IClassFixture<ApiWebApplicationFactory>, IDisposable
 {
+    private const string UserIdHeader = "Teams-User-Id";
+    private const string UserTagHeader = "Teams-User-Tag";
+    private const string UserNameHeader = "Teams-User-Name";
+
     protected HttpClient Client { get; } = factory.CreateClient();
 
     protected ApiWebApplicationFactory Factory { get; } = factory;
@@ -53,10 +58,18 @@ public abstract class ApiControllerTestsBase(ApiWebApplicationFactory factory)
     protected static Task<ProblemDetails?> ReadProblemDetailsAsync(HttpResponseMessage response, CancellationToken cancellationToken) =>
         ReadContentAsync<ProblemDetails>(response, cancellationToken);
 
-    protected static IEnumerable<string> GetHeaderValues(HttpResponseMessage response, string headerName) =>
-        response.Headers.TryGetValues(headerName, out var values) ? values : [];
+    /// <summary>Attaches the actor headers required by any endpoint that resolves <c>IActorAccessor.Current</c>.</summary>
+    protected static HttpRequestMessage WithActorHeaders(HttpRequestMessage request, User actor) =>
+        WithActorHeaders(request, actor.Id, actor.Tag, actor.DisplayName);
 
-    protected static string ToETagValue(string concurrencyToken) => $"\"{concurrencyToken}\"";
+    /// <summary>Attaches the actor headers required by any endpoint that resolves <c>IActorAccessor.Current</c>.</summary>
+    protected static HttpRequestMessage WithActorHeaders(HttpRequestMessage request, string id, string tag, string displayName)
+    {
+        request.Headers.Add(UserIdHeader, id);
+        request.Headers.Add(UserTagHeader, tag);
+        request.Headers.Add(UserNameHeader, displayName);
+        return request;
+    }
 
     public void Dispose()
     {
