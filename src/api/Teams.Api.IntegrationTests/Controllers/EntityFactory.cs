@@ -10,15 +10,14 @@ internal static class EntityFactory
 {
     // Cursor has a DB-level unique constraint and is derived from an entity's created timestamp. DateTimeOffset.UtcNow
     // sampled independently per call is not guaranteed unique - two calls in quick succession (or under parallel test
-    // execution) can land in the same microsecond. This is a monotonic, thread-safe substitute: every call without an
-    // explicit dateCreated gets a strictly increasing timestamp, so uniqueness holds regardless of clock resolution.
-    // A single fixed base plus a pure arithmetic offset (rather than re-sampling UtcNow per call) keeps the guarantee
-    // independent of wall-clock behavior entirely.
-    private static readonly DateTimeOffset SequenceBase = DateTimeOffset.UtcNow;
+    // execution) can land in the same microsecond. This anchors at a fixed point in time, decades away from both
+    // BaseDate-based seed data (2026) and "now", and increments by whole seconds - an enormous, unambiguous margin -
+    // so uniqueness is guaranteed by pure integer arithmetic, independent of wall-clock behavior or precision entirely.
+    private static readonly DateTimeOffset SequenceBase = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
     private static long _sequence;
 
     private static DateTimeOffset NextDateCreated() =>
-        SequenceBase.AddTicks(Interlocked.Increment(ref _sequence) * TimeSpan.TicksPerMicrosecond);
+        SequenceBase.AddSeconds(Interlocked.Increment(ref _sequence));
 
     public static T CreateSeeded<T>(string id, DateTimeOffset dateCreated, Func<T> factory, Action<T>? postCreation = null)
         where T : EntityBase
