@@ -143,21 +143,15 @@ public static partial class GamesControllerTests
 
         private async Task<(User LinkedUser, Game Game, Player HomePlayer, Player AwayPlayer)> SeedGameWithPlayersAsync(User organiser)
         {
-            var now = DateTimeOffset.UtcNow;
-            var linkedUser = EntityFactory.CreateUser(displayName: "Linked Player", dateCreated: now);
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3, dateCreated: now.Add(TimeSpan.FromMicroseconds(1)));
+            var linkedUser = EntityFactory.CreateUser(displayName: "Linked Player");
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
             var homePlayer = EntityFactory.CreatePlayer(
                 game.Id, userId: linkedUser.Id, displayName: linkedUser.DisplayName, rating: linkedUser.Rating,
-                type: PlayerTypeEnum.User, team: GameTeamEnum.Home, dateCreated: now.Add(TimeSpan.FromMicroseconds(2)));
-            var homeTeammate = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Dummy Home Player", rating: 1000, team: GameTeamEnum.Home,
-                dateCreated: now.Add(TimeSpan.FromMicroseconds(3)));
+                type: PlayerTypeEnum.User, team: GameTeamEnum.Home);
+            var homeTeammate = EntityFactory.CreatePlayer(game.Id, displayName: "Dummy Home Player", rating: 1000, team: GameTeamEnum.Home);
             var awayPlayer = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Dummy Away Player", rating: 900, team: GameTeamEnum.Away,
-                dateCreated: now.Add(TimeSpan.FromMicroseconds(4)));
-            var awayTeammate = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Dummy Away Player 2", rating: 900, team: GameTeamEnum.Away,
-                dateCreated: now.Add(TimeSpan.FromMicroseconds(5)));
+                game.Id, displayName: "Dummy Away Player", rating: 900, team: GameTeamEnum.Away);
+            var awayTeammate = EntityFactory.CreatePlayer(game.Id, displayName: "Dummy Away Player 2", rating: 900, team: GameTeamEnum.Away);
 
             await using var scope = Factory.Services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();

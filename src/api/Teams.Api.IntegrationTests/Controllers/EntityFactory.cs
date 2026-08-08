@@ -8,6 +8,18 @@ namespace Teams.Api.IntegrationTests.Controllers;
 
 internal static class EntityFactory
 {
+    // Cursor has a DB-level unique constraint and is derived from an entity's created timestamp. DateTimeOffset.UtcNow
+    // sampled independently per call is not guaranteed unique - two calls in quick succession (or under parallel test
+    // execution) can land in the same microsecond. This is a monotonic, thread-safe substitute: every call without an
+    // explicit dateCreated gets a strictly increasing timestamp, so uniqueness holds regardless of clock resolution.
+    // A single fixed base plus a pure arithmetic offset (rather than re-sampling UtcNow per call) keeps the guarantee
+    // independent of wall-clock behavior entirely.
+    private static readonly DateTimeOffset SequenceBase = DateTimeOffset.UtcNow;
+    private static long _sequence;
+
+    private static DateTimeOffset NextDateCreated() =>
+        SequenceBase.AddTicks(Interlocked.Increment(ref _sequence) * TimeSpan.TicksPerMicrosecond);
+
     public static T CreateSeeded<T>(string id, DateTimeOffset dateCreated, Func<T> factory, Action<T>? postCreation = null)
         where T : EntityBase
     {
@@ -28,7 +40,7 @@ internal static class EntityFactory
         Action<User>? postCreationSteps = null) =>
         CreateSeeded(
             id ?? $"user-{Guid.NewGuid():N}",
-            dateCreated ?? DateTimeOffset.UtcNow,
+            dateCreated ?? NextDateCreated(),
             () => new User(
                 displayName ?? "Test User",
                 externalId ?? $"external-{Guid.NewGuid():N}",
@@ -49,7 +61,7 @@ internal static class EntityFactory
         Action<Game>? postCreationSteps = null) =>
         CreateSeeded(
             id ?? $"game-{Guid.NewGuid():N}",
-            dateCreated ?? DateTimeOffset.UtcNow,
+            dateCreated ?? NextDateCreated(),
             () => new Game(organiserId, location, startTime ?? DateTime.UtcNow, duration, teamSize),
             postCreationSteps);
 
@@ -70,7 +82,7 @@ internal static class EntityFactory
         Action<Player>? postCreationSteps = null) =>
         CreateSeeded(
             id ?? $"player-{Guid.NewGuid():N}",
-            dateCreated ?? DateTimeOffset.UtcNow,
+            dateCreated ?? NextDateCreated(),
             () => new Player(gameId, userId, displayName ?? "Test Player", rating, type, team),
             postCreationSteps);
 }

@@ -109,14 +109,9 @@ public static partial class GamesControllerTests
         public async Task ShouldReturnNoContent_WithTeamsCleared_WhenRequestIsValid()
         {
             var organiser = SeedOrganisers[0];
-            var now = DateTimeOffset.UtcNow;
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3, dateCreated: now);
-            var homePlayer = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Home Player", rating: 1000, team: GameTeamEnum.Home,
-                dateCreated: now.Add(TimeSpan.FromMicroseconds(1)));
-            var awayPlayer = EntityFactory.CreatePlayer(
-                game.Id, displayName: "Away Player", rating: 950, team: GameTeamEnum.Away,
-                dateCreated: now.Add(TimeSpan.FromMicroseconds(2)));
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
+            var homePlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Home Player", rating: 1000, team: GameTeamEnum.Home);
+            var awayPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Away Player", rating: 950, team: GameTeamEnum.Away);
 
             await using (var scope = Factory.Services.CreateAsyncScope())
             {

@@ -82,11 +82,9 @@ public static partial class GamesControllerTests
         protected async Task<(Game Game, IReadOnlyList<Player> Players)> SeedGameWithUnassignedPlayersAsync(
             User organiser, int playerCount = 4, int teamSize = 3)
         {
-            var now = DateTimeOffset.UtcNow;
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: teamSize, dateCreated: now);
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: teamSize);
             var players = Enumerable.Range(1, playerCount)
-                .Select(i => EntityFactory.CreatePlayer(
-                    game.Id, displayName: $"Player {i}", rating: 1000, dateCreated: now.Add(TimeSpan.FromMicroseconds(i))))
+                .Select(i => EntityFactory.CreatePlayer(game.Id, displayName: $"Player {i}", rating: 1000))
                 .ToList();
 
             await using var scope = Factory.Services.CreateAsyncScope();

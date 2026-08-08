@@ -95,10 +95,9 @@ public static partial class GamesControllerTests
         public async Task ShouldReturnOkWithNoBody_WhenNoSuggestionMeetsTheDifferentialThreshold()
         {
             var organiser = SeedOrganisers[0];
-            var now = DateTimeOffset.UtcNow;
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3, dateCreated: now);
-            var strongPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Strong Player", rating: 2000, dateCreated: now.Add(TimeSpan.FromMicroseconds(1)));
-            var weakPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Weak Player", rating: 100, dateCreated: now.Add(TimeSpan.FromMicroseconds(2)));
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
+            var strongPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Strong Player", rating: 2000);
+            var weakPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Weak Player", rating: 100);
 
             await using (var scope = Factory.Services.CreateAsyncScope())
             {
@@ -122,11 +121,9 @@ public static partial class GamesControllerTests
         public async Task ShouldReturnOkWithSuggestion_WhenRequestIsValid()
         {
             var organiser = SeedOrganisers[0];
-            var now = DateTimeOffset.UtcNow;
-            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3, dateCreated: now);
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
             var players = Enumerable.Range(1, 4)
-                .Select(i => EntityFactory.CreatePlayer(
-                    game.Id, displayName: $"Player {i}", rating: 1000, dateCreated: now.Add(TimeSpan.FromMicroseconds(i))))
+                .Select(i => EntityFactory.CreatePlayer(game.Id, displayName: $"Player {i}", rating: 1000))
                 .ToList();
 
             await using (var scope = Factory.Services.CreateAsyncScope())
