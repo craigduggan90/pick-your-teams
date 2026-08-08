@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 using Teams.Data.Context;
 using Teams.Domain.Entities;
 
@@ -43,13 +42,5 @@ public static partial class UsersControllerTests
                 email: $"user{index:D3}@test.net",
                 dateCreated: BaseDate.AddDays(index),
                 postCreationSteps: user => user.ApplyRatingChange(index)); // Ratings: 1001 - 1030, cycling deterministically with the index.
-
-        /// <summary>Extracts the validation error messages for a given field from the problem details "errors" extension.</summary>
-        protected static IReadOnlyList<string> GetValidationErrors(ProblemDetails problemDetails, string propertyName) =>
-            ((JsonElement)problemDetails.Extensions["errors"]!)
-                .GetProperty(propertyName)
-                .EnumerateArray()
-                .Select(error => error.GetString()!)
-                .ToList();
     }
 }

@@ -30,6 +30,9 @@ public class RecordGameResultCommandHandler(
         game.SetResult(winner);
         await uow.Games.UpdateAsync(game, cancellationToken);
 
+        if (!game.IsDirty)
+            return game;
+
         foreach (var player in game.Players)
             await UpdatePlayerAsync(game, player, cancellationToken);
 

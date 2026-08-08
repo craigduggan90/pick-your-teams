@@ -109,8 +109,7 @@ public static partial class UsersControllerTests
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.NotNull(problem);
-            Assert.Contains(
-                GetValidationErrors(problem, nameof(UpdateUserRequestModel.Tag)),
+            Assert.Contains(GetValidationErrors(problem, nameof(UpdateUserRequestModel.Tag)),
                 error => error.Contains("characters", StringComparison.OrdinalIgnoreCase));
         }
 

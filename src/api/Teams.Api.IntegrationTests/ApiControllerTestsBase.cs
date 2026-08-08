@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Teams.Common;
 using Teams.Domain.Entities;
 
@@ -57,6 +58,14 @@ public abstract class ApiControllerTestsBase(ApiWebApplicationFactory factory)
 
     protected static Task<ProblemDetails?> ReadProblemDetailsAsync(HttpResponseMessage response, CancellationToken cancellationToken) =>
         ReadContentAsync<ProblemDetails>(response, cancellationToken);
+
+    /// <summary>Extracts the validation error messages for a given field from the problem details "errors" extension.</summary>
+    protected static IReadOnlyList<string> GetValidationErrors(ProblemDetails problemDetails, string propertyName) =>
+        ((JsonElement)problemDetails.Extensions["errors"]!)
+        .GetProperty(propertyName)
+        .EnumerateArray()
+        .Select(error => error.GetString()!)
+        .ToList();
 
     /// <summary>Attaches the actor headers required by any endpoint that resolves <c>IActorAccessor.Current</c>.</summary>
     protected static HttpRequestMessage WithActorHeaders(HttpRequestMessage request, User actor) =>
