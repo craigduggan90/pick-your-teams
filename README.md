@@ -30,3 +30,9 @@ GAME ||--o{ PLAYER : participates
 USER |o--o{ PLAYER : "plays as"
 GAME }o--|| USER : "organised by"
 ```
+
+## Generative AI
+
+We have used generative AI as an assistant to handle repetitive coding tasks in this project.  We have also leveraged 
+LLMs for code review and for fast feedback.  The structures, patterns, and algorthms in this project are all developed
+"by hand".

@@ -411,3 +411,4 @@ FodyWeavers.xsd
 coverage/
 *.xml
 .logs/
+TestResults/
