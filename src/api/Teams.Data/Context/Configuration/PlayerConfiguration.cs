@@ -56,5 +56,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .HasForeignKey(p => p.UserId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+        builder.Navigation(e => e.User).AutoInclude();
     }
 }

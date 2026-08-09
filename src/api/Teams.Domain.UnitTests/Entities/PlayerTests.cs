@@ -42,7 +42,7 @@ public static class PlayerTests
 
             Assert.Equal(DefaultGameId, player.GameId);
             Assert.Equal(DefaultUserId, player.UserId);
-            Assert.Equal(DefaultDisplayName, player.DisplayName);
+            Assert.Equal(DefaultDisplayName, player.GetDisplayName);
             Assert.Equal(DefaultRating, player.Rating);
             Assert.Equal(DefaultType, player.Type);
             Assert.Equal(DefaultTeam, player.Team);
@@ -59,7 +59,7 @@ public static class PlayerTests
 
             Assert.Equal(game.Id, player.GameId);
             Assert.Same(game, player.Game);
-            Assert.Equal("dummy-name", player.DisplayName);
+            Assert.Equal("dummy-name", player.GetDisplayName);
             Assert.Equal(950, player.Rating);
             Assert.Null(player.UserId);
             Assert.Null(player.User);
@@ -79,7 +79,7 @@ public static class PlayerTests
             Assert.Same(game, player.Game);
             Assert.Equal(user.Id, player.UserId);
             Assert.Same(user, player.User);
-            Assert.Equal(user.Tag, player.DisplayName);
+            Assert.Equal(user.Tag, player.GetDisplayName);
             Assert.Equal(user.Rating, player.Rating);
             Assert.Equal(PlayerTypeEnum.User, player.Type);
             Assert.Equal(GameTeamEnum.None, player.Team);

@@ -16,7 +16,7 @@ public static class PlayersMapper
             GameId: entity.GameId,
             UserId: entity.UserId,
             Type: entity.Type.ToString(),
-            DisplayName: entity.DisplayName,
+            DisplayName: entity.GetDisplayName(),
             Rating: entity.Rating,
             Team: entity.Team.ToString());
 
@@ -25,7 +25,7 @@ public static class PlayersMapper
             GameId: entity.GameId,
             UserId: entity.UserId,
             Type: entity.Type.ToString(),
-            DisplayName: entity.DisplayName,
+            DisplayName: entity.GetDisplayName(),
             Rating: entity.Rating,
             RatingChange: entity.RatingChange,
             Team: entity.Team.ToString(),

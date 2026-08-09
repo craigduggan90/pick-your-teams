@@ -98,7 +98,7 @@ public static class CreateDummyPlayerCommandHandlerTests
             var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
 
             Assert.Equal(game.Id, result.GameId);
-            Assert.Equal(command.DisplayName, result.DisplayName);
+            Assert.Equal(command.DisplayName, result.GetDisplayName);
             Assert.Equal(command.EstimatedRating, result.Rating);
             Assert.Null(result.UserId);
             Assert.Equal(Teams.Domain.Enums.PlayerTypeEnum.Dummy, result.Type);

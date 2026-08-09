@@ -69,7 +69,7 @@ public static class PlayersFilterHelperTests
         {
             const string value = "00000015";
             var data = GetSeedData(30);
-            var expected = data.Where(player => player.DisplayName.Contains(value));
+            var expected = data.Where(player => player.GetDisplayName.Contains(value));
             var filtered = data.ApplyDisplayNameFilter(value);
             Assert.Equivalent(expected, filtered, true);
         }

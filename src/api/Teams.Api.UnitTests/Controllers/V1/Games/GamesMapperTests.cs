@@ -122,7 +122,7 @@ public static class GamesMapperTests
 
             var resultHomePlayer = Assert.Single(result.Home!.Players);
             Assert.Equal(homePlayer.Id, resultHomePlayer.Id);
-            Assert.Equal(homePlayer.DisplayName, resultHomePlayer.DisplayName);
+            Assert.Equal(homePlayer.GetDisplayName, resultHomePlayer.DisplayName);
             Assert.Equal(homePlayer.Rating, resultHomePlayer.Rating);
             Assert.Equal(game.HomeTeamRating, result.Home.TeamRating);
 
@@ -178,7 +178,7 @@ public static class GamesMapperTests
             var result = player.ToGameTeamPlayerModel();
 
             Assert.Equal(player.Id, result.Id);
-            Assert.Equal(player.DisplayName, result.DisplayName);
+            Assert.Equal(player.GetDisplayName, result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
         }
     }

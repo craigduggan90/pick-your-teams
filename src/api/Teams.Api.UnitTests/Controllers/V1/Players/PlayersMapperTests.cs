@@ -40,7 +40,7 @@ public static class PlayersMapperTests
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
-            Assert.Equal(player.DisplayName, result.DisplayName);
+            Assert.Equal(player.GetDisplayName, result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);
         }
@@ -64,7 +64,7 @@ public static class PlayersMapperTests
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
-            Assert.Equal(player.DisplayName, result.DisplayName);
+            Assert.Equal(player.GetDisplayName, result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
             Assert.Equal(player.RatingChange, result.RatingChange);
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);

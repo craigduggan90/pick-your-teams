@@ -62,7 +62,7 @@ public static partial class PlayersControllerTests
             Assert.NotNull(content);
             Assert.Equal(existingPlayer.Id, content.Id);
             Assert.Equal(existingPlayer.GameId, content.GameId);
-            Assert.Equal(existingPlayer.DisplayName, content.DisplayName);
+            Assert.Equal(existingPlayer.GetDisplayName, content.DisplayName);
             Assert.Equal(existingPlayer.Rating, content.Rating);
             Assert.Equal(existingPlayer.Team.ToString(), content.Team);
         }

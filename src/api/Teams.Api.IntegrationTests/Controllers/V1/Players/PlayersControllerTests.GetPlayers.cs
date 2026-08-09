@@ -77,7 +77,7 @@ public static partial class PlayersControllerTests
         {
             var existingPlayer = SeedPlayers[14];
 
-            var url = WithQuery(Url, ("DisplayName", existingPlayer.DisplayName));
+            var url = WithQuery(Url, ("DisplayName", existingPlayer.GetDisplayName));
             var request = CreateRequest(HttpMethod.Get, url);
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);

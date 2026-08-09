@@ -10,7 +10,7 @@ namespace Teams.Domain.Entities;
 /// <param name="displayName">The players display name.</param>
 /// <param name="rating">The players rating.</param>
 /// <param name="team">The team to which this player is assigned.</param>
-public class Player(string gameId, string? userId, string displayName, int rating, PlayerTypeEnum type, GameTeamEnum team)
+public class Player(string gameId, string? userId, int rating, PlayerTypeEnum type, GameTeamEnum team)
     : EntityBase
 {
     /// <summary>
@@ -20,9 +20,10 @@ public class Player(string gameId, string? userId, string displayName, int ratin
     /// <param name="displayName">The display name of the dummy user.</param>
     /// <param name="estimatedRating">The estimated rating for the dummy user.</param>
     public Player(Game game, string displayName, int estimatedRating)
-        : this(game.Id, null, displayName, estimatedRating, PlayerTypeEnum.Dummy, GameTeamEnum.None)
+        : this(game.Id, null, estimatedRating, PlayerTypeEnum.Dummy, GameTeamEnum.None)
     {
         Game = game;
+        DisplayName = displayName;
     }
 
     /// <summary>
@@ -31,7 +32,7 @@ public class Player(string gameId, string? userId, string displayName, int ratin
     /// <param name="game">The game.</param>
     /// <param name="user">The user.</param>
     public Player(Game game, User user)
-        : this(game.Id, user.Id, user.Tag, user.Rating, PlayerTypeEnum.User, GameTeamEnum.None)
+        : this(game.Id, user.Id, user.Rating, PlayerTypeEnum.User, GameTeamEnum.None)
     {
         Game = game;
         User = user;
@@ -45,7 +46,7 @@ public class Player(string gameId, string? userId, string displayName, int ratin
     /// <summary>
     /// The display name of the game player, used for non-player participants and when the player has been deleted.
     /// </summary>
-    public string DisplayName { get; init; } = displayName;
+    public string? DisplayName { get; init; }
 
     /// <summary>
     /// The unique identifier of the user. <c>null</c> when the player is a dummy player.
@@ -77,6 +78,9 @@ public class Player(string gameId, string? userId, string displayName, int ratin
         get => field ?? throw UninitializedPropertyException.For(nameof(Game));
         init;
     }
+
+    /// <summary>Get the display name for the current player.</summary>
+    public string? GetDisplayName() => User?.DisplayName ?? DisplayName;
 
     /// <summary>Set the player team and fix the player rating at time of assignment.</summary>
     /// <param name="team">The team to which the player is assigned.</param>

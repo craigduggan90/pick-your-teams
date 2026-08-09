@@ -8,7 +8,7 @@ public record PlayerDetailModel(
     string GameId,
     string? UserId,
     string Type,
-    string DisplayName,
+    string? DisplayName,
     int Rating,
     int? RatingChange,
     string Team,

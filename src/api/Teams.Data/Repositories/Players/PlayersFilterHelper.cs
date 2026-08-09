@@ -14,7 +14,9 @@ public static class PlayersFilterHelper
     public static IQueryable<Player> ApplyDisplayNameFilter(this IQueryable<Player> queryable, string? value) =>
         value is null
             ? queryable
-            : queryable.Where(entity => entity.DisplayName.Contains(value));
+            : queryable.Where(entity =>
+                (entity.User != null && entity.User.DisplayName.Contains(value)) ||
+                (entity.DisplayName != null && entity.DisplayName.Contains(value)));
 
     public static IQueryable<Player> ApplyUserIdFilter(this IQueryable<Player> queryable, string? value) =>
         value is null

@@ -131,7 +131,7 @@ public static class CreatePlayerCommandHandlerTests
 
             Assert.Equal(game.Id, result.GameId);
             Assert.Equal(user.Id, result.UserId);
-            Assert.Equal(user.Tag, result.DisplayName);
+            Assert.Equal(user.Tag, result.GetDisplayName);
             Assert.Equal(user.Rating, result.Rating);
         }
 

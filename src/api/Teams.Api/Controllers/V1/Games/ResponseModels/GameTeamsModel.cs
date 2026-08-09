@@ -42,4 +42,4 @@ public record GameTeamModel(IReadOnlyCollection<GameTeamPlayerModel> Players, in
     ], TeamRating: 5515);
 }
 
-public record GameTeamPlayerModel(string Id, string DisplayName, int Rating);
+public record GameTeamPlayerModel(string Id, string? DisplayName, int Rating);
