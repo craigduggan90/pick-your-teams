@@ -9,6 +9,7 @@ using Teams.Common.Providers.Identifiers;
 using Teams.Core.CQRS;
 using Teams.Core.UseCases.Users.CreateUser;
 using Teams.Core.UseCases.Users.DeleteUser;
+using Teams.Core.UseCases.Users.GetSelf;
 using Teams.Core.UseCases.Users.GetUserById;
 using Teams.Core.UseCases.Users.GetUsers;
 using Teams.Core.UseCases.Users.UpdateUser;
@@ -119,6 +120,27 @@ public static class UsersControllerTests
                     c.Email == requestModel.Email &&
                     c.Mobile == requestModel.Mobile),
                 Arg.Any<CancellationToken>());
+        }
+    }
+
+    public class GetSelf : UserControllerTestsBase
+    {
+        [Fact]
+        public async Task ShouldReturnOk_WhenSuccess()
+        {
+            var user = GetUser();
+
+            Mediator.SendAsync(Arg.Any<GetSelfQuery>(), Arg.Any<CancellationToken>())
+                .Returns(user);
+
+            var expected = user.ToDetailedModel();
+
+            var sut = GetOrCreateSut();
+            var rawResult = await sut.GetSelf(TestContext.Current.CancellationToken);
+
+            AssertResultValue<OkObjectResult, UserDetailModel>(rawResult, expected);
+
+            await Mediator.Received(1).SendAsync(Arg.Any<GetSelfQuery>(), Arg.Any<CancellationToken>());
         }
     }
 

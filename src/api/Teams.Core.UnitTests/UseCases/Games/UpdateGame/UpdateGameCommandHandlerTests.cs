@@ -2,6 +2,7 @@ using Teams.Core.Exceptions;
 using Teams.Core.Models;
 using Teams.Core.UseCases.Games.UpdateGame;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.UnitTests.UseCases.Games.UpdateGame;
 
@@ -63,6 +64,22 @@ public static class UpdateGameCommandHandlerTests
             var sut = CreateSut();
 
             await Assert.ThrowsAsync<AccessDeniedException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await GamesRepository.DidNotReceive().UpdateAsync(Arg.Any<Game>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldThrowRequestHandlerExceptionAndNotPersistChanges_WhenGameIsFinished()
+        {
+            var existingGame = CreateExistingGame();
+            existingGame.SetResult(GameTeamEnum.Home);
+            GamesRepository.GetByIdAsync(existingGame.Id, Arg.Any<CancellationToken>()).Returns(existingGame);
+            var command = new UpdateGameCommand(existingGame.Id, "new-location", null, null);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<RequestHandlerException>(
                 () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
 
             await GamesRepository.DidNotReceive().UpdateAsync(Arg.Any<Game>(), Arg.Any<CancellationToken>());

@@ -98,6 +98,23 @@ public static partial class GamesControllerTests
         }
 
         [Fact]
+        public async Task ShouldReturnUnprocessableEntity_WhenGameIsFinished()
+        {
+            var finishedGame = SeedGames[1]; // seed game 2 - even index, already finished
+            var organiser = SeedOrganisers.Single(u => u.Id == finishedGame.OrganiserId);
+
+            var request = CreateJsonRequest(HttpMethod.Patch, $"{Url}/{finishedGame.Id}", ValidRequest);
+            WithActorHeaders(request, organiser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            Assert.NotNull(problem);
+            Assert.Equal("Game cannot be updated once finished.", problem.Detail);
+        }
+
+        [Fact]
         public async Task ShouldReturnUnprocessableEntity_WhenDurationIsOutOfRange()
         {
             var existingGame = SeedGames[0];

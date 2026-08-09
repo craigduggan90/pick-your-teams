@@ -9,6 +9,7 @@ using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 using Teams.Common.Pagination;
 using Teams.Core.CQRS;
 using Teams.Core.UseCases.Users.DeleteUser;
+using Teams.Core.UseCases.Users.GetSelf;
 using Teams.Core.UseCases.Users.GetUserById;
 using Teams.Domain.Extensions;
 
@@ -39,6 +40,17 @@ public class UsersController(IMediator mediator) : ApiControllerBase
         // before any User exists to resolve the caller's identity against.
         var entity = await mediator.SendAsync(body.ToCommand(), cancellationToken);
         return CreatedAtAction(nameof(GetUserById), new { id = entity.Id }, entity.ToModel());
+    }
+
+    [HttpGet("self")]
+    [ProducesResponseType<UserDetailModel>(200)]
+    [ProducesResponseType<ProblemDetails>(404)]
+    [SwaggerResponseExample(200, typeof(UserDetailModelExample))]
+    [SwaggerResponseExample(404, typeof(UserNotFoundProblemDetailsExample))]
+    public async Task<IActionResult> GetSelf(CancellationToken cancellationToken)
+    {
+        var entity = await mediator.SendAsync(new GetSelfQuery(), cancellationToken);
+        return Ok(entity.ToDetailedModel());
     }
 
     [HttpGet("{id}")]

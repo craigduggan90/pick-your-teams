@@ -5,6 +5,7 @@ using Teams.Core.Exceptions;
 using Teams.Core.Services;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.UseCases.Games.UpdateGame;
 
@@ -23,6 +24,9 @@ public class UpdateGameCommandHandler(
                    ?? throw new NotFoundException(typeof(Game), request.Id);
 
         actor.Current.ThrowIfNotOrganiser(game.OrganiserId);
+
+        if (game.Status == GameStatusEnum.Finished)
+            throw RequestHandlerException.ForCommandRequest("Game cannot be updated once finished.");
 
         game.Update(request.Location, request.StartTime, request.Duration);
         if (!game.IsDirty)
