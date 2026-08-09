@@ -23,3 +23,10 @@ dotnet ef database update --project ./Teams.Data --startup-project ./Teams.Api
 > Before: ```"Reader": "Data Source=../../teams.db;mode=ReadOnly",```
 > 
 > After: ```"Reader": "Data Source=../../teams.db",```
+ 
+```mermaid
+erDiagram
+GAME ||--o{ PLAYER : participates
+USER |o--o{ PLAYER : "plays as"
+GAME }o--|| USER : "organised by"
+```

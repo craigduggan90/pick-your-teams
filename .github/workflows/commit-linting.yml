@@ -8,7 +8,8 @@ jobs:
     name: commit linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 📩 checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -18,7 +19,7 @@ jobs:
           curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 
-      - name: 📩 install commitlint
+      - name: 🏗️ install commitlint
         run: |
           npm install conventional-changelog-conventionalcommits
           npm install commitlint@latest
