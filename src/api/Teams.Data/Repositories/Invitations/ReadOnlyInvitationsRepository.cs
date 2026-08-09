@@ -13,6 +13,8 @@ public class ReadOnlyInvitationsRepository(ApiDbContext context) : RepositoryBas
         await Context.Invitations
             .Include(invitation => invitation.Game)
                 .ThenInclude(game => game.Organiser)
+            .Include(invitation => invitation.Game)
+                .ThenInclude(game => game.Players)
             .Include(invitation => invitation.User)
             .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 

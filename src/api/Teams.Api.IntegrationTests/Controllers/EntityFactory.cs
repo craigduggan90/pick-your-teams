@@ -89,4 +89,19 @@ internal static class EntityFactory
                     : null
             },
             postCreationSteps);
+
+    /// <summary>Creates a seeded invitation. <paramref name="gameId"/> is required (not defaulted) because an
+    /// invitation must reference a real seeded <see cref="Game"/> - callers should seed that game first.</summary>
+    public static Invitation CreateInvitation(
+        string gameId,
+        string? userId,
+        string emailAddress,
+        string? id = null,
+        DateTimeOffset? dateCreated = null,
+        Action<Invitation>? postCreationSteps = null) =>
+        CreateSeeded(
+            id ?? $"invitation-{Guid.NewGuid():N}",
+            dateCreated ?? NextDateCreated(),
+            () => new Invitation(gameId, userId, emailAddress),
+            postCreationSteps);
 }
