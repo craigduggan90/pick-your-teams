@@ -7,7 +7,6 @@ namespace Teams.Domain.Entities;
 /// <summary>Represents a player in a game.</summary>
 /// <param name="gameId">The unique identifier of the game in which the player is participating.</param>
 /// <param name="userId">The unique identifier of the user with which this player is associated.</param>
-/// <param name="displayName">The players display name.</param>
 /// <param name="rating">The players rating.</param>
 /// <param name="team">The team to which this player is assigned.</param>
 public class Player(string gameId, string? userId, int rating, PlayerTypeEnum type, GameTeamEnum team)

@@ -51,8 +51,16 @@ public static class CreatePlayerCommandHandlerTests
         public async Task ShouldThrowCommandValidationException_WhenUserAlreadyAssociatedWithGame_AndActorIsOrganiser()
         {
             var game = CreateExistingGame();
-            var existingPlayer = new Player(game.Id, "user-id", "existing-display-name", 1000,
-                Teams.Domain.Enums.PlayerTypeEnum.User, Teams.Domain.Enums.GameTeamEnum.None);
+            var existingPlayer = new Player(
+                gameId: game.Id,
+                userId: "user-id",
+                rating: 1000,
+                type: Domain.Enums.PlayerTypeEnum.User,
+                team: Domain.Enums.GameTeamEnum.None)
+            {
+                DisplayName = "existing-display-name"
+            };
+
             game.Players.Add(existingPlayer);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             var command = new CreatePlayerCommand(game.Id, "user-id");
@@ -68,8 +76,16 @@ public static class CreatePlayerCommandHandlerTests
         public async Task ShouldThrowCommandValidationException_WhenUserAlreadyAssociatedWithGame_AndActorIsSelf()
         {
             var game = CreateExistingGame();
-            var existingPlayer = new Player(game.Id, "user-id", "existing-display-name", 1000,
-                Teams.Domain.Enums.PlayerTypeEnum.User, Teams.Domain.Enums.GameTeamEnum.None);
+            var existingPlayer = new Player(
+                gameId: game.Id,
+                userId: "user-id",
+                rating: 1000,
+                type: Domain.Enums.PlayerTypeEnum.User,
+                team: Domain.Enums.GameTeamEnum.None)
+            {
+                DisplayName = "existing-display-name"
+            };
+
             game.Players.Add(existingPlayer);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             ActorAccessor.Current.Returns(new Actor("user-id", "tag", "display-name"));
@@ -86,8 +102,16 @@ public static class CreatePlayerCommandHandlerTests
         public async Task ShouldNotLoadUser_WhenUserAlreadyAssociatedWithGame()
         {
             var game = CreateExistingGame();
-            var existingPlayer = new Player(game.Id, "user-id", "existing-display-name", 1000,
-                Teams.Domain.Enums.PlayerTypeEnum.User, Teams.Domain.Enums.GameTeamEnum.None);
+            var existingPlayer = new Player(
+                gameId: game.Id,
+                userId: "user-id",
+                rating: 1000,
+                type: Domain.Enums.PlayerTypeEnum.User,
+                team: Domain.Enums.GameTeamEnum.None)
+            {
+                DisplayName = "existing-display-name"
+            };
+
             game.Players.Add(existingPlayer);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             var command = new CreatePlayerCommand(game.Id, "user-id");
@@ -131,7 +155,7 @@ public static class CreatePlayerCommandHandlerTests
 
             Assert.Equal(game.Id, result.GameId);
             Assert.Equal(user.Id, result.UserId);
-            Assert.Equal(user.Tag, result.GetDisplayName);
+            Assert.Equal(user.Tag, result.GetDisplayName());
             Assert.Equal(user.Rating, result.Rating);
         }
 

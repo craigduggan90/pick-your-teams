@@ -18,7 +18,10 @@ public static class PlayerTests
 
         protected static Player CreatePlayer(Action<Player>? setup = null)
         {
-            var player = new Player(DefaultGameId, DefaultUserId, DefaultDisplayName, DefaultRating, DefaultType, DefaultTeam);
+            var player = new Player(DefaultGameId, DefaultUserId, DefaultRating, DefaultType, DefaultTeam)
+            {
+                DisplayName = DefaultDisplayName
+            };
             setup?.Invoke(player);
             return player;
         }
@@ -30,7 +33,7 @@ public static class PlayerTests
             new("display name", "external-id", "email@example.com", null);
 
         protected static Player CreatePlayerWithRating(int rating) =>
-            new(DefaultGameId, DefaultUserId, DefaultDisplayName, rating, DefaultType, DefaultTeam);
+            new(DefaultGameId, DefaultUserId, rating, DefaultType, DefaultTeam) { DisplayName = DefaultDisplayName };
     }
 
     public class Constructor : PlayerTestsBase
@@ -42,7 +45,7 @@ public static class PlayerTests
 
             Assert.Equal(DefaultGameId, player.GameId);
             Assert.Equal(DefaultUserId, player.UserId);
-            Assert.Equal(DefaultDisplayName, player.GetDisplayName);
+            Assert.Equal(DefaultDisplayName, player.GetDisplayName());
             Assert.Equal(DefaultRating, player.Rating);
             Assert.Equal(DefaultType, player.Type);
             Assert.Equal(DefaultTeam, player.Team);
@@ -59,7 +62,7 @@ public static class PlayerTests
 
             Assert.Equal(game.Id, player.GameId);
             Assert.Same(game, player.Game);
-            Assert.Equal("dummy-name", player.GetDisplayName);
+            Assert.Equal("dummy-name", player.GetDisplayName());
             Assert.Equal(950, player.Rating);
             Assert.Null(player.UserId);
             Assert.Null(player.User);
@@ -79,10 +82,60 @@ public static class PlayerTests
             Assert.Same(game, player.Game);
             Assert.Equal(user.Id, player.UserId);
             Assert.Same(user, player.User);
-            Assert.Equal(user.Tag, player.GetDisplayName);
+            Assert.Null(player.DisplayName); // no snapshot taken - GetDisplayName() falls back to User.DisplayName
+            Assert.Equal(user.DisplayName, player.GetDisplayName());
             Assert.Equal(user.Rating, player.Rating);
             Assert.Equal(PlayerTypeEnum.User, player.Type);
             Assert.Equal(GameTeamEnum.None, player.Team);
+        }
+    }
+
+    public class GetDisplayName : PlayerTestsBase
+    {
+        [Fact]
+        public void ReturnsDisplayName_WhenUserIsNull()
+        {
+            var player = new Player(DefaultGameId, null, DefaultRating, PlayerTypeEnum.Dummy, DefaultTeam)
+            {
+                DisplayName = "Dummy Player"
+            };
+
+            Assert.Equal("Dummy Player", player.GetDisplayName());
+        }
+
+        [Fact]
+        public void ReturnsUserDisplayName_WhenUserIsSet()
+        {
+            var user = CreateUser();
+            var player = new Player(DefaultGameId, user.Id, DefaultRating, PlayerTypeEnum.User, DefaultTeam)
+            {
+                User = user
+            };
+
+            Assert.Equal(user.DisplayName, player.GetDisplayName());
+        }
+
+        [Fact]
+        public void PrefersUserDisplayName_WhenBothUserAndDisplayNameAreSet()
+        {
+            // Guards against the fallback order silently flipping - a stale snapshot must never win over the
+            // linked user's current, live display name.
+            var user = CreateUser();
+            var player = new Player(DefaultGameId, user.Id, DefaultRating, PlayerTypeEnum.User, DefaultTeam)
+            {
+                User = user,
+                DisplayName = "Stale Snapshot"
+            };
+
+            Assert.Equal(user.DisplayName, player.GetDisplayName());
+        }
+
+        [Fact]
+        public void ReturnsNull_WhenNeitherUserNorDisplayNameIsSet()
+        {
+            var player = new Player(DefaultGameId, null, DefaultRating, PlayerTypeEnum.Dummy, DefaultTeam);
+
+            Assert.Null(player.GetDisplayName());
         }
     }
 
@@ -181,7 +234,7 @@ public static class PlayerTests
         public void ReturnsAssignedGame_WhenSetViaObjectInitializer()
         {
             var game = CreateGame();
-            var player = new Player(DefaultGameId, DefaultUserId, DefaultDisplayName, DefaultRating, DefaultType, DefaultTeam)
+            var player = new Player(DefaultGameId, DefaultUserId, DefaultRating, DefaultType, DefaultTeam)
             {
                 Game = game
             };

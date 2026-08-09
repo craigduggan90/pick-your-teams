@@ -15,7 +15,10 @@ public static class PlayersRepositoryTests
         public async Task Should_AddEntity_ToChangeTracker()
         {
             var gameId = Context.Games.First().Id;
-            var entity = new Player(gameId, null, "new-player", 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None);
+            var entity = new Player(gameId, null, 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None)
+            {
+                DisplayName = "new-player"
+            };
 
             var sut = CreateSut();
             _ = await sut.CreateAsync(entity, TestContext.Current.CancellationToken);

@@ -195,7 +195,11 @@ public static class SetTeamsCommandHandlerTests
         public async Task ShouldNotUpdatePlayer_WhenTeamAndRatingAreUnchanged()
         {
             var game = CreateExistingGame();
-            var home = new Player(game.Id, null, "dummy", 1000, PlayerTypeEnum.Dummy, GameTeamEnum.Home) { Game = game };
+            var home = new Player(game.Id, "dummy", 1000, PlayerTypeEnum.Dummy, GameTeamEnum.Home)
+            {
+                Game = game,
+                DisplayName = "dummy"
+            };
             game.Players.Add(home);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             var command = new SetTeamsCommand(game.Id, [home.Id], []);

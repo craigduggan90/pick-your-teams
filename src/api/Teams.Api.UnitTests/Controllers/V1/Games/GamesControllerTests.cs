@@ -67,7 +67,12 @@ public static class GamesControllerTests
             GameTeamEnum team = GameTeamEnum.None)
         {
             using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
-            return new Player(gameId, userId, displayName ?? "Test Player", rating, type, team);
+            return new Player(gameId, userId, rating, type, team)
+            {
+                DisplayName = userId == null
+                    ? displayName ?? "Test Player"
+                    : null
+            };
         }
 
         protected static void AssertResultValue<TResult, TValue>(IActionResult result, TValue expected)

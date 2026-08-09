@@ -11,7 +11,7 @@ public static class UpdateUserCommandHandlerTests
     {
         private static User CreateExistingUser(string id = "existing-user")
         {
-            using var _ = new Teams.Common.Providers.Identifiers.IdentifierProviderContext(id);
+            using var _ = new Common.Providers.Identifiers.IdentifierProviderContext(id);
             return new User("existing-display-name", "external-id", "existing@example.com", "+15551111111");
         }
 

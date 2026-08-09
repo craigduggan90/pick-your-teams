@@ -82,6 +82,11 @@ internal static class EntityFactory
         CreateSeeded(
             id ?? $"player-{Guid.NewGuid():N}",
             dateCreated ?? NextDateCreated(),
-            () => new Player(gameId, userId, displayName ?? "Test Player", rating, type, team),
+            () => new Player(gameId, userId, rating, type, team)
+            {
+                DisplayName = userId == null
+                    ? displayName ?? "Test Player"
+                    : null
+            },
             postCreationSteps);
 }

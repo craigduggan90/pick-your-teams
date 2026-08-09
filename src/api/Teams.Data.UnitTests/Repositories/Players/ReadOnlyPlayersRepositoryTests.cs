@@ -64,7 +64,9 @@ public static class ReadOnlyPlayersRepositoryTests
             // Every game's first home-team dummy is seeded at index 100, so this matches one
             // player per game across the whole set.
             const string value = "00000100";
-            var expected = Context.Players.Where(p => p.GetDisplayName.Contains(value))
+            var expected = Context.Players
+                .Where(p => (p.User != null && p.User.DisplayName.Contains(value)) ||
+                            (p.DisplayName != null && p.DisplayName.Contains(value)))
                 .OrderBy(p => p.Cursor)
                 .Take(Constants.DefaultPageSize);
 

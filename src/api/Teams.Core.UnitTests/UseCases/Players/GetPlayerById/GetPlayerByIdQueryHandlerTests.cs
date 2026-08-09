@@ -27,8 +27,16 @@ public static class GetPlayerByIdQueryHandlerTests
         [Fact]
         public async Task ShouldReturnPlayer_WhenPlayerExists()
         {
-            var existingPlayer = new Player("game-id", null, "display-name", 1000,
-                Teams.Domain.Enums.PlayerTypeEnum.Dummy, Teams.Domain.Enums.GameTeamEnum.None);
+            var existingPlayer = new Player(
+                gameId: "game-id",
+                userId: null,
+                rating: 1000,
+                type: Domain.Enums.PlayerTypeEnum.Dummy,
+                team: Domain.Enums.GameTeamEnum.None)
+            {
+                DisplayName = "display-name"
+            };
+
             PlayersRepository.GetByIdAsync(existingPlayer.Id, Arg.Any<CancellationToken>()).Returns(existingPlayer);
             var query = new GetPlayerByIdQuery(existingPlayer.Id);
             var sut = CreateSut();

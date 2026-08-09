@@ -54,8 +54,8 @@ public static class GetPlayersQueryHandlerTests
         public async Task ShouldReturnEntities_AsReadOnlyCollection()
         {
             Player[] entities = [
-                new("game-id", null, "display-one", 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None),
-                new("game-id", null, "display-two", 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None)
+                new("game-id", null,  1000, PlayerTypeEnum.Dummy, GameTeamEnum.None) { DisplayName = "display-one" },
+                new("game-id", null, 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None) { DisplayName = "display-two" }
             ];
             PlayersRepository.GetAsync(
                 Arg.Any<string?>(),

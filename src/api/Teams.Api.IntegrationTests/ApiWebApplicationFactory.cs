@@ -12,7 +12,7 @@ using Teams.Data.Context;
 
 namespace Teams.Api.IntegrationTests;
 
-public class ApiWebApplicationFactory : WebApplicationFactory<Teams.Api.Program>
+public class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
     // A shared-cache, named in-memory SQLite database - kept alive for this factory's lifetime by holding this
     // connection open. Every ApiDbContext created against this same connection string sees the same data.

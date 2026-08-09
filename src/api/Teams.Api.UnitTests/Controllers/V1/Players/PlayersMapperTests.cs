@@ -19,7 +19,12 @@ public static class PlayersMapperTests
         GameTeamEnum team = GameTeamEnum.None)
     {
         using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
-        return new Player(gameId, userId, displayName, rating, type, team);
+        return new Player(gameId, userId, rating, type, team)
+        {
+            DisplayName = userId == null
+                ? displayName
+                : null
+        };
     }
 
     public class ToPlayerModel
@@ -40,7 +45,7 @@ public static class PlayersMapperTests
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
-            Assert.Equal(player.GetDisplayName, result.DisplayName);
+            Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);
         }
@@ -64,7 +69,7 @@ public static class PlayersMapperTests
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
-            Assert.Equal(player.GetDisplayName, result.DisplayName);
+            Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
             Assert.Equal(player.RatingChange, result.RatingChange);
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);

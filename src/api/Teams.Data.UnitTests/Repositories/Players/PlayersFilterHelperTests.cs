@@ -26,9 +26,10 @@ public static class PlayersFilterHelperTests
             var userId = type == PlayerTypeEnum.User ? $"u-{i:D8}" : null;
             var rating = 1000 + i * (i % 2 == 0 ? 10 : -10);
 
-            return new Player(GameIds[i % GameIds.Length], userId, $"display name {i:D8}", rating, type, TeamValues[i % TeamValues.Length])
+            return new Player(GameIds[i % GameIds.Length], userId, rating, type, TeamValues[i % TeamValues.Length])
             {
-                Game = PlaceholderGame
+                Game = PlaceholderGame,
+                DisplayName = $"display name {i:D8}"
             };
         })
         .AsQueryable();
@@ -65,13 +66,36 @@ public static class PlayersFilterHelperTests
         }
 
         [Fact]
-        public void ShouldApplyFilter_WhenValueProvided()
+        public void ShouldMatchOnOwnDisplayName_WhenPlayerHasNoLinkedUser()
         {
-            const string value = "00000015";
-            var data = GetSeedData(30);
-            var expected = data.Where(player => player.GetDisplayName.Contains(value));
-            var filtered = data.ApplyDisplayNameFilter(value);
-            Assert.Equivalent(expected, filtered, true);
+            var data = GetSeedData(5).ToArray();
+            var target = new Player(GameIds[0], null, 1000, PlayerTypeEnum.Dummy, GameTeamEnum.None)
+            {
+                Game = PlaceholderGame,
+                DisplayName = "Some Unique Dummy Name"
+            };
+
+            var queryable = data.Append(target).AsQueryable();
+            var filtered = queryable.ApplyDisplayNameFilter("Unique Dummy");
+
+            Assert.Equal([target], filtered);
+        }
+
+        [Fact]
+        public void ShouldMatchOnLinkedUserDisplayName_WhenPlayerHasNoOwnDisplayNameSnapshot()
+        {
+            var user = new User("Some Unique User Name", "external-id", "user@example.com", null);
+            var data = GetSeedData(5).ToArray();
+            var target = new Player(GameIds[0], user.Id, 1000, PlayerTypeEnum.User, GameTeamEnum.None)
+            {
+                Game = PlaceholderGame,
+                User = user
+            };
+
+            var queryable = data.Append(target).AsQueryable();
+            var filtered = queryable.ApplyDisplayNameFilter("Unique User");
+
+            Assert.Equal([target], filtered);
         }
     }
 
