@@ -13,6 +13,8 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options) : DbContext(op
     public DbSet<User> Users { get; init; }
 
     public DbSet<Game> Games { get; init; }
+    
+    public DbSet<Invitation> Invitations { get; init; }
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
