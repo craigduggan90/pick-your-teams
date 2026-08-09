@@ -54,7 +54,6 @@ public class SetTeamsCommandHandler(
         game.UpdateHomeTeamRating();
         game.UpdateAwayTeamRating();
 
-        // TODO: Test the inverse route with an integration test
         if (game.IsDirty)
             await uow.Games.UpdateAsync(game, cancellationToken);
 
