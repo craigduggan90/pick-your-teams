@@ -199,5 +199,37 @@ public static partial class GamesControllerTests
             Assert.Equal([players[0].Id], content.Home!.Players.Select(p => p.Id));
             Assert.Equal([players[1].Id], content.Away!.Players.Select(p => p.Id));
         }
+
+        [Fact]
+        public async Task ShouldLeaveGameUnchanged_WhenRequestRepeatsTheExistingAssignment()
+        {
+            var organiser = SeedOrganisers[0];
+            var (game, players) = await SeedGameWithUnassignedPlayersAsync(organiser);
+            var requestModel = new SetTeamsRequestModel([players[0].Id], [players[1].Id]);
+
+            var firstRequest = CreateJsonRequest(HttpMethod.Put, $"{Url}/{game.Id}/teams", requestModel);
+            WithActorHeaders(firstRequest, organiser);
+            var firstResponse = await Client.SendAsync(firstRequest, TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.NoContent, firstResponse.StatusCode);
+
+            var firstGetRequest = CreateRequest(HttpMethod.Get, $"{Url}/{game.Id}");
+            var firstGetResponse = await Client.SendAsync(firstGetRequest, TestContext.Current.CancellationToken);
+            var firstDetail = await ReadContentAsync<GameDetailModel>(firstGetResponse, TestContext.Current.CancellationToken);
+            Assert.NotNull(firstDetail);
+
+            // Same request again - identical Home/Away assignment, nothing for the handler to actually change.
+            var secondRequest = CreateJsonRequest(HttpMethod.Put, $"{Url}/{game.Id}/teams", requestModel);
+            WithActorHeaders(secondRequest, organiser);
+            var secondResponse = await Client.SendAsync(secondRequest, TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.NoContent, secondResponse.StatusCode);
+
+            var secondGetRequest = CreateRequest(HttpMethod.Get, $"{Url}/{game.Id}");
+            var secondGetResponse = await Client.SendAsync(secondGetRequest, TestContext.Current.CancellationToken);
+            var secondDetail = await ReadContentAsync<GameDetailModel>(secondGetResponse, TestContext.Current.CancellationToken);
+            Assert.NotNull(secondDetail);
+
+            // The game itself wasn't touched the second time - Games.UpdateAsync was skipped since IsDirty stayed false.
+            Assert.Equal(firstDetail.Modified, secondDetail.Modified);
+        }
     }
 }

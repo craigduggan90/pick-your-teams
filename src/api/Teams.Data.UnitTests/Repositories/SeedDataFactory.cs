@@ -89,4 +89,39 @@ public static class SeedDataFactory
             return player;
         }
     }
+
+    public static class Invitations
+    {
+        private static readonly InvitationStatusEnum[] Statuses =
+            [InvitationStatusEnum.Open, InvitationStatusEnum.Accepted, InvitationStatusEnum.Declined, InvitationStatusEnum.Failed];
+
+        public static string GetIdentifier(int index) => $"i-{index:D8}";
+
+        /// <summary>Creates an invitation cycling through every status, index-deterministically. Pass a
+        /// <paramref name="user"/> for an existing-user invite (by tag); omit it for a new-user invite (by email).</summary>
+        public static Invitation Create(int index, Game game, User? user = null)
+        {
+            using var idFix = new IdentifierProviderContext(GetIdentifier(index));
+            using var createdDtFix = new DateTimeOffsetProviderContext(BaseDate.AddDays(index));
+
+            var emailAddress = user?.EmailAddress ?? $"invitee-{index:D8}@test.io";
+            var invitation = new Invitation(game.Id, user?.Id, emailAddress) { Game = game, User = user };
+
+            using var updatedDtFix = new DateTimeOffsetProviderContext(BaseDate.AddYears(2).AddDays(index));
+            switch (Statuses[index % Statuses.Length])
+            {
+                case InvitationStatusEnum.Accepted:
+                    invitation.Accept();
+                    break;
+                case InvitationStatusEnum.Declined:
+                    invitation.Decline();
+                    break;
+                case InvitationStatusEnum.Failed:
+                    invitation.DispatchError("Delivery failed.");
+                    break;
+            }
+
+            return invitation;
+        }
+    }
 }

@@ -12,7 +12,6 @@ using Teams.Core.UseCases.Games.DeleteGame;
 using Teams.Core.UseCases.Games.GenerateTeams;
 using Teams.Core.UseCases.Games.GetGameById;
 using Teams.Core.UseCases.Games.GetGames;
-using Teams.Core.UseCases.Games.InvitePlayers;
 using Teams.Core.UseCases.Games.RecordResult;
 using Teams.Core.UseCases.Games.SetTeams;
 using Teams.Core.UseCases.Games.UpdateGame;
@@ -208,31 +207,6 @@ public static class GamesControllerTests
             Assert.IsType<NoContentResult>(rawResult);
 
             await Mediator.Received(1).SendAsync(Arg.Is<DeleteGameCommand>(c => c.Id == id), Arg.Any<CancellationToken>());
-        }
-    }
-
-    public class InvitePlayers : GameControllerTestsBase
-    {
-        [Fact]
-        public async Task ShouldReturnNoContent_WhenSuccess()
-        {
-            const string id = "test-id";
-            var requestModel = new InvitePlayersRequestModel(["joe@test.net", " user-tag "]);
-
-            Mediator.SendAsync(Arg.Any<InvitePlayersCommand>(), Arg.Any<CancellationToken>())
-                .Returns(GetGame(id: id));
-
-            var sut = GetOrCreateSut();
-            var rawResult = await sut.InvitePlayers(id, requestModel, TestContext.Current.CancellationToken);
-
-            Assert.IsType<NoContentResult>(rawResult);
-
-            string[] expected = ["joe@test.net", "user-tag"];
-            await Mediator.Received(1).SendAsync(
-                Arg.Is<InvitePlayersCommand>(c =>
-                    c.GameId == id &&
-                    c.UserIdentifiers.SequenceEqual(expected)),
-                Arg.Any<CancellationToken>());
         }
     }
 

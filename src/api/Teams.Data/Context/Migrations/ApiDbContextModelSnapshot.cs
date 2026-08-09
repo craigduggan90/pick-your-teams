@@ -94,6 +94,73 @@ namespace Teams.Data.Context.Migrations
                     b.ToTable("game", (string)null);
                 });
 
+            modelBuilder.Entity("Teams.Domain.Entities.Invitation", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<long>("Cursor")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("cursor");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_created");
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_deleted");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("date_modified");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("email");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("error");
+
+                    b.Property<string>("GameId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("game_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("status");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cursor")
+                        .IsUnique();
+
+                    b.HasIndex("DateCreated");
+
+                    b.HasIndex("DateDeleted");
+
+                    b.HasIndex("DateModified");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("invitations", (string)null);
+                });
+
             modelBuilder.Entity("Teams.Domain.Entities.Player", b =>
                 {
                     b.Property<string>("Id")
@@ -254,6 +321,24 @@ namespace Teams.Data.Context.Migrations
                     b.Navigation("Organiser");
                 });
 
+            modelBuilder.Entity("Teams.Domain.Entities.Invitation", b =>
+                {
+                    b.HasOne("Teams.Domain.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Teams.Domain.Entities.User", "User")
+                        .WithMany("Invitations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Teams.Domain.Entities.Player", b =>
                 {
                     b.HasOne("Teams.Domain.Entities.Game", "Game")
@@ -278,6 +363,8 @@ namespace Teams.Data.Context.Migrations
 
             modelBuilder.Entity("Teams.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Invitations");
+
                     b.Navigation("Participation");
                 });
 #pragma warning restore 612, 618

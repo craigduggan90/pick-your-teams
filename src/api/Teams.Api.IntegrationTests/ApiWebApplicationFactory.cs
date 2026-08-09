@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Teams.Api.IntegrationTests.TestHelpers;
 using Teams.Api.IntegrationTests.TestServices;
-using Teams.Core.Services.Invitations;
+using Teams.Core.Services.Events;
 using Teams.Data.Context;
 
 namespace Teams.Api.IntegrationTests;
@@ -36,9 +36,8 @@ public class ApiWebApplicationFactory : WebApplicationFactory<Teams.Api.Program>
             services.AddDbContext<ApiDbContext>(options => options.UseSqlite(_connection));
             services.AddScoped<IApiDbContextFactory, TestApiDbContextFactory>();
 
-            // Replace the invitation sender with a test service
-            services.RemoveService<IGameInvitationDispatcher>()
-                .AddSingleton<IGameInvitationDispatcher, TestGameInvitationDispatcher>();
+            services.RemoveService<IEventPublisher>()
+                .AddSingleton<IEventPublisher, TestEventPublisher>();
         });
     }
 

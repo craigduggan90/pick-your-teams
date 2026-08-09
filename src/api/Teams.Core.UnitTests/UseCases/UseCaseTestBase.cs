@@ -2,7 +2,9 @@ using FluentValidation;
 using FluentValidation.Results;
 using Teams.Core.Models;
 using Teams.Core.Services;
+using Teams.Core.Services.Events;
 using Teams.Data.Repositories.Games;
+using Teams.Data.Repositories.Invitations;
 using Teams.Data.Repositories.Players;
 using Teams.Data.Repositories.Users;
 using Teams.Data.Services;
@@ -17,11 +19,15 @@ public abstract class UseCaseTestBase<TRequest>
 
     protected IPlayersRepository PlayersRepository { get; } = Substitute.For<IPlayersRepository>();
 
+    protected IInvitationsRepository InvitationsRepository { get; } = Substitute.For<IInvitationsRepository>();
+
     protected IUnitOfWork UnitOfWork { get; }
 
     protected IValidator<TRequest> Validator { get; } = Substitute.For<IValidator<TRequest>>();
 
     protected IActorAccessor ActorAccessor { get; } = Substitute.For<IActorAccessor>();
+
+    protected IEventPublisher EventPublisher { get; } = Substitute.For<IEventPublisher>();
 
     protected UseCaseTestBase()
     {
@@ -29,6 +35,7 @@ public abstract class UseCaseTestBase<TRequest>
         UnitOfWork.Users.Returns(UsersRepository);
         UnitOfWork.Games.Returns(GamesRepository);
         UnitOfWork.Players.Returns(PlayersRepository);
+        UnitOfWork.Invitations.Returns(InvitationsRepository);
 
         UsersRepository.CreateAsync(Arg.Any<Domain.Entities.User>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.ArgAt<Domain.Entities.User>(0));
@@ -47,6 +54,12 @@ public abstract class UseCaseTestBase<TRequest>
 
         PlayersRepository.UpdateAsync(Arg.Any<Domain.Entities.Player>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Player>(0));
+
+        InvitationsRepository.CreateAsync(Arg.Any<Domain.Entities.Invitation>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Invitation>(0));
+
+        InvitationsRepository.UpdateAsync(Arg.Any<Domain.Entities.Invitation>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => callInfo.ArgAt<Domain.Entities.Invitation>(0));
 
         ActorAccessor.Current.Returns(new Actor("organiser-id", "organiser-tag", "organiser-display-name"));
 

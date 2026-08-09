@@ -68,6 +68,26 @@ public static class UnitOfWorkTests
         }
     }
 
+    public class Invitations : DatabaseAwareTestBase
+    {
+        [Fact]
+        public void Should_ReturnsRepository_WhenCalledForTheFirstTime()
+        {
+            var sut = CreateSut(Context);
+            var repository = sut.Invitations;
+            Assert.NotNull(repository);
+        }
+
+        [Fact]
+        public void Should_ReusesRepository_ForSubsequentCalls()
+        {
+            var sut = CreateSut(Context);
+            var firstRepository = sut.Invitations;
+            var secondRepository = sut.Invitations;
+            Assert.Same(firstRepository, secondRepository);
+        }
+    }
+
     public class SaveChangesAsync : DatabaseAwareTestBase
     {
         [Fact]

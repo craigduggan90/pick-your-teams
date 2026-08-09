@@ -14,6 +14,8 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options) : DbContext(op
 
     public DbSet<Game> Games { get; init; }
 
+    public DbSet<Invitation> Invitations { get; init; }
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

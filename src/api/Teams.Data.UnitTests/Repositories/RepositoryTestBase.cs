@@ -54,6 +54,16 @@ public class RepositoryTestBase : DatabaseAwareTestBase
 
         await Context.Players.AddRangeAsync(players, TestContext.Current.CancellationToken);
 
+        // Every game also gets one invitation, cycling deterministically through every status. Roughly a third are
+        // tied to a real existing user (invited by tag); the rest are new-user invites (invited by email only).
+        var invitations = games.Select((game, i) =>
+        {
+            var index = i + 1;
+            var invitee = index % 3 == 0 ? nonOrganiserUsers[index % nonOrganiserUsers.Length] : null;
+            return SeedDataFactory.Invitations.Create(index, game, invitee);
+        });
+        await Context.Invitations.AddRangeAsync(invitations, TestContext.Current.CancellationToken);
+
         await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 }
