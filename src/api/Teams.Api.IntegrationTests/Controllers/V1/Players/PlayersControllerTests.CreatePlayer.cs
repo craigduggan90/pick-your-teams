@@ -149,7 +149,7 @@ public static partial class PlayersControllerTests
             Assert.NotNull(content);
             Assert.Equal(SeedGame.Id, content.GameId);
             Assert.Equal(newUser.Id, content.UserId);
-            Assert.Equal(newUser.Tag, content.DisplayName);
+            Assert.Equal(newUser.DisplayName, content.DisplayName);
             Assert.Equal(newUser.Rating, content.Rating);
             Assert.Equal(nameof(PlayerTypeEnum.User), content.Type);
             Assert.EndsWith($"/api/v1/players/{content.Id}", response.Headers.Location?.ToString(), StringComparison.OrdinalIgnoreCase);
