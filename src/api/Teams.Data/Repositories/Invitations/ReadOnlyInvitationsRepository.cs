@@ -10,7 +10,11 @@ namespace Teams.Data.Repositories.Invitations;
 public class ReadOnlyInvitationsRepository(ApiDbContext context) : RepositoryBase(context), IReadOnlyInvitationsRepository
 {
     public async Task<Invitation?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
-        await Context.Invitations.SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+        await Context.Invitations
+            .Include(invitation => invitation.Game)
+                .ThenInclude(game => game.Organiser)
+            .Include(invitation => invitation.User)
+            .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
     public async Task<IEnumerable<Invitation>> GetInvitationsAsync(
         string? gameId = null,
@@ -21,6 +25,9 @@ public class ReadOnlyInvitationsRepository(ApiDbContext context) : RepositoryBas
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default) =>
         await Context.Invitations
+            .Include(invitation => invitation.Game)
+                .ThenInclude(game => game.Organiser)
+            .Include(invitation => invitation.User)
             .ApplyGameIdFilter(gameId)
             .ApplyUserIdFilter(userId)
             .ApplyEmailAddressFilter(emailAddress)
