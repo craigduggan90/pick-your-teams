@@ -16,13 +16,13 @@ public static class InvitationsMapper
         Game: invitation.Game.ToModel(),
         Organiser: invitation.Game.Organiser.ToModel());
 
-    public static InvitationGameModel ToModel(this Game game) => new(
+    private static InvitationGameModel ToModel(this Game game) => new(
         Id: game.Id,
         StartTime: game.StartTime,
         Duration: game.Duration,
         Location: game.Location);
 
-    public static InvitationOrganiserModel ToModel(this User user) => new(
+    private static InvitationOrganiserModel ToModel(this User user) => new(
         Id: user.Id,
         Tag: user.Tag,
         DisplayName: user.DisplayName);
