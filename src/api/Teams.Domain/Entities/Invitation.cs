@@ -12,7 +12,7 @@ public class Invitation(string gameId, string? userId, string emailAddress) : En
 
     public string EmailAddress { get; init; } = emailAddress;
 
-    public InvitationStatusEnum Status { get; private set; } = InvitationStatusEnum.None;
+    public InvitationStatusEnum Status { get; private set; } = InvitationStatusEnum.Open;
 
     public string? ErrorMessage { get; private set; }
 
@@ -26,7 +26,7 @@ public class Invitation(string gameId, string? userId, string emailAddress) : En
 
     public void Accept()
     {
-        if (Status != InvitationStatusEnum.None)
+        if (Status != InvitationStatusEnum.Open)
             return;
 
         UpdateProperty(nameof(Status), InvitationStatusEnum.Accepted);
@@ -34,7 +34,7 @@ public class Invitation(string gameId, string? userId, string emailAddress) : En
 
     public void Decline()
     {
-        if (Status != InvitationStatusEnum.None)
+        if (Status != InvitationStatusEnum.Open)
             return;
 
         UpdateProperty(nameof(Status), InvitationStatusEnum.Declined);
@@ -42,7 +42,7 @@ public class Invitation(string gameId, string? userId, string emailAddress) : En
 
     public void DispatchError(string errorMessage)
     {
-        if (Status != InvitationStatusEnum.None)
+        if (Status != InvitationStatusEnum.Open)
             return;
 
         UpdateProperty(nameof(Status), InvitationStatusEnum.Failed);

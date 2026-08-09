@@ -33,7 +33,7 @@ public static class InvitationTests
             Assert.Equal(DefaultGameId, invitation.GameId);
             Assert.Equal(DefaultUserId, invitation.UserId);
             Assert.Equal(DefaultEmailAddress, invitation.EmailAddress);
-            Assert.Equal(InvitationStatusEnum.None, invitation.Status);
+            Assert.Equal(InvitationStatusEnum.Open, invitation.Status);
             Assert.Null(invitation.ErrorMessage);
             Assert.Null(invitation.User);
         }

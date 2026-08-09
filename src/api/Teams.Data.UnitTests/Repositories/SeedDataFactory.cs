@@ -93,7 +93,7 @@ public static class SeedDataFactory
     public static class Invitations
     {
         private static readonly InvitationStatusEnum[] Statuses =
-            [InvitationStatusEnum.None, InvitationStatusEnum.Accepted, InvitationStatusEnum.Declined, InvitationStatusEnum.Failed];
+            [InvitationStatusEnum.Open, InvitationStatusEnum.Accepted, InvitationStatusEnum.Declined, InvitationStatusEnum.Failed];
 
         public static string GetIdentifier(int index) => $"i-{index:D8}";
 

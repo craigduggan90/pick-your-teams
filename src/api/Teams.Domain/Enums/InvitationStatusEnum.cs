@@ -2,7 +2,7 @@ namespace Teams.Domain.Enums;
 
 public enum InvitationStatusEnum
 {
-    None,
+    Open,
     Failed,
     Accepted,
     Declined
