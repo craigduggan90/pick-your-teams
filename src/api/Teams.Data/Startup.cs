@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using Teams.Data.Context;
 using Teams.Data.Repositories.Games;
+using Teams.Data.Repositories.Invitations;
 using Teams.Data.Repositories.Players;
 using Teams.Data.Repositories.Users;
 using Teams.Data.Services;
@@ -41,6 +42,7 @@ public static class Startup
         builder.Services.AddScoped<IReadOnlyPlayersRepository, ReadOnlyPlayersRepository>();
         builder.Services.AddScoped<IReadOnlyGamesRepository, ReadOnlyGamesRepository>();
         builder.Services.AddScoped<IReadOnlyUsersRepository, ReadOnlyUsersRepository>();
+        builder.Services.AddScoped<IReadOnlyInvitationsRepository, ReadOnlyInvitationsRepository>();
 
         return builder;
     }

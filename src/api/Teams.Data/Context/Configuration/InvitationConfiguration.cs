@@ -29,7 +29,7 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         builder.Property(e => e.EmailAddress)
             .HasColumnName("email")
             .HasMaxLength(1000);
-        
+
         builder.Property(e => e.ErrorMessage)
             .HasColumnName("error")
             .HasMaxLength(1000);

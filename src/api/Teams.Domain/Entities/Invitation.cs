@@ -13,7 +13,7 @@ public class Invitation(string gameId, string? userId, string emailAddress) : En
     public string EmailAddress { get; init; } = emailAddress;
 
     public InvitationStatusEnum Status { get; private set; } = InvitationStatusEnum.None;
-    
+
     public string? ErrorMessage { get; private set; }
 
     public User? User { get; init; }

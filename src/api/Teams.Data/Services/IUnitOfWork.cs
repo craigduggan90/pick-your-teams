@@ -1,4 +1,5 @@
 ﻿using Teams.Data.Repositories.Games;
+using Teams.Data.Repositories.Invitations;
 using Teams.Data.Repositories.Players;
 using Teams.Data.Repositories.Users;
 using Teams.Domain.Entities;
@@ -15,6 +16,9 @@ public interface IUnitOfWork
 
     /// <summary>Accessor for the <see cref="User"/> repository.</summary>
     IUsersRepository Users { get; }
+
+    /// <summary>Accessor for the <see cref="Invitation"/> repository.</summary>
+    IInvitationsRepository Invitations { get; }
 
     /// <summary>Saves all changes made in this context to the database.</summary>
     /// <param name="cancellationToken">The cancellation token.</param>
