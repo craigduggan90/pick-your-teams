@@ -86,24 +86,6 @@ public class GamesController(IMediator mediator) : ApiControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/invite")]
-    [ProducesResponseType(204)]
-    [ProducesResponseType<ProblemDetails>(403)]
-    [ProducesResponseType<ProblemDetails>(404)]
-    [ProducesResponseType<ProblemDetails>(422)]
-    [SwaggerRequestExample(typeof(InvitePlayersRequestModel), typeof(InvitePlayersRequestModelExample))]
-    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
-    [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
-    [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
-    public async Task<IActionResult> InvitePlayers(
-        string id,
-        [FromBody] InvitePlayersRequestModel body,
-        CancellationToken cancellationToken)
-    {
-        _ = await mediator.SendAsync(body.ToCommand(id), cancellationToken);
-        return NoContent();
-    }
-
     [HttpPost("{id}/result")]
     [ProducesResponseType(204)]
     [ProducesResponseType<ProblemDetails>(403)]

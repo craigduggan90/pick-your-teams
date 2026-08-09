@@ -288,29 +288,6 @@ public static class GamesMapperTests
         }
     }
 
-    public class ToCommandFromInvitePlayersRequestModel
-    {
-        [Fact]
-        public void MapsGameId_WhenCalled()
-        {
-            var model = new InvitePlayersRequestModel(["joe@test.net"]);
-
-            var result = model.ToCommand("test-game-id");
-
-            Assert.Equal("test-game-id", result.GameId);
-        }
-
-        [Fact]
-        public void TrimsUserIdentifiers_WhenCalled()
-        {
-            var model = new InvitePlayersRequestModel([" joe@test.net ", "  user-tag", "jacqui@test.net  "]);
-
-            var result = model.ToCommand("test-game-id");
-
-            Assert.Equal(["joe@test.net", "user-tag", "jacqui@test.net"], result.UserIdentifiers);
-        }
-    }
-
     public class ToQuery
     {
         [Fact]

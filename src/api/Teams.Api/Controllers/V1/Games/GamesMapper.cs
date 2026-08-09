@@ -4,7 +4,6 @@ using Teams.Common.Pagination;
 using Teams.Core.UseCases.Games.CreateGame;
 using Teams.Core.UseCases.Games.GenerateTeams;
 using Teams.Core.UseCases.Games.GetGames;
-using Teams.Core.UseCases.Games.InvitePlayers;
 using Teams.Core.UseCases.Games.RecordResult;
 using Teams.Core.UseCases.Games.SetTeams;
 using Teams.Core.UseCases.Games.UpdateGame;
@@ -91,10 +90,6 @@ public static class GamesMapper
     public static RecordGameResultCommand ToCommand(this RecordResultRequestModel model, string id) => new(
         Id: id,
         Winner: model.Winner);
-
-    public static InvitePlayersCommand ToCommand(this InvitePlayersRequestModel model, string id) => new(
-        GameId: id,
-        UserIdentifiers: [.. model.UserIdentifiers.Select(value => value.Trim())]);
 
     public static GetGamesQuery ToQuery(this GetGamesRequestModel model) => new(
         model.Location,
