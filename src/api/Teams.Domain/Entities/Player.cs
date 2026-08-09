@@ -108,9 +108,14 @@ public class Player(string gameId, string? userId, int rating, PlayerTypeEnum ty
     /// </remarks>
     public void SetRatingChange(int teamRating, double teamChange, int teamSize)
     {
-        var weight = teamChange > 0
+        var weight = 1d;
+        if (teamSize > 1)
+        {
+            weight = teamChange > 0
                 ? (double)(teamRating - Rating) / (teamRating * (teamSize - 1))
                 : (double)Rating / teamRating;
+        }
+
         RatingChange = (int)Math.Round(teamChange * weight);
         SetDateModified();
     }

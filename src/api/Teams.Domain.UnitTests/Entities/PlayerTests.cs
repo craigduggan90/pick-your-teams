@@ -218,6 +218,17 @@ public static class PlayerTests
 
             Assert.Equal(1000, player.Rating);
         }
+
+        [Fact]
+        public void DoesNotApplyZeroChange_WhenTeamHasOnlyOneWinningPlayer()
+        {
+            const int teamChange = 16;
+            var soleWinner = CreatePlayerWithRating(1000);
+
+            soleWinner.SetRatingChange(teamRating: 1000, teamChange: teamChange, teamSize: 1);
+
+            Assert.Equal(teamChange, soleWinner.RatingChange);
+        }
     }
 
     public class GameProperty : PlayerTestsBase
