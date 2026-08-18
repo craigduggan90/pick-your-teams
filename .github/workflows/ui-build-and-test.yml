@@ -1,0 +1,32 @@
+name: UI Build and Test
+on:
+  - push
+
+jobs:
+  build-and-test:
+    name: build and test ui
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📩 checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: src/ui/package-lock.json
+
+      - name: 📦 install dependencies
+        working-directory: src/ui
+        run: npm ci
+
+      - name: 🔨 build
+        working-directory: src/ui
+        run: npm run build
+
+      - name: 🧪 run tests
+        working-directory: src/ui
+        run: npm run test -- --run
