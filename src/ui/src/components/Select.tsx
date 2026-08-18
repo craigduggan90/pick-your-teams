@@ -49,7 +49,7 @@ export function SelectField<T extends string = string>({
         onValueChange={(next) => onValueChange?.(next as T)}
         disabled={disabled}
       >
-        <SelectTrigger id={id} className={cn('w-full', className)}>
+        <SelectTrigger id={id} className={cn('h-12 w-full', className)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
