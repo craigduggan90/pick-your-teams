@@ -118,3 +118,14 @@ body {
     @apply bg-background text-foreground font-sans;
   }
 }
+
+/*
+ * sonner (Toast primitive) injects its own stylesheet at runtime after ours, so this needs
+ * !important to reliably win. Moves the dismiss button from its LTR default (top-left) to the
+ * top-right of the toast.
+ */
+[data-sonner-toaster] {
+  --toast-close-button-start: unset !important;
+  --toast-close-button-end: 0 !important;
+  --toast-close-button-transform: translate(35%, -35%) !important;
+}

@@ -24,6 +24,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function ComponentsShowcasePage() {
   const [name, setName] = useState('')
   const [tag, setTag] = useState('taken-tag')
+  const [playersPerTeam, setPlayersPerTeam] = useState('7')
   const [team, setTeam] = useState<string>('home')
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -55,6 +56,13 @@ export function ComponentsShowcasePage() {
           value={tag}
           onChange={(e) => setTag(e.target.value)}
           error={`'${tag}' is not a valid tag.`}
+        />
+        <TextInput
+          label="Players per Team"
+          type="number"
+          min={1}
+          value={playersPerTeam}
+          onChange={(e) => setPlayersPerTeam(e.target.value)}
         />
       </Section>
 
