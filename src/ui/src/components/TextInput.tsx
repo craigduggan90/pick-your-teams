@@ -35,13 +35,13 @@ export function TextInput({
   const errorId = error ? `${inputId}-error` : undefined
 
   return (
-    <div className="relative pt-3">
+    <div className="relative">
       <Input
         id={inputId}
         aria-invalid={Boolean(error) || undefined}
         aria-describedby={errorId}
         className={cn(
-          'pt-3.5 pb-1.5',
+          'h-14 pt-5 pb-1.5 text-base',
           error && 'border-error focus-visible:ring-error/50',
           className,
         )}
@@ -67,7 +67,7 @@ export function TextInput({
         className={cn(
           'pointer-events-none absolute left-2.5 origin-left text-base text-muted-foreground transition-all',
           floated
-            ? 'top-1.5 -translate-y-0 scale-75 text-primary'
+            ? 'top-2.5 -translate-y-0 scale-75 text-primary'
             : 'top-1/2 -translate-y-1/2 scale-100',
         )}
       >

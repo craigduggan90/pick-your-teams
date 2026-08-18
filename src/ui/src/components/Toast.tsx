@@ -4,5 +4,5 @@ import type { ToasterProps } from 'sonner'
 export { toast } from 'sonner'
 
 export function Toaster(props: ToasterProps) {
-  return <BaseToaster richColors {...props} />
+  return <BaseToaster richColors closeButton {...props} />
 }
