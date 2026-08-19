@@ -231,10 +231,17 @@ inline above.
   `lib/navigation.ts`) — whoever navigates to `/change-tag` supplies it, `ChangeTagPage` reads it
   back on success/cancel, defaulting to `/` only if it's missing (e.g. someone bookmarks the URL
   directly).
-- **Primary/Secondary brand colors confirmed, then Primary adjusted for contrast** — the user
-  gave the real brand values, Primary `#00B295` / Secondary `#F05D23`, replacing the Stage 1
-  placeholders. White text on `#00B295` computes to ~2.70:1 contrast, under WCAG AA's 3:1 minimum
-  even for large text/UI components (Secondary's ~3.33:1 clears it, if only just). Primary was
-  darkened/desaturated to `#32936F` (~3.79:1) to fix this — Secondary is unchanged. `:root`'s
-  comment in `index.css` documents `#32936F` as a contrast-adjusted variant of the real brand
-  `#00B295`, not a placeholder guess, so a future design pass doesn't "correct" it back.
+- **Primary/Secondary colors — several rounds, current values are explicitly temporary.** First
+  real values given were Primary `#00B295` / Secondary `#F05D23`; white text on `#00B295` computed
+  to ~2.70:1 contrast (under WCAG AA's 3:1 floor even for large text/UI components), so Primary
+  was darkened to `#32936F` (~3.79:1). That was superseded before landing — current values are
+  Primary `#465775` (blue) / Secondary `#EF6F6C` (coral), explicitly called out as **not final,
+  just something to build against for now** (Secondary is only ever used as an accent, Primary
+  only for buttons/the header, so contrast tuning wasn't revisited for these). `:root`'s comment
+  in `index.css` reflects this — don't assume the current hex values carry any contrast
+  reasoning forward; re-check if/when these are finalized for real.
+- **Real branding assets added, also temporary** — favicon (`favicon.ico`, `apple-touch-icon.png`,
+  `icon-192`/`icon-512` + maskable variants, all in `src/ui/public/`, generated via IconKitchen)
+  replaced the Vite placeholder `favicon.svg`. `Header`'s home button now shows the round
+  `icon-192.png` instead of a generic placeholder dot. Not final branding, just something to use
+  for now — same spirit as the temporary colors above.

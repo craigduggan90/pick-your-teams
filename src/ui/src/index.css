@@ -3,10 +3,10 @@
 
 /*
  * Semantic palette from claude.md's Design Tokens section, mapped onto shadcn/ui's variable
- * slots. Primary (#32936F) and Secondary (#F05D23) are the confirmed brand colors — Primary is
- * a darkened/desaturated version of the brand's #00B295, adjusted for white-text contrast (see
- * Decisions log in docs/claude/stage-2.md). Everything else (Tertiary/Success/Warning/Info/Dark
- * Grey/Light Grey) is still a placeholder — the
+ * slots. Primary (#465775, blue) and Secondary (#EF6F6C, coral) are temporary — explicitly not
+ * final, just something to build against for now (see Decisions log in docs/claude/stage-2.md).
+ * Everything else (Tertiary/Success/Warning/Info/Dark Grey/Light Grey) is still a placeholder —
+ * the
  * Excalidraw diagrams only label these roles ("Colour Placeholder") with no real hex values, so
  * swap the :root values for the rest later without touching anything that consumes the tokens.
  * Tertiary/Success/Warning/Info have no shadcn-native slot, so they're exposed as extra
@@ -58,9 +58,9 @@
   --popover: #ffffff;
   --popover-foreground: #3f3f46;
 
-  --primary: #32936f;
+  --primary: #465775;
   --primary-foreground: #ffffff;
-  --secondary: #f05d23;
+  --secondary: #ef6f6c;
   --secondary-foreground: #ffffff;
   --tertiary: #9333ea;
   --tertiary-foreground: #ffffff;
