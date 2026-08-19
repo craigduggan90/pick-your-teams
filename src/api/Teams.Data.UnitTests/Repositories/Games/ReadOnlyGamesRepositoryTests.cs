@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Teams.Data.Models;
 using Teams.Data.Repositories.Games;
-using Teams.Domain.Entities;
 using Teams.Domain.Enums;
 
 namespace Teams.Data.UnitTests.Repositories.Games;
