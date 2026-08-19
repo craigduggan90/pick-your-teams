@@ -61,16 +61,29 @@ default, `cacheLocation: "memory"` (explicit, matching `claude.md`'s "in-memory 
   `Authorization: Bearer <token>` (real production-shaped behavior; the dev proxy substituting
   headers is a transport concern the client code doesn't know about).
 - `users.ts` — `getSelf()` (`GET /api/v1/users/self` → `UserDetailModel`), `updateUser(id, body)`
-  (`PATCH /api/v1/users/{id}`, body `{ tag?, displayName?, email?, mobile? }`). Types mirror the
-  API's `UserDetailModel`/`UpdateUserRequestModel` exactly (`Id`, `Tag`, `DisplayName`, `Rating`,
-  `Email`, `Mobile: string | null`, `Created`, `Modified`).
+  (`PATCH /api/v1/users/{id}`, body `{ Tag?, DisplayName?, Email?, Mobile? }`).
+
+  **Casing is asymmetric and this applies to every future API module, not just users:** the API
+  serializes *response* bodies in camelCase (ASP.NET's default JSON naming policy) even though
+  the C# model properties are PascalCase — `UserDetailModel` is typed `id`/`tag`/`displayName`/
+  etc. to match the real wire format, confirmed via curl against the running API. *Request*
+  bodies stay PascalCase (`UpdateUserRequestModel`), since ASP.NET's model binding is
+  case-insensitive on input and that's what matches the C# request DTO directly. The
+  `ProblemDetails.errors` dict (422/400 validation failures) is keyed PascalCase too (`Tag`, not
+  `tag`) — those keys come from FluentValidation's `PropertyName`/`nameof(...)`, not the JSON
+  naming policy, so they don't follow the response-body rule. This asymmetry cost real debugging
+  time (see Decisions log) — check the actual response shape via curl/Swagger before assuming
+  either casing for a new endpoint.
 
 ### 6. Hooks (`src/ui/src/hooks/`)
-- `useAccessToken.ts` — thin wrapper over `useAuth0().getAccessTokenSilently`.
 - `useSelf.ts` — TanStack Query `useQuery` wrapping `getSelf()`, enabled only when
   `isAuthenticated`.
 - `useUpdateTag.ts` — `useMutation` wrapping `updateUser()`, invalidates the self query on
-  success.
+  success. Typed `useMutation<void, ApiError, string>` so `mutation.error` is a real `ApiError`
+  in the common case — components still need an `instanceof ApiError` guard, since a token
+  failure (e.g. `getAccessTokenSilently()` rejecting) can still surface a plain `Error`.
+- No separate `useAccessToken` hook — planned initially, dropped as an unnecessary layer since
+  `useAuth0().getAccessTokenSilently` is called directly in the one or two places that need it.
 
 ### 7. Routing / route guards
 Per `01-login-and-registration.png`, unauthenticated users land on a **public "Team Picker"
@@ -90,14 +103,42 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
   redirects to `/`.
 - `/dev/components` — stays public/unguarded, as before.
 
+### 7a. Shared header title (`usePageTitle`)
+Not in the original plan — added once the tag-setup screen was built and it became clear that
+having `TagSetup` render its own "Set Your Tag" bar produced two stacked header bars (the app's
+persistent `Header` plus the screen's own), which doesn't fit the mobile-first single-header
+layout. Instead:
+- `hooks/usePageTitle.tsx` exports a `PageTitleProvider` (wraps the whole app, holds the current
+  title in state) and two hooks: `usePageTitle(title)` — call once per routed page component,
+  sets the shared title for as long as that page is mounted — and `useHeaderTitle()`, read once
+  by `App.tsx`'s shell to feed the persistent `Header`.
+- **Every routed page must call `usePageTitle`,** including ones that just want the default app
+  name (`TeamPickerPage` calls `usePageTitle(APP_NAME)`) — there's no automatic reset when
+  navigating away from a page that set a custom title, so a page that skips this would show
+  whatever the previous page left behind.
+- `lib/constants.ts` now holds `APP_NAME` (`"Pick Your Teams"`), deduplicated out of `Header`'s
+  default, `Footer`, and `TeamPickerPage`.
+
+This pattern is the one future stages should follow for every new screen's header title, not a
+Stage 2-only concern.
+
 ### 8. Tag-setup component
 Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop.
 - Both modes: `TextInput` (Stage 1 primitive, floating label) for the tag, live requirements list
   driven by the **real API validation rules** (found in `UpdateUserCommandValidator.cs` /
   `Constants.TagRegexPattern`): 3–36 characters, must start with a letter/digit/underscore, only
-  letters/digits/`.`/`_`/`-` after that, must contain at least one alphanumeric character. Four
-  states: initial / loading (submitting) / error (inline field error, e.g. server-side "Tag not
-  available.") / success.
+  letters/digits/`.`/`_`/`-` after that, must contain at least one alphanumeric character.
+- Save feedback uses the Stage 1 **Toast primitive**, not the diagram's inline saving/error/
+  success banners — the diagram was built before Stage 1 had a toast system to reuse, and once it
+  existed, duplicating a second feedback mechanism inline didn't make sense. `toast.success`/
+  `toast.error` fire off the mutation's state; only the *field-level* error (e.g. "Tag not
+  available.") stays inline under the `TextInput`, matching the diagram's "Field error (if we
+  have it)" annotation specifically. Because `Toaster` is mounted globally in `App.tsx` (outside
+  routed content), the success toast survives the redirect, so the artificial "show success for a
+  beat before navigating" delay the diagram implies isn't needed — `onSuccess` fires immediately.
+  **This sets the precedent for later screens with similar diagram banners** (e.g.
+  `04-view-game.png`'s "Changes Saved!") — prefer the toast over a bespoke inline banner unless
+  there's a specific reason not to.
 - Gate mode: no Back/Cancel button, "Not Now" omitted entirely (per `claude.md`'s resolved
   decision), on success navigates to `/`.
 - Normal mode: Back/Cancel enabled, no forced redirect — not wired to a route yet (Stage 3's My
@@ -122,3 +163,30 @@ both modes, requirements list reflecting the real validation rules, mutation err
 - Manual browser check: log in via real Auth0 → lands on Team Picker if not authenticated, or
   redirects to `/tag-setup` if the seeded dev user's `Tag === Id`, or through to `/` otherwise.
   Submit a tag, confirm success + redirect, confirm a duplicate/invalid tag shows the right error.
+
+## Decisions log
+Resolved during implementation, kept here for traceability — outcomes are already reflected
+inline above.
+
+- **Local dev API access** — the API expects raw `Teams-User-*` headers and there's no deployed
+  API Gateway/authorizer to produce them locally; real Auth0 login can't authenticate local API
+  calls on its own. → Vite dev proxy injects a fixed dev user's headers (see "Vite dev proxy"
+  above); Auth0 login UX itself is still real. Confirmed acceptable to develop against this
+  "rigged" backend for now; tests mock the API client rather than needing MSW or a real backend.
+- **Auth0 "Allowed Web Origins"** — after the seeded dev user was provided, testing hit silent
+  re-authentication failures (`/authorize?...&prompt=none` returning 400) on page refresh, because
+  `cacheLocation: "memory"` means every reload needs a silent iframe-based token renewal, and that
+  requires the app's origin to be listed in the Auth0 application's **Allowed Web Origins** — a
+  field separate from Allowed Callback URLs, easy to miss. Adding `http://localhost:5173` there
+  resolved it. Worth checking first if this recurs against a different Auth0 tenant/environment.
+- **Response casing bug** — `UserDetailModel` was typed PascalCase to match the C# source, but the
+  API actually serializes responses camelCase. Every field read (`.Id`, `.Tag`, ...) was silently
+  `undefined`, which incidentally still "worked" for the gate redirect (`undefined === undefined`
+  is `true`, so untagged-looking behavior happened to be right) but broke the tag-save mutation
+  outright, since it never had a real user id to PATCH and failed before any network request —
+  the kind of bug that's easy to miss because the visible symptom (stuck on the gate) looks
+  correct. Fixed by correcting `UserDetailModel` to camelCase and auditing every `.Id`/`.Tag`
+  field read; request bodies and `ProblemDetails.errors` keys were confirmed unaffected (see the
+  API client section above). Tests were also fixed — they'd used the same wrong casing as the
+  type, so they passed despite the bug and wouldn't have caught a regression here.
+- **Toast vs. inline banners for save feedback** — see the tag-setup component section above.
