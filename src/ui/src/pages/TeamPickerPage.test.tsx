@@ -1,29 +1,45 @@
-import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { StrictMode } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { MemoryRouter, Route, Routes, useSearchParams } from 'react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useSelf } from '@/hooks/useSelf'
 import { PageTitleProvider } from '@/hooks/usePageTitle'
+import { toast } from '@/components/Toast'
 import { TeamPickerPage } from './TeamPickerPage'
 
 vi.mock('@auth0/auth0-react')
 vi.mock('@/hooks/useSelf')
+vi.mock('@/components/Toast', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
 
-function renderPage() {
-  return render(
+function SearchParamsProbe() {
+  const [searchParams] = useSearchParams()
+  return <p>search: {searchParams.toString() || '(empty)'}</p>
+}
+
+function renderPage(initialEntry = '/', { strict = false } = {}) {
+  const tree = (
     <PageTitleProvider initialTitle="Pick Your Teams">
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <SearchParamsProbe />
         <Routes>
           <Route path="/" element={<TeamPickerPage />} />
           <Route path="/change-tag" element={<p>Change tag screen</p>} />
         </Routes>
       </MemoryRouter>
-    </PageTitleProvider>,
+    </PageTitleProvider>
   )
+  return render(strict ? <StrictMode>{tree}</StrictMode> : tree)
 }
 
 describe('TeamPickerPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('shows Log In / Register when not authenticated', () => {
     vi.mocked(useAuth0).mockReturnValue({
       isAuthenticated: false,
@@ -88,6 +104,47 @@ describe('TeamPickerPage', () => {
     renderPage()
 
     expect(screen.getByText('Screens land in later stages.')).toBeInTheDocument()
+  })
+
+  it('shows a logged-out toast and strips the query param when ?logged_out=true', async () => {
+    vi.mocked(useAuth0).mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      loginWithRedirect: vi.fn(),
+    } as unknown as ReturnType<typeof useAuth0>)
+    vi.mocked(useSelf).mockReturnValue({ isPending: true } as unknown as ReturnType<typeof useSelf>)
+
+    renderPage('/?logged_out=true')
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("You've been logged out."))
+    await waitFor(() => expect(screen.getByText('search: (empty)')).toBeInTheDocument())
+  })
+
+  it('shows the logged-out toast exactly once under StrictMode', async () => {
+    vi.mocked(useAuth0).mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      loginWithRedirect: vi.fn(),
+    } as unknown as ReturnType<typeof useAuth0>)
+    vi.mocked(useSelf).mockReturnValue({ isPending: true } as unknown as ReturnType<typeof useSelf>)
+
+    renderPage('/?logged_out=true', { strict: true })
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalled())
+    expect(toast.success).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not toast when there is no logged_out param', () => {
+    vi.mocked(useAuth0).mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      loginWithRedirect: vi.fn(),
+    } as unknown as ReturnType<typeof useAuth0>)
+    vi.mocked(useSelf).mockReturnValue({ isPending: true } as unknown as ReturnType<typeof useSelf>)
+
+    renderPage('/')
+
+    expect(toast.success).not.toHaveBeenCalled()
   })
 
   it('shows an error state if the self query fails', () => {
