@@ -1,15 +1,80 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router'
+import { useAuth0 } from '@auth0/auth0-react'
 import { Header } from './Header'
+
+vi.mock('@auth0/auth0-react')
+
+function renderHeader() {
+  return render(
+    <MemoryRouter initialEntries={['/games']}>
+      <Routes>
+        <Route path="/games" element={<Header title="Games" />} />
+        <Route path="/" element={<p>Home page</p>} />
+        <Route path="/account" element={<p>My account page</p>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
 
 describe('Header', () => {
   it('renders the screen title', () => {
-    render(<Header title="Games" />)
+    vi.mocked(useAuth0).mockReturnValue({
+      isAuthenticated: true,
+    } as unknown as ReturnType<typeof useAuth0>)
+
+    renderHeader()
+
     expect(screen.getByRole('heading', { name: 'Games' })).toBeInTheDocument()
   })
 
-  it('renders a custom account slot when provided', () => {
-    render(<Header title="Games" accountSlot={<button>Account</button>} />)
-    expect(screen.getByRole('button', { name: 'Account' })).toBeInTheDocument()
+  describe('when authenticated', () => {
+    it('navigates home when the left icon is clicked', async () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: true,
+      } as unknown as ReturnType<typeof useAuth0>)
+      const user = userEvent.setup()
+      renderHeader()
+
+      await user.click(screen.getByRole('button', { name: 'Home' }))
+
+      expect(screen.getByText('Home page')).toBeInTheDocument()
+    })
+
+    it('shows a My Account icon that navigates to /account', async () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: true,
+      } as unknown as ReturnType<typeof useAuth0>)
+      const user = userEvent.setup()
+      renderHeader()
+
+      await user.click(screen.getByRole('button', { name: 'My Account' }))
+
+      expect(screen.getByText('My account page')).toBeInTheDocument()
+    })
+  })
+
+  describe('when not authenticated', () => {
+    it('disables the Home icon instead of hiding it', () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: false,
+      } as unknown as ReturnType<typeof useAuth0>)
+
+      renderHeader()
+
+      expect(screen.getByRole('button', { name: 'Home' })).toBeDisabled()
+    })
+
+    it('hides the My Account icon entirely', () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: false,
+      } as unknown as ReturnType<typeof useAuth0>)
+
+      renderHeader()
+
+      expect(screen.queryByRole('button', { name: 'My Account' })).not.toBeInTheDocument()
+    })
   })
 })

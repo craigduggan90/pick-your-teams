@@ -17,7 +17,6 @@ function renderPage() {
         <Routes>
           <Route path="/" element={<TeamPickerPage />} />
           <Route path="/change-tag" element={<p>Change tag screen</p>} />
-          <Route path="/account" element={<p>My account screen</p>} />
         </Routes>
       </MemoryRouter>
     </PageTitleProvider>,
@@ -89,25 +88,6 @@ describe('TeamPickerPage', () => {
     renderPage()
 
     expect(screen.getByText('Screens land in later stages.')).toBeInTheDocument()
-  })
-
-  it('links to My Account once tagged', async () => {
-    vi.mocked(useAuth0).mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      loginWithRedirect: vi.fn(),
-    } as unknown as ReturnType<typeof useAuth0>)
-    vi.mocked(useSelf).mockReturnValue({
-      isPending: false,
-      isError: false,
-      data: { id: '1', tag: 'bob' },
-    } as unknown as ReturnType<typeof useSelf>)
-    const user = userEvent.setup()
-
-    renderPage()
-    await user.click(screen.getByRole('button', { name: 'My Account' }))
-
-    expect(screen.getByText('My account screen')).toBeInTheDocument()
   })
 
   it('shows an error state if the self query fails', () => {
