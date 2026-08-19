@@ -99,8 +99,12 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
   `Id === Tag`. Nothing consumes this yet (Stage 3 adds the first real protected screen), but the
   component is built now so Stage 3 just wraps its routes in it.
 - `/tag-setup` — wrapped in `RequireAuth` only (must be logged in, but must NOT tag-redirect-loop
-  on itself). Renders the tag-setup component in **gate mode**: no Back/Cancel, on success
-  redirects to `/`.
+  on itself). **This is the one URL for both first-time setup and later changes** — `TagSetupPage`
+  checks `Id === Tag` itself and picks the `TagSetup` mode accordingly: gate mode (no Back,
+  blank field) if the user still needs to set a tag, normal mode (Back enabled, prefilled with
+  the current tag) if they already have one and navigated here voluntarily. Stage 3's "Change
+  Tag" button just needs to link to `/tag-setup`; there's no second route or page to build for
+  it.
 - `/dev/components` — stays public/unguarded, as before.
 
 ### 7a. Shared header title (`usePageTitle`)

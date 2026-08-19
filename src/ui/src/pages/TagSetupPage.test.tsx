@@ -41,7 +41,7 @@ describe('TagSetupPage', () => {
     expect(screen.getByText('Something went wrong loading your account.')).toBeInTheDocument()
   })
 
-  it('renders the gate-mode tag setup form once self resolves', () => {
+  it('renders gate mode with no Back button when the user still needs to set a tag', () => {
     vi.mocked(useSelf).mockReturnValue({
       isPending: false,
       isError: false,
@@ -59,5 +59,25 @@ describe('TagSetupPage', () => {
 
     expect(screen.getByLabelText('Tag')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+  })
+
+  it('renders normal mode, prefilled, with a Back button for a user who already has a tag', () => {
+    vi.mocked(useSelf).mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { id: 'user-1', tag: 'bob' },
+    } as unknown as ReturnType<typeof useSelf>)
+    vi.mocked(useUpdateTag).mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useUpdateTag>)
+
+    renderPage()
+
+    expect(screen.getByLabelText('Tag')).toHaveValue('bob')
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
   })
 })

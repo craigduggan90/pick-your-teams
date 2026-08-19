@@ -18,5 +18,15 @@ export function TagSetupPage() {
     return <ErrorMessage>Something went wrong loading your account.</ErrorMessage>
   }
 
-  return <TagSetup mode="gate" userId={selfQuery.data.id} onSuccess={() => navigate('/')} />
+  const needsTag = selfQuery.data.id === selfQuery.data.tag
+
+  return (
+    <TagSetup
+      mode={needsTag ? 'gate' : 'normal'}
+      userId={selfQuery.data.id}
+      currentTag={needsTag ? undefined : selfQuery.data.tag}
+      onSuccess={() => navigate('/')}
+      onCancel={() => navigate('/')}
+    />
+  )
 }
