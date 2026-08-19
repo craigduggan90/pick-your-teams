@@ -96,8 +96,8 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
 - `RequireAuth` — redirects to `/` if not authenticated (no auto Auth0 redirect); renders children
   once authenticated. Used to wrap the change-tag route.
 - `RequireAuthAndTag` — `RequireAuth`, plus fires `useSelf`, redirects to `/change-tag` if
-  `Id === Tag`. Nothing consumes this yet (Stage 3 adds the first real protected screen), but the
-  component is built now so Stage 3 just wraps its routes in it.
+  `Id === Tag`. Already used by `/account` (see below); Stage 3's other protected screens (Games
+  List, View Game, etc.) wrap in it the same way.
 - `/change-tag` — wrapped in `RequireAuth` only (must be logged in, but must NOT tag-redirect-loop
   on itself). **This is the one URL for both first-time setup and later changes** — `ChangeTagPage`
   checks `Id === Tag` itself and picks the `ChangeTag` component's mode accordingly: gate mode (no
@@ -111,8 +111,8 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
     `ChangeTagLocationState`, so both sides use the same contract). On success or cancel,
     `ChangeTagPage` navigates back to `location.state?.from ?? '/'`. This is what makes gate-mode
     users land back on whichever page they were originally trying to reach (not just the Team
-    Picker root), and will do the same for Stage 3's My Account once it exists — no extra wiring
-    needed there beyond passing `state` when it links here.
+    Picker root), and it's already how the `/account` placeholder's Change Tag button works too
+    (see below) — Stage 3's real My Account needs no extra wiring beyond what's already there.
 - `/dev/components` — stays public/unguarded, as before.
 - `/account` — added out of sequence, ahead of Stage 3, purely so there's a real page to click
   "Change Tag" from while testing (needed to be able to get back to `/change-tag` after the first
@@ -141,6 +141,22 @@ layout. Instead:
 
 This pattern is the one future stages should follow for every new screen's header title, not a
 Stage 2-only concern.
+
+### 7b. Header navigation icons
+Also not in the original plan — the persistent `Header` had a decorative circle on the right and
+nothing on the left; both are now real navigation. Left icon shows the brand image
+(`/icon-192.png`, from `public/`, see Decisions log) and navigates to `/`; right icon navigates
+to `/account` and only appears when authenticated.
+
+Both are auth-aware, but differently, and the distinction matters:
+- **My Account (right):** hidden entirely when logged out — there's nothing there to go to.
+- **Home (left):** the brand icon always renders (it's branding, not just a nav control), but it's
+  only a real `<button>` when authenticated. Logged out, it's a plain non-interactive `<div>` —
+  deliberately *not* a disabled button. The first attempt used a `disabled` button (faded via
+  `disabled:opacity-40`), which the user pushed back on: fading it read as "broken link," when the
+  actual intent was "not a link at all right now." Worth remembering as a general distinction for
+  future auth-conditional controls in this app: disabled ≠ absent-as-a-link — pick the one that
+  matches what's actually true.
 
 ### 8. Change-tag component (`ChangeTag`, in `components/ChangeTag.tsx`)
 Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop. Originally built and named `TagSetup`
@@ -180,8 +196,15 @@ surfacing (duplicate-tag "Tag not available." message), and `ChangeTagPage`'s mo
 return-navigation (with `ChangeTag` itself mocked out, so the page's own responsibility is tested
 in isolation).
 
+### 10. Dev tooling
+`npm run watch` — not in the original plan, added because `vite dev` alone only transpiles
+TypeScript, it doesn't type-check; errors only ever surfaced via the full `npm run build`. `watch`
+runs `vite` and `tsc -b --watch` side by side via `concurrently` (new devDependency), so type
+errors show up live during development too. `npm run dev` is unchanged, for when the extra
+process isn't wanted.
+
 ## Explicitly out of scope for this stage
-- Games List / My Account / any Stage 3+ screens.
+- Games List / My Account (the real one) / any Stage 3+ screens.
 - Playwright/E2E.
 - Any AWS infrastructure (API Gateway, Lambda authorizer) — local dev shim only.
 - Modifying `src/api` in any way (no CORS changes) — frontend-only, per `claude.md`.
