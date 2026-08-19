@@ -16,15 +16,33 @@ public static class GamesMapperTests
         string? location = "Test Venue",
         DateTime? startTime = null,
         int duration = 60,
-        int teamSize = 5)
+        int teamSize = 5,
+        User? organiser = null)
     {
+        organiserId ??= organiser?.Id ?? Guid.NewGuid().ToString("N");
         using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
         return new Game(
-            organiserId ?? Guid.NewGuid().ToString("N"),
+            organiserId,
             location,
             startTime ?? new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc),
             duration,
-            teamSize);
+            teamSize)
+        {
+            Organiser = organiser ?? GetUser(organiserId)
+        };
+    }
+
+    private static User GetUser(
+        string? id = null,
+        string? displayName = null,
+        string? tag = null)
+    {
+        using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
+        var user = new User(displayName ?? "Test Organiser", "external-id", "organiser@test.net", null);
+        if (tag is not null)
+            user.Update(tag, null, null, null);
+
+        return user;
     }
 
     private static Player GetPlayer(
@@ -64,6 +82,19 @@ public static class GamesMapperTests
             Assert.Equal(game.Duration, result.Duration);
             Assert.Equal(game.TeamSize, result.TeamSize);
             Assert.Equal(nameof(GameStatusEnum.Scheduled), result.Status);
+            Assert.Equal(game.Organiser!.Id, result.Organiser!.Id);
+            Assert.Equal(game.Organiser.Tag, result.Organiser.Tag);
+            Assert.Equal(game.Organiser.DisplayName, result.Organiser.DisplayName);
+        }
+
+        [Fact]
+        public void SetsOrganiserToNull_WhenGameHasNoOrganiser()
+        {
+            var game = new Game("missing-organiser-id", "Test Venue", new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc), 60, 5);
+
+            var result = game.ToModel();
+
+            Assert.Null(result.Organiser);
         }
     }
 
@@ -90,6 +121,19 @@ public static class GamesMapperTests
             Assert.Equal(game.AwayTeamRating, result.AwayTeamRating);
             Assert.Equal(game.DateCreated, result.Created);
             Assert.Equal(game.DateModified, result.Modified);
+            Assert.Equal(game.Organiser!.Id, result.Organiser!.Id);
+            Assert.Equal(game.Organiser.Tag, result.Organiser.Tag);
+            Assert.Equal(game.Organiser.DisplayName, result.Organiser.DisplayName);
+        }
+
+        [Fact]
+        public void SetsOrganiserToNull_WhenGameHasNoOrganiser()
+        {
+            var game = new Game("missing-organiser-id", "Test Venue", new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc), 60, 5);
+
+            var result = game.ToDetailedModel();
+
+            Assert.Null(result.Organiser);
         }
 
         [Fact]

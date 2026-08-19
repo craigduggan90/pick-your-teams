@@ -43,6 +43,15 @@ public static partial class GamesControllerTests
             Assert.NotNull(content);
             Assert.Equal(25, content.Data.Count); // 30 seed games, default page size 25
             Assert.Equal(25, content.Count);
+
+            Assert.All(content.Data, game =>
+            {
+                var existingGame = SeedGames.Single(g => g.Id == game.Id);
+                var organiser = SeedOrganisers.Single(o => o.Id == existingGame.OrganiserId);
+                Assert.Equal(organiser.Id, game.Organiser!.Id);
+                Assert.Equal(organiser.Tag, game.Organiser.Tag);
+                Assert.Equal(organiser.DisplayName, game.Organiser.DisplayName);
+            });
         }
 
         [Fact]

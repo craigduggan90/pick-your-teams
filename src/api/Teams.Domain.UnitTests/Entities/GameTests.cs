@@ -1,6 +1,5 @@
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
-using Teams.Domain.Exceptions;
 using Teams.Domain.UnitTests.TestHelpers;
 
 namespace Teams.Domain.UnitTests.Entities;
@@ -117,11 +116,11 @@ public static partial class GameTests
     public class OrganiserProperty : GameTestsBase
     {
         [Fact]
-        public void ThrowsUninitializedPropertyException_WhenOrganiserNotSet()
+        public void IsNull_WhenOrganiserNotSet()
         {
             var game = CreateGame();
 
-            Assert.Throws<UninitializedPropertyException>(() => game.Organiser);
+            Assert.Null(game.Organiser);
         }
 
         [Fact]

@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Teams.Data.Models;
 using Teams.Data.Repositories.Games;
+using Teams.Domain.Entities;
 using Teams.Domain.Enums;
 
 namespace Teams.Data.UnitTests.Repositories.Games;
@@ -28,6 +30,30 @@ public static class ReadOnlyGamesRepositoryTests
             var sut = CreateSut();
             var actual = await sut.GetByIdAsync(id, TestContext.Current.CancellationToken);
             Assert.Equivalent(expected, actual, true);
+        }
+
+        [Fact]
+        public async Task ShouldReturnGameWithNullOrganiser_WhenOrganiserHasBeenHardDeleted()
+        {
+            var organiser = SeedDataFactory.Users.Create(200);
+            var game = SeedDataFactory.Games.Create(200, organiser);
+            await Context.Users.AddAsync(organiser, TestContext.Current.CancellationToken);
+            await Context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+            await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            // Bulk delete bypasses change tracking, so this exercises the database's own ON DELETE SET NULL
+            // behavior rather than EF's client-side fixup - clearing the tracker afterward forces a genuinely
+            // fresh read, rather than returning the already-tracked (now stale) Game instance from memory.
+            await Context.Users.IgnoreQueryFilters().Where(u => u.Id == organiser.Id)
+                .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
+            Context.ChangeTracker.Clear();
+
+            var sut = CreateSut();
+            var actual = await sut.GetByIdAsync(game.Id, TestContext.Current.CancellationToken);
+
+            Assert.NotNull(actual);
+            Assert.Null(actual.OrganiserId);
+            Assert.Null(actual.Organiser);
         }
     }
 
@@ -241,6 +267,29 @@ public static class ReadOnlyGamesRepositoryTests
                 cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equivalent(page, actual, true);
+        }
+
+        [Fact]
+        public async Task ShouldReturnGamesWithNullOrganiser_WhenOrganiserHasBeenHardDeleted()
+        {
+            var organiser = SeedDataFactory.Users.Create(201);
+            var game = SeedDataFactory.Games.Create(201, organiser);
+            await Context.Users.AddAsync(organiser, TestContext.Current.CancellationToken);
+            await Context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+            await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            await Context.Users.IgnoreQueryFilters().Where(u => u.Id == organiser.Id)
+                .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
+            Context.ChangeTracker.Clear();
+
+            var sut = CreateSut();
+            var actual = await sut.GetAsync(
+                pagination: new PaginationFilter(null, 200),
+                cancellationToken: TestContext.Current.CancellationToken);
+
+            var result = actual.Single(g => g.Id == game.Id);
+            Assert.Null(result.OrganiserId);
+            Assert.Null(result.Organiser);
         }
     }
 }

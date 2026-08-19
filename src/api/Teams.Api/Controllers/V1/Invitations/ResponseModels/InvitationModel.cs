@@ -7,7 +7,7 @@ public record InvitationModel(
     string Id,
     string Status,
     InvitationGameModel Game,
-    InvitationOrganiserModel Organiser)
+    InvitationOrganiserModel? Organiser)
 {
     [ExcludeFromCodeCoverage]
     public static InvitationModel Example => new(
