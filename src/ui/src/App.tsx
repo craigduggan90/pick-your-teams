@@ -6,11 +6,13 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Toaster } from '@/components/Toast'
 import { RequireAuth } from '@/components/RequireAuth'
+import { RequireAuthAndTag } from '@/components/RequireAuthAndTag'
 import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
 import { APP_NAME } from '@/lib/constants'
 import { ComponentsShowcasePage } from '@/pages/dev/ComponentsShowcasePage'
 import { TeamPickerPage } from '@/pages/TeamPickerPage'
 import { ChangeTagPage } from '@/pages/ChangeTagPage'
+import { MyAccountPage } from '@/pages/MyAccountPage'
 
 const queryClient = new QueryClient()
 
@@ -65,6 +67,14 @@ export default function App() {
                     <RequireAuth>
                       <ChangeTagPage />
                     </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/account"
+                  element={
+                    <RequireAuthAndTag>
+                      <MyAccountPage />
+                    </RequireAuthAndTag>
                   }
                 />
                 <Route path="/dev/components" element={<ComponentsShowcasePage />} />

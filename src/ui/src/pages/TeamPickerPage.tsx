@@ -1,4 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import { useNavigate } from 'react-router'
 import { Button } from '@/components/Button'
 import { TagGate } from '@/components/TagGate'
 import { Loading } from '@/components/Loading'
@@ -6,7 +7,16 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { APP_NAME } from '@/lib/constants'
 
 function HomePlaceholder() {
-  return <p className="p-4 text-sm text-light-grey">Screens land in later stages.</p>
+  const navigate = useNavigate()
+
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <p className="text-sm text-light-grey">Screens land in later stages.</p>
+      <Button variant="outline" className="w-full" onClick={() => navigate('/account')}>
+        My Account
+      </Button>
+    </div>
+  )
 }
 
 export function TeamPickerPage() {

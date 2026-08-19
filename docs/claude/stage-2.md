@@ -114,6 +114,14 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
     Picker root), and will do the same for Stage 3's My Account once it exists — no extra wiring
     needed there beyond passing `state` when it links here.
 - `/dev/components` — stays public/unguarded, as before.
+- `/account` — added out of sequence, ahead of Stage 3, purely so there's a real page to click
+  "Change Tag" from while testing (needed to be able to get back to `/change-tag` after the first
+  gate pass, without it there's no in-app way to reach it again). `MyAccountPage` is a one-line
+  placeholder plus a "Change Tag" button wired exactly like Stage 3's real one will be — navigates
+  to `/change-tag` with `state: { from: '/account' }`. Wrapped in `RequireAuthAndTag` (not just
+  `RequireAuth`), since viewing My Account presupposes you already have a tag. `HomePlaceholder`
+  (rendered at `/` once tagged) links here too, so the whole loop is clickable without typing a
+  URL: Home → My Account → Change Tag → back to My Account.
 
 ### 7a. Shared header title (`usePageTitle`)
 Not in the original plan — added once the change-tag screen was built and it became clear that
@@ -157,7 +165,8 @@ existing tag (see Decisions log).
 - Gate mode: no Back/Cancel button, "Not Now" omitted entirely (per `claude.md`'s resolved
   decision).
 - Normal mode: Back/Cancel enabled, prefilled with the current tag. Wired to `/change-tag` now
-  (see routing above) — Stage 3's My Account "Change Tag" button just links there.
+  (see routing above) — Stage 3's real My Account "Change Tag" button just links there, same as
+  the minimal placeholder below already does.
 - Both modes call the same `onSuccess`/`onCancel` props, which `ChangeTagPage` wires to "go back
   to wherever the user came from" (see routing above) — the component itself doesn't know or care
   where that is.
