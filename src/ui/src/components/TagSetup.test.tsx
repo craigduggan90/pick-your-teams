@@ -1,11 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useUpdateTag } from '@/hooks/useUpdateTag'
 import { ApiError } from '@/api/client'
+import { toast } from '@/components/Toast'
 import { TagSetup } from './TagSetup'
 
 vi.mock('@/hooks/useUpdateTag')
+vi.mock('@/components/Toast', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
 
 function mockMutation(overrides: Partial<ReturnType<typeof useUpdateTag>> = {}) {
   const mutate = vi.fn()
@@ -68,15 +72,15 @@ describe('TagSetup', () => {
     expect(mutate).toHaveBeenCalledWith('new_tag')
   })
 
-  it('shows a saving banner and disables the field while pending', () => {
+  it('shows a saving state on the button and disables the field while pending', () => {
     mockMutation({ isPending: true })
     render(<TagSetup mode="gate" userId="user-1" />)
 
-    expect(screen.getByText('Saving…')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeDisabled()
     expect(screen.getByLabelText('Tag')).toBeDisabled()
   })
 
-  it('shows the field error and banner reason on a validation failure', () => {
+  it('shows the field error and toasts the reason on a validation failure', () => {
     const error = new ApiError(422, {
       title: 'Validation Error',
       detail: 'One or more validation failures occurred.',
@@ -86,30 +90,25 @@ describe('TagSetup', () => {
     render(<TagSetup mode="gate" userId="user-1" />)
 
     expect(screen.getByText('Tag not available.')).toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('One or more validation failures occurred.')
+    expect(toast.error).toHaveBeenCalledWith('One or more validation failures occurred.')
   })
 
-  describe('success', () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
+  it('toasts a generic message on a non-API failure', () => {
+    // getAccessTokenSilently (or a raw network failure) can reject with a plain Error even
+    // though the mutation's declared error type is ApiError — this exercises that fallback.
+    mockMutation({ isError: true, error: new Error('network down') as unknown as ApiError })
+    render(<TagSetup mode="gate" userId="user-1" />)
 
-    afterEach(() => {
-      vi.useRealTimers()
-    })
+    expect(toast.error).toHaveBeenCalledWith('Something went wrong saving your tag.')
+  })
 
-    it('shows a success banner and calls onSuccess after a short delay', () => {
-      mockMutation({ isSuccess: true })
-      const onSuccess = vi.fn()
-      render(<TagSetup mode="gate" userId="user-1" onSuccess={onSuccess} />)
+  it('toasts success and calls onSuccess immediately', () => {
+    mockMutation({ isSuccess: true })
+    const onSuccess = vi.fn()
+    render(<TagSetup mode="gate" userId="user-1" onSuccess={onSuccess} />)
 
-      expect(screen.getByText('Tag Saved. Redirecting you now!')).toBeInTheDocument()
-      expect(screen.getByLabelText('Tag')).toBeDisabled()
-      expect(onSuccess).not.toHaveBeenCalled()
-
-      vi.advanceTimersByTime(1200)
-
-      expect(onSuccess).toHaveBeenCalled()
-    })
+    expect(toast.success).toHaveBeenCalledWith('Tag saved!')
+    expect(screen.getByLabelText('Tag')).toBeDisabled()
+    expect(onSuccess).toHaveBeenCalled()
   })
 })

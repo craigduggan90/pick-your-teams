@@ -3,6 +3,7 @@ import { TextInput } from '@/components/TextInput'
 import { Button } from '@/components/Button'
 import { useUpdateTag } from '@/hooks/useUpdateTag'
 import { ApiError } from '@/api/client'
+import { toast } from '@/components/Toast'
 
 const TAG_REQUIREMENTS = [
   '3–36 characters',
@@ -25,43 +26,29 @@ export function TagSetup({ mode, userId, currentTag, onSuccess, onCancel }: TagS
   const mutation = useUpdateTag(userId)
 
   useEffect(() => {
-    if (!mutation.isSuccess) {
-      return
+    if (mutation.isSuccess) {
+      toast.success('Tag saved!')
+      onSuccess?.()
     }
-    const timeout = setTimeout(() => onSuccess?.(), 1200)
-    return () => clearTimeout(timeout)
   }, [mutation.isSuccess, onSuccess])
+
+  useEffect(() => {
+    if (mutation.isError) {
+      const message =
+        mutation.error instanceof ApiError
+          ? (mutation.error.problem.detail ?? mutation.error.message)
+          : 'Something went wrong saving your tag.'
+      toast.error(message)
+    }
+  }, [mutation.isError, mutation.error])
 
   const fieldError =
     mutation.error instanceof ApiError ? mutation.error.problem.errors?.Tag?.[0] : undefined
-  const bannerMessage = mutation.isError
-    ? mutation.error instanceof ApiError
-      ? (mutation.error.problem.detail ?? mutation.error.message)
-      : 'Something went wrong saving your tag.'
-    : undefined
 
   const disabled = mutation.isPending || mutation.isSuccess
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col">
-      <div className="bg-primary px-4 py-3 text-primary-foreground">
-        <h1 className="text-lg font-medium">Set Your Tag</h1>
-      </div>
-
-      {mutation.isPending && (
-        <div className="bg-muted px-4 py-2 text-sm text-dark-grey">Saving…</div>
-      )}
-      {bannerMessage && (
-        <div role="alert" className="bg-error px-4 py-2 text-sm text-error-foreground">
-          {bannerMessage}
-        </div>
-      )}
-      {mutation.isSuccess && (
-        <div className="bg-success px-4 py-2 text-sm text-success-foreground">
-          Tag Saved. Redirecting you now!
-        </div>
-      )}
-
       <div className="flex flex-col gap-4 p-4">
         <p className="text-sm text-dark-grey">
           Your tag is the main way your friends will find you and invite you to games. Don't
@@ -98,7 +85,7 @@ export function TagSetup({ mode, userId, currentTag, onSuccess, onCancel }: TagS
           onClick={() => mutation.mutate(tag)}
           disabled={disabled || tag.length === 0}
         >
-          Save
+          {mutation.isPending ? 'Saving…' : 'Save'}
         </Button>
       </div>
     </div>
