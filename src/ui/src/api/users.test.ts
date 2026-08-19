@@ -8,12 +8,12 @@ vi.mock('./client', () => ({
 
 describe('users api', () => {
   it('getSelf fetches the current user', async () => {
-    vi.mocked(apiFetch).mockResolvedValue({ Id: '1', Tag: 'bob' })
+    vi.mocked(apiFetch).mockResolvedValue({ id: '1', tag: 'bob' })
 
     const result = await getSelf('token123')
 
     expect(apiFetch).toHaveBeenCalledWith('/v1/users/self', { token: 'token123' })
-    expect(result).toEqual({ Id: '1', Tag: 'bob' })
+    expect(result).toEqual({ id: '1', tag: 'bob' })
   })
 
   it('updateUser PATCHes the given id with the body', async () => {

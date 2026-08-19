@@ -19,7 +19,7 @@ export function TagGate({ children }: { children: ReactNode }) {
     return <ErrorMessage>Something went wrong loading your account.</ErrorMessage>
   }
 
-  if (selfQuery.data.Id === selfQuery.data.Tag) {
+  if (selfQuery.data.id === selfQuery.data.tag) {
     return <Navigate to="/tag-setup" replace />
   }
 

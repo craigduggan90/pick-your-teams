@@ -62,7 +62,7 @@ describe('TeamPickerPage', () => {
     vi.mocked(useSelf).mockReturnValue({
       isPending: false,
       isError: false,
-      data: { Id: '1', Tag: '1' },
+      data: { id: '1', tag: '1' },
     } as unknown as ReturnType<typeof useSelf>)
 
     renderPage()
@@ -79,7 +79,7 @@ describe('TeamPickerPage', () => {
     vi.mocked(useSelf).mockReturnValue({
       isPending: false,
       isError: false,
-      data: { Id: '1', Tag: 'bob' },
+      data: { id: '1', tag: 'bob' },
     } as unknown as ReturnType<typeof useSelf>)
 
     renderPage()

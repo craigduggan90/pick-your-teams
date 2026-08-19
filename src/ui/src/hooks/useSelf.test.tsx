@@ -33,14 +33,14 @@ describe('useSelf', () => {
       getAccessTokenSilently,
     } as any)
     vi.mocked(getSelf).mockResolvedValue({
-      Id: '1',
-      Tag: '1',
-      DisplayName: 'Dev User',
-      Rating: 0,
-      Email: 'dev@example.com',
-      Mobile: null,
-      Created: '2026-01-01T00:00:00Z',
-      Modified: '2026-01-01T00:00:00Z',
+      id: '1',
+      tag: '1',
+      displayName: 'Dev User',
+      rating: 0,
+      email: 'dev@example.com',
+      mobile: null,
+      created: '2026-01-01T00:00:00Z',
+      modified: '2026-01-01T00:00:00Z',
     })
 
     const { result } = renderHook(() => useSelf(), { wrapper })
@@ -49,6 +49,6 @@ describe('useSelf', () => {
 
     expect(getAccessTokenSilently).toHaveBeenCalled()
     expect(getSelf).toHaveBeenCalledWith('token123')
-    expect(result.current.data?.Id).toBe('1')
+    expect(result.current.data?.id).toBe('1')
   })
 })

@@ -42,7 +42,7 @@ describe('TagSetupPage', () => {
     vi.mocked(useSelf).mockReturnValue({
       isPending: false,
       isError: false,
-      data: { Id: 'user-1', Tag: 'user-1' },
+      data: { id: 'user-1', tag: 'user-1' },
     } as unknown as ReturnType<typeof useSelf>)
     vi.mocked(useUpdateTag).mockReturnValue({
       mutate: vi.fn(),
