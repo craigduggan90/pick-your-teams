@@ -10,7 +10,7 @@ import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
 import { APP_NAME } from '@/lib/constants'
 import { ComponentsShowcasePage } from '@/pages/dev/ComponentsShowcasePage'
 import { TeamPickerPage } from '@/pages/TeamPickerPage'
-import { TagSetupPage } from '@/pages/TagSetupPage'
+import { ChangeTagPage } from '@/pages/ChangeTagPage'
 
 const queryClient = new QueryClient()
 
@@ -60,10 +60,10 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<TeamPickerPage />} />
                 <Route
-                  path="/tag-setup"
+                  path="/change-tag"
                   element={
                     <RequireAuth>
-                      <TagSetupPage />
+                      <ChangeTagPage />
                     </RequireAuth>
                   }
                 />

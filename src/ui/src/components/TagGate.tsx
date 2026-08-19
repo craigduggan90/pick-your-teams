@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react'
-import { Navigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router'
 import { useSelf } from '@/hooks/useSelf'
+import type { ChangeTagLocationState } from '@/lib/navigation'
 import { Loading } from './Loading'
 import { ErrorMessage } from './ErrorMessage'
 
 /**
  * Renders children once the current user is confirmed to have a tag set; redirects to
- * /tag-setup otherwise. Assumes the caller already knows the user is authenticated.
+ * /change-tag otherwise. Assumes the caller already knows the user is authenticated.
  */
 export function TagGate({ children }: { children: ReactNode }) {
+  const location = useLocation()
   const selfQuery = useSelf()
 
   if (selfQuery.isPending) {
@@ -20,7 +22,8 @@ export function TagGate({ children }: { children: ReactNode }) {
   }
 
   if (selfQuery.data.id === selfQuery.data.tag) {
-    return <Navigate to="/tag-setup" replace />
+    const state: ChangeTagLocationState = { from: location.pathname }
+    return <Navigate to="/change-tag" state={state} replace />
   }
 
   return <>{children}</>

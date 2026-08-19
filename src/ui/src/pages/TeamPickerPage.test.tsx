@@ -16,7 +16,7 @@ function renderPage() {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<TeamPickerPage />} />
-          <Route path="/tag-setup" element={<p>Tag setup screen</p>} />
+          <Route path="/change-tag" element={<p>Change tag screen</p>} />
         </Routes>
       </MemoryRouter>
     </PageTitleProvider>,
@@ -56,7 +56,7 @@ describe('TeamPickerPage', () => {
     })
   })
 
-  it('redirects to /tag-setup when the user still needs to set a tag', () => {
+  it('redirects to /change-tag when the user still needs to set a tag', () => {
     vi.mocked(useAuth0).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -70,7 +70,7 @@ describe('TeamPickerPage', () => {
 
     renderPage()
 
-    expect(screen.getByText('Tag setup screen')).toBeInTheDocument()
+    expect(screen.getByText('Change tag screen')).toBeInTheDocument()
   })
 
   it('renders the home placeholder once tagged', () => {

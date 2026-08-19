@@ -94,22 +94,30 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
   authenticated, redirects onward (through the same tag-check as below) instead of showing the
   landing again.
 - `RequireAuth` — redirects to `/` if not authenticated (no auto Auth0 redirect); renders children
-  once authenticated. Used to wrap the tag-setup route.
-- `RequireAuthAndTag` — `RequireAuth`, plus fires `useSelf`, redirects to `/tag-setup` if
+  once authenticated. Used to wrap the change-tag route.
+- `RequireAuthAndTag` — `RequireAuth`, plus fires `useSelf`, redirects to `/change-tag` if
   `Id === Tag`. Nothing consumes this yet (Stage 3 adds the first real protected screen), but the
   component is built now so Stage 3 just wraps its routes in it.
-- `/tag-setup` — wrapped in `RequireAuth` only (must be logged in, but must NOT tag-redirect-loop
-  on itself). **This is the one URL for both first-time setup and later changes** — `TagSetupPage`
-  checks `Id === Tag` itself and picks the `TagSetup` mode accordingly: gate mode (no Back,
-  blank field) if the user still needs to set a tag, normal mode (Back enabled, prefilled with
-  the current tag) if they already have one and navigated here voluntarily. Stage 3's "Change
-  Tag" button just needs to link to `/tag-setup`; there's no second route or page to build for
-  it.
+- `/change-tag` — wrapped in `RequireAuth` only (must be logged in, but must NOT tag-redirect-loop
+  on itself). **This is the one URL for both first-time setup and later changes** — `ChangeTagPage`
+  checks `Id === Tag` itself and picks the `ChangeTag` component's mode accordingly: gate mode (no
+  Back, blank field, header title "Set Your Tag") if the user still needs to set a tag, normal
+  mode (Back enabled, prefilled with the current tag, header title "Change Tag") if they already
+  have one and navigated here voluntarily. Stage 3's "Change Tag" button just needs to link to
+  `/change-tag`; there's no second route or page to build for it.
+  - **Returns the user to wherever they came from, not always `/`.** Whoever navigates *to*
+    `/change-tag` — `TagGate`'s automatic redirect, or Stage 3's future Change Tag button — passes
+    `state: { from: location.pathname }` (the shared shape lives in `lib/navigation.ts` as
+    `ChangeTagLocationState`, so both sides use the same contract). On success or cancel,
+    `ChangeTagPage` navigates back to `location.state?.from ?? '/'`. This is what makes gate-mode
+    users land back on whichever page they were originally trying to reach (not just the Team
+    Picker root), and will do the same for Stage 3's My Account once it exists — no extra wiring
+    needed there beyond passing `state` when it links here.
 - `/dev/components` — stays public/unguarded, as before.
 
 ### 7a. Shared header title (`usePageTitle`)
-Not in the original plan — added once the tag-setup screen was built and it became clear that
-having `TagSetup` render its own "Set Your Tag" bar produced two stacked header bars (the app's
+Not in the original plan — added once the change-tag screen was built and it became clear that
+having the screen render its own "Set Your Tag" bar produced two stacked header bars (the app's
 persistent `Header` plus the screen's own), which doesn't fit the mobile-first single-header
 layout. Instead:
 - `hooks/usePageTitle.tsx` exports a `PageTitleProvider` (wraps the whole app, holds the current
@@ -126,8 +134,11 @@ layout. Instead:
 This pattern is the one future stages should follow for every new screen's header title, not a
 Stage 2-only concern.
 
-### 8. Tag-setup component
-Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop.
+### 8. Change-tag component (`ChangeTag`, in `components/ChangeTag.tsx`)
+Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop. Originally built and named `TagSetup`
+for gate-only use; renamed once it became the shared entry point for both first-time setup and
+later changes — "tag-setup" stopped being an accurate name for something also used to change an
+existing tag (see Decisions log).
 - Both modes: `TextInput` (Stage 1 primitive, floating label) for the tag, live requirements list
   driven by the **real API validation rules** (found in `UpdateUserCommandValidator.cs` /
   `Constants.TagRegexPattern`): 3–36 characters, must start with a letter/digit/underscore, only
@@ -144,17 +155,21 @@ Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop.
   `04-view-game.png`'s "Changes Saved!") — prefer the toast over a bespoke inline banner unless
   there's a specific reason not to.
 - Gate mode: no Back/Cancel button, "Not Now" omitted entirely (per `claude.md`'s resolved
-  decision), on success navigates to `/`.
-- Normal mode: Back/Cancel enabled, no forced redirect — not wired to a route yet (Stage 3's My
-  Account "Change Tag" button does that), just needs to exist and work standalone for Stage 3 to
-  consume without changes.
+  decision).
+- Normal mode: Back/Cancel enabled, prefilled with the current tag. Wired to `/change-tag` now
+  (see routing above) — Stage 3's My Account "Change Tag" button just links there.
+- Both modes call the same `onSuccess`/`onCancel` props, which `ChangeTagPage` wires to "go back
+  to wherever the user came from" (see routing above) — the component itself doesn't know or care
+  where that is.
 
 ### 9. Testing
 Vitest + RTL as established in Stage 1. Component/hook tests mock the `api/users.ts` module
 directly (`vi.mock`) rather than hitting a real backend or introducing MSW — keeps the dependency
-footprint the same as Stage 1. Covers: route guard redirect behavior, tag-setup's four states in
-both modes, requirements list reflecting the real validation rules, mutation error surfacing
-(duplicate-tag "Tag not available." message).
+footprint the same as Stage 1. Covers: route guard redirect behavior, the change-tag component's
+states in both modes, requirements list reflecting the real validation rules, mutation error
+surfacing (duplicate-tag "Tag not available." message), and `ChangeTagPage`'s mode selection and
+return-navigation (with `ChangeTag` itself mocked out, so the page's own responsibility is tested
+in isolation).
 
 ## Explicitly out of scope for this stage
 - Games List / My Account / any Stage 3+ screens.
@@ -165,8 +180,9 @@ both modes, requirements list reflecting the real validation rules, mutation err
 ## Verification
 - `npm run build` and `npm run test -- --run` both green.
 - Manual browser check: log in via real Auth0 → lands on Team Picker if not authenticated, or
-  redirects to `/tag-setup` if the seeded dev user's `Tag === Id`, or through to `/` otherwise.
-  Submit a tag, confirm success + redirect, confirm a duplicate/invalid tag shows the right error.
+  redirects to `/change-tag` if the seeded dev user's `Tag === Id`, or through to `/` otherwise.
+  Submit a tag, confirm success + redirect back to `/`, confirm a duplicate/invalid tag shows the
+  right error.
 
 ## Decisions log
 Resolved during implementation, kept here for traceability — outcomes are already reflected
@@ -193,4 +209,16 @@ inline above.
   field read; request bodies and `ProblemDetails.errors` keys were confirmed unaffected (see the
   API client section above). Tests were also fixed — they'd used the same wrong casing as the
   type, so they passed despite the bug and wouldn't have caught a regression here.
-- **Toast vs. inline banners for save feedback** — see the tag-setup component section above.
+- **Toast vs. inline banners for save feedback** — see the change-tag component section above.
+- **"tag-setup" → "change-tag" rename, plus return-navigation** — once the component became
+  genuinely dual-use (gate *and* normal mode reachable at the same URL), "tag-setup" stopped
+  describing what it does for an already-tagged user changing their tag. Renamed throughout:
+  `TagSetup`/`TagSetupProps`/`TagSetupMode` → `ChangeTag`/`ChangeTagProps`/`ChangeTagMode`,
+  `TagSetupPage` → `ChangeTagPage`, route `/tag-setup` → `/change-tag`. Separately, the original
+  "always navigate to `/` when done" behavior was wrong for two real cases: a user gated to
+  `/change-tag` from somewhere other than `/` should land back on *that* page, not always root;
+  and Stage 3's Change Tag button (from My Account) needs to return to My Account specifically,
+  not root. Fixed with a `state: { from: <pathname> }` convention (`ChangeTagLocationState` in
+  `lib/navigation.ts`) — whoever navigates to `/change-tag` supplies it, `ChangeTagPage` reads it
+  back on success/cancel, defaulting to `/` only if it's missing (e.g. someone bookmarks the URL
+  directly).

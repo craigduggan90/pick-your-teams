@@ -21,7 +21,7 @@ function renderGuard() {
           }
         />
         <Route path="/" element={<p>Team Picker landing</p>} />
-        <Route path="/tag-setup" element={<p>Tag setup screen</p>} />
+        <Route path="/change-tag" element={<p>Change tag screen</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -39,7 +39,7 @@ describe('RequireAuthAndTag', () => {
     expect(screen.getByText('Team Picker landing')).toBeInTheDocument()
   })
 
-  it('redirects to /tag-setup when authenticated but untagged', () => {
+  it('redirects to /change-tag when authenticated but untagged', () => {
     vi.mocked(useAuth0).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -52,7 +52,7 @@ describe('RequireAuthAndTag', () => {
 
     renderGuard()
 
-    expect(screen.getByText('Tag setup screen')).toBeInTheDocument()
+    expect(screen.getByText('Change tag screen')).toBeInTheDocument()
   })
 
   it('renders children when authenticated and tagged', () => {

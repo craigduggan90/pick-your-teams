@@ -11,17 +11,17 @@ const TAG_REQUIREMENTS = [
   'Only letters, numbers, ".", "_", and "-" after that',
 ]
 
-export type TagSetupMode = 'gate' | 'normal'
+export type ChangeTagMode = 'gate' | 'normal'
 
-export interface TagSetupProps {
-  mode: TagSetupMode
+export interface ChangeTagProps {
+  mode: ChangeTagMode
   userId: string | undefined
   currentTag?: string
   onSuccess?: () => void
   onCancel?: () => void
 }
 
-export function TagSetup({ mode, userId, currentTag, onSuccess, onCancel }: TagSetupProps) {
+export function ChangeTag({ mode, userId, currentTag, onSuccess, onCancel }: ChangeTagProps) {
   const [tag, setTag] = useState(currentTag ?? '')
   const mutation = useUpdateTag(userId)
 

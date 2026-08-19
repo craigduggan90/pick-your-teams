@@ -18,7 +18,7 @@ function renderGate() {
             </TagGate>
           }
         />
-        <Route path="/tag-setup" element={<p>Tag setup screen</p>} />
+        <Route path="/change-tag" element={<p>Change tag screen</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -46,7 +46,7 @@ describe('TagGate', () => {
     expect(screen.getByText('Something went wrong loading your account.')).toBeInTheDocument()
   })
 
-  it('redirects to /tag-setup when the user still needs to set a tag', () => {
+  it('redirects to /change-tag when the user still needs to set a tag', () => {
     vi.mocked(useSelf).mockReturnValue({
       isPending: false,
       isError: false,
@@ -55,7 +55,7 @@ describe('TagGate', () => {
 
     renderGate()
 
-    expect(screen.getByText('Tag setup screen')).toBeInTheDocument()
+    expect(screen.getByText('Change tag screen')).toBeInTheDocument()
   })
 
   it('renders children once the user has a tag set', () => {
