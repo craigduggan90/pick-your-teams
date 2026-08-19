@@ -231,3 +231,10 @@ inline above.
   `lib/navigation.ts`) — whoever navigates to `/change-tag` supplies it, `ChangeTagPage` reads it
   back on success/cancel, defaulting to `/` only if it's missing (e.g. someone bookmarks the URL
   directly).
+- **Primary/Secondary brand colors confirmed, then Primary adjusted for contrast** — the user
+  gave the real brand values, Primary `#00B295` / Secondary `#F05D23`, replacing the Stage 1
+  placeholders. White text on `#00B295` computes to ~2.70:1 contrast, under WCAG AA's 3:1 minimum
+  even for large text/UI components (Secondary's ~3.33:1 clears it, if only just). Primary was
+  darkened/desaturated to `#32936F` (~3.79:1) to fix this — Secondary is unchanged. `:root`'s
+  comment in `index.css` documents `#32936F` as a contrast-adjusted variant of the real brand
+  `#00B295`, not a placeholder guess, so a future design pass doesn't "correct" it back.
