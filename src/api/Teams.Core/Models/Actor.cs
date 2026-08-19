@@ -4,7 +4,7 @@ namespace Teams.Core.Models;
 
 public record Actor(string Id, string Tag, string DisplayName)
 {
-    public void ThrowIfNotOrganiser(string organiserId)
+    public void ThrowIfNotOrganiser(string? organiserId)
     {
         if (!Id.Equals(organiserId, StringComparison.OrdinalIgnoreCase))
             throw AccessDeniedException.ForOrganiserOnly();
@@ -16,7 +16,7 @@ public record Actor(string Id, string Tag, string DisplayName)
             throw AccessDeniedException.ForSelfOnly();
     }
 
-    public void ThrowIfNotOrganiserOrUser(string userId, string organiserId)
+    public void ThrowIfNotOrganiserOrUser(string? userId, string? organiserId)
     {
         if (!new[] { userId, organiserId }.Contains(Id, StringComparer.OrdinalIgnoreCase))
             throw AccessDeniedException.ForOrganiserOrSelfOnly();

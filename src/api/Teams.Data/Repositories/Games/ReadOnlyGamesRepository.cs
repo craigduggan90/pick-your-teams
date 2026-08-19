@@ -13,6 +13,7 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
     /// <inheritdoc />
     public async Task<Game?> GetByIdAsync(string id, CancellationToken cancellationToken)
         => await Context.Games
+            .Include(g => g.Organiser)
             .Include(g => g.Players)
                 .ThenInclude(gp => gp.User)
             .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
@@ -30,6 +31,7 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default)
         => await Context.Games
+            .Include(g => g.Organiser)
             .ApplyLocationFilter(location)
             .ApplyStartTimeFromFilter(startTime?.From)
             .ApplyStartTimeToFilter(startTime?.To)

@@ -40,8 +40,8 @@ public class RepositoryTestBase : DatabaseAwareTestBase
         var counter = 0;
         var players = games.SelectMany(game =>
         {
-            var userPlayer = new Player(game, game.Organiser);
-            userPlayer.AssignTeam(GameTeamEnum.Home, game.Organiser.Rating);
+            var userPlayer = new Player(game, game.Organiser!);
+            userPlayer.AssignTeam(GameTeamEnum.Home, game.Organiser!.Rating);
 
             var awayUser = nonOrganiserUsers[counter++ % nonOrganiserUsers.Length];
             var awayPlayer = new Player(game, awayUser);

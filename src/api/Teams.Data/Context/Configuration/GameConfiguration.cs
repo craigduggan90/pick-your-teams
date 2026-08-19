@@ -51,8 +51,12 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
                 toProvider => (int?)toProvider,
                 fromProvider => (GameTeamEnum?)fromProvider);
 
+        // The organiser is _usually_ present, but if an organiser hard-deletes their account we don't want the game
+        // disappearing for all the other players - so on delete we just clear the reference rather than cascading
+        // or blocking the delete.
         builder.HasOne(entity => entity.Organiser)
             .WithMany()
-            .HasForeignKey(entity => entity.OrganiserId);
+            .HasForeignKey(entity => entity.OrganiserId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

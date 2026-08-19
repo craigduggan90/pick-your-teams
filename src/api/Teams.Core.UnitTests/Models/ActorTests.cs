@@ -38,6 +38,14 @@ public static class ActorTests
 
             Assert.Throws<AccessDeniedException>(() => actor.ThrowIfNotOrganiser(ActorId));
         }
+
+        [Fact]
+        public void ThrowsAccessDeniedException_WhenOrganiserIsNull()
+        {
+            var actor = CreateActor();
+
+            Assert.Throws<AccessDeniedException>(() => actor.ThrowIfNotOrganiser(null));
+        }
     }
 
     public class ThrowIfNotUser

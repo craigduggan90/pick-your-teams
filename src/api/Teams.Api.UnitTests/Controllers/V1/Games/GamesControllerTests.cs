@@ -48,13 +48,23 @@ public static class GamesControllerTests
             int duration = 60,
             int teamSize = 5)
         {
+            organiserId ??= Guid.NewGuid().ToString("N");
             using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
             return new Game(
-                organiserId ?? Guid.NewGuid().ToString("N"),
+                organiserId,
                 location,
                 startTime ?? new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc),
                 duration,
-                teamSize);
+                teamSize)
+            {
+                Organiser = GetUser(organiserId)
+            };
+        }
+
+        protected static User GetUser(string? id = null, string? displayName = null)
+        {
+            using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
+            return new User(displayName ?? "Test Organiser", "external-id", "organiser@test.net", null);
         }
 
         protected static Player GetPlayer(

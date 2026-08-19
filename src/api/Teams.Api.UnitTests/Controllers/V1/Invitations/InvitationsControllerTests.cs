@@ -35,7 +35,7 @@ public static class InvitationsControllerTests
                 ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
             };
 
-        protected static User GetOrganiser(string? id = null, string? displayName = "Test Organiser")
+        protected static User GetOrganiser(string? id = null, string displayName = "Test Organiser")
         {
             using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
             return new User(displayName, $"external-{Guid.NewGuid():N}", $"{Guid.NewGuid():N}@test.net", null);

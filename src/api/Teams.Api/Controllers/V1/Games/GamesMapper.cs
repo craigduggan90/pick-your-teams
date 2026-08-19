@@ -21,7 +21,8 @@ public static class GamesMapper
         StartTime: game.StartTime,
         Duration: game.Duration,
         TeamSize: game.TeamSize,
-        Status: game.Status.ToString());
+        Status: game.Status.ToString(),
+        Organiser: game.Organiser?.ToModel());
 
     public static GameDetailModel ToDetailedModel(this Game game) => new(
         Id: game.Id,
@@ -34,7 +35,13 @@ public static class GamesMapper
         HomeTeamRating: game.HomeTeamRating,
         AwayTeamRating: game.AwayTeamRating,
         game.DateCreated,
-        game.DateModified);
+        game.DateModified,
+        Organiser: game.Organiser?.ToModel());
+
+    private static GameOrganiserModel ToModel(this User user) => new(
+        Id: user.Id,
+        Tag: user.Tag,
+        DisplayName: user.DisplayName);
 
     public static GameTeamsModel ToTeamsModel(this Game game) => new(
         Id: game.Id,
