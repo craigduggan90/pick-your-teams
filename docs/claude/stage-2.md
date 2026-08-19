@@ -117,11 +117,11 @@ isn't `withAuthenticationRequired`'s default behavior. Structure:
 - `/account` — added out of sequence, ahead of Stage 3, purely so there's a real page to click
   "Change Tag" from while testing (needed to be able to get back to `/change-tag` after the first
   gate pass, without it there's no in-app way to reach it again). `MyAccountPage` is a one-line
-  placeholder plus a "Change Tag" button wired exactly like Stage 3's real one will be — navigates
-  to `/change-tag` with `state: { from: '/account' }`. Wrapped in `RequireAuthAndTag` (not just
-  `RequireAuth`), since viewing My Account presupposes you already have a tag. `HomePlaceholder`
-  (rendered at `/` once tagged) links here too, so the whole loop is clickable without typing a
-  URL: Home → My Account → Change Tag → back to My Account.
+  placeholder plus working "Change Tag" and "Log Out" buttons, wired exactly like Stage 3's real
+  ones will be — Change Tag navigates to `/change-tag` with `state: { from: '/account' }`. Wrapped
+  in `RequireAuthAndTag` (not just `RequireAuth`), since viewing My Account presupposes you already
+  have a tag. `HomePlaceholder` (rendered at `/` once tagged) links here too, so the whole loop is
+  clickable without typing a URL: Home → My Account → Change Tag → back to My Account.
 
 ### 7a. Shared header title (`usePageTitle`)
 Not in the original plan — added once the change-tag screen was built and it became clear that
@@ -157,6 +157,34 @@ Both are auth-aware, but differently, and the distinction matters:
   actual intent was "not a link at all right now." Worth remembering as a general distinction for
   future auth-conditional controls in this app: disabled ≠ absent-as-a-link — pick the one that
   matches what's actually true.
+
+### 7c. Logout
+Not in the original brief or diagrams at all (checked — zero mentions; see Decisions log). Added
+to `MyAccountPage`'s "Log Out" button: `useAuth0().logout({ logoutParams: { returnTo } })`.
+
+- **`returnTo` is the normal `/` route with a query marker, not a dedicated signed-out page.**
+  `/` already renders the Team Picker landing for unauthenticated visitors, so a separate page
+  would just duplicate it. `returnTo` is
+  `` `${window.location.origin}/?${LOGGED_OUT_QUERY_PARAM}=true` `` (`LOGGED_OUT_QUERY_PARAM` =
+  `"logged_out"`, in `lib/constants.ts`) — Auth0's logout redirect preserves the query string
+  through the round trip (its Allowed Logout URLs check ignores query/fragment when matching the
+  whitelist, then redirects to the exact URL given). `TeamPickerPage` watches for that param in a
+  `useEffect`, fires a one-time `toast.success("You've been logged out.")`, then strips the param
+  via `setSearchParams` so it doesn't linger or re-fire on refresh/back-navigation.
+- **A third Auth0 dashboard allowlist**, distinct from both Allowed Callback URLs and Allowed Web
+  Origins (see the Decisions log entry on the latter): **Allowed Logout URLs**. `returnTo` will
+  silently fail to redirect if `http://localhost:5173` isn't registered there too — same class of
+  gotcha as before, different field. Check this first if logout doesn't return to the app.
+- **StrictMode double-toast bug, caught and fixed.** The first version had no re-entrancy guard,
+  so React StrictMode's dev-only double effect invocation (mount → effect → cleanup → effect
+  again, using the same pre-update closure since no re-render has happened yet) fired the toast
+  twice — both invocations saw the same stale `searchParams` still containing `logged_out=true`,
+  since the first invocation's `setSearchParams` hadn't been committed yet. Fixed with a
+  `useRef(false)` guard checked and set inside the effect. General lesson for this codebase: any
+  effect that does something visible and non-idempotent (toast, analytics ping, etc.) based on
+  URL/query state needs this guard, and a test that actually renders under `<StrictMode>` to catch
+  it — a plain `render()` without `StrictMode` (RTL's default) won't reproduce the bug at all, so
+  it's not enough to assert the toast fired once under normal rendering.
 
 ### 8. Change-tag component (`ChangeTag`, in `components/ChangeTag.tsx`)
 Dual-use per `claude.md`: a `mode: 'gate' | 'normal'` prop. Originally built and named `TagSetup`
@@ -268,3 +296,7 @@ inline above.
   replaced the Vite placeholder `favicon.svg`. `Header`'s home button now shows the round
   `icon-192.png` instead of a generic placeholder dot. Not final branding, just something to use
   for now — same spirit as the temporary colors above.
+- **Logout was a real gap, not scope creep** — neither the diagrams nor `claude.md` mention any
+  way to log out once signed in; confirmed by checking directly rather than assuming. Added now
+  (see "Logout" above) rather than left for Stage 3 to rediscover; `claude.md`'s own Decisions log
+  records the same resolution for continuity outside this doc.

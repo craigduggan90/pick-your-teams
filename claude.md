@@ -193,10 +193,11 @@ its normal (non-gate) mode.
 
 **Already exists, ahead of schedule:** Stage 2 needed a real page to link to `/change-tag` a
 second time after the first gate pass, so a minimal `MyAccountPage` at `/account` already exists
-— one line of placeholder copy plus a working "Change Tag" button, wired exactly the way this
-stage's real one should be. Stage 3 replaces its contents (profile fields, delete-account modal)
-rather than building the route/page/Change-Tag-wiring from scratch — see `docs/claude/stage-2.md`
-section 7 for exactly what's there now.
+— one line of placeholder copy plus working "Change Tag" and "Log Out" buttons, wired exactly the
+way this stage's real ones should be. Stage 3 replaces its contents (profile fields, delete-account
+modal) rather than building the route/page/Change-Tag/logout wiring from scratch — see
+`docs/claude/stage-2.md` section 7 for exactly what's there now. Logout wasn't in the original
+diagrams or brief at all (see Decisions log) — it's a real gap the brief missed, not scope creep.
 
 **Stage 4 — Teams management.** View/Manage Teams screen, the per-row assignment `<select>`,
 Generate/Reset/Save, Add Non-User Player.
@@ -222,3 +223,4 @@ Clarifying questions raised during design review, kept here for traceability. Th
 - Floating labels — 02-games-list.png and 03-my-account.png both call out a "floaty labels" interaction that isn't mentioned in the design-tokens section; is it required? → Yes. Build it into the Stage 1 TextInput primitive as a core behavior, not a later enhancement.
 - Change Tag button — 03-my-account.png has a "Send to Change Tag" button not mentioned anywhere in the build order or known gaps, backed by the same PATCH /users/{id} endpoint as tag-setup; in scope, and if so when? → In scope, and it belongs to the login/tag path from Stage 2 onward, not bolted on in Stage 3. Build the Stage 2 tag-setup component generically (gate mode vs. normal editable mode) so Stage 3's My Account can route into it without a rebuild.
 - My Invitations transitional row state — 07-my-invitations.png shows a dimmed "working" state on a row between tapping accept/decline and the row disappearing; is this optimistic UI required for the Stage 5 build? → No, nice-to-have only. A simple loading/disabled state on the row's buttons is enough for v1.
+- Logout — no diagram or brief text anywhere mentions a way to log out once signed in; is that intentional, or a gap? → A gap, not intentional. Added to Stage 3's scope now (and built early, on the Stage 2 `MyAccountPage` placeholder — see `docs/claude/stage-2.md`) rather than left for Stage 3 to rediscover. Standard `auth0-react` `logout()`, returning to the normal unauthenticated home page (not a dedicated signed-out page) with a one-time toast.
