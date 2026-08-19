@@ -3,14 +3,12 @@
 
 /*
  * Semantic palette from claude.md's Design Tokens section, mapped onto shadcn/ui's variable
- * slots. The Excalidraw diagrams only label these roles ("Primary Colour Placeholder", etc.)
- * with no real hex values, so these are deliberately generic, distinguishable placeholders —
- * swap the :root values for real brand colors later without touching anything that consumes
- * the tokens (Tertiary/Success/Warning/Info/Dark Grey/Light Grey have no shadcn-native slot, so
- * they're exposed as extra --color-* tokens alongside the standard ones). Primary and Secondary
- * are still unconfirmed (Primary is expected to land on a green, chosen here as a teal-leaning
- * shade distinct from the Success token so the two don't read as the same color; Secondary has
- * no direction yet) — everything else is a stable placeholder.
+ * slots. Primary (#00B295) and Secondary (#F05D23) are the confirmed brand colors; everything
+ * else (Tertiary/Success/Warning/Info/Dark Grey/Light Grey) is still a placeholder — the
+ * Excalidraw diagrams only label these roles ("Colour Placeholder") with no real hex values, so
+ * swap the :root values for the rest later without touching anything that consumes the tokens.
+ * Tertiary/Success/Warning/Info have no shadcn-native slot, so they're exposed as extra
+ * --color-* tokens alongside the standard ones.
  */
 @theme inline {
   --font-sans: var(--font-sans);
@@ -58,9 +56,9 @@
   --popover: #ffffff;
   --popover-foreground: #3f3f46;
 
-  --primary: #0f766e;
+  --primary: #00b295;
   --primary-foreground: #ffffff;
-  --secondary: #ea580c;
+  --secondary: #f05d23;
   --secondary-foreground: #ffffff;
   --tertiary: #9333ea;
   --tertiary-foreground: #ffffff;
