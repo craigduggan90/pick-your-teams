@@ -57,14 +57,15 @@ describe('Header', () => {
   })
 
   describe('when not authenticated', () => {
-    it('disables the Home icon instead of hiding it', () => {
+    it('shows the home icon but not as a link/button', () => {
       vi.mocked(useAuth0).mockReturnValue({
         isAuthenticated: false,
       } as unknown as ReturnType<typeof useAuth0>)
 
       renderHeader()
 
-      expect(screen.getByRole('button', { name: 'Home' })).toBeDisabled()
+      expect(screen.getByTestId('home-icon')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Home' })).not.toBeInTheDocument()
     })
 
     it('hides the My Account icon entirely', () => {
