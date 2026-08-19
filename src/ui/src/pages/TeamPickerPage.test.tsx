@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useSelf } from '@/hooks/useSelf'
+import { PageTitleProvider } from '@/hooks/usePageTitle'
 import { TeamPickerPage } from './TeamPickerPage'
 
 vi.mock('@auth0/auth0-react')
@@ -11,12 +12,14 @@ vi.mock('@/hooks/useSelf')
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        <Route path="/" element={<TeamPickerPage />} />
-        <Route path="/tag-setup" element={<p>Tag setup screen</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <PageTitleProvider initialTitle="Pick Your Teams">
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={<TeamPickerPage />} />
+          <Route path="/tag-setup" element={<p>Tag setup screen</p>} />
+        </Routes>
+      </MemoryRouter>
+    </PageTitleProvider>,
   )
 }
 

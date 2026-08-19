@@ -6,6 +6,8 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Toaster } from '@/components/Toast'
 import { RequireAuth } from '@/components/RequireAuth'
+import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
+import { APP_NAME } from '@/lib/constants'
 import { ComponentsShowcasePage } from '@/pages/dev/ComponentsShowcasePage'
 import { TeamPickerPage } from '@/pages/TeamPickerPage'
 import { TagSetupPage } from '@/pages/TagSetupPage'
@@ -35,28 +37,40 @@ function Auth0ProviderWithNavigate({ children }: { children: ReactNode }) {
   )
 }
 
+function AppShell({ children }: { children: ReactNode }) {
+  const title = useHeaderTitle()
+
+  return (
+    <>
+      <Header title={title} />
+      <main className="flex-1">{children}</main>
+      <Footer />
+      <Toaster />
+    </>
+  )
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Auth0ProviderWithNavigate>
-          <Header title="Pick Your Teams" />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<TeamPickerPage />} />
-              <Route
-                path="/tag-setup"
-                element={
-                  <RequireAuth>
-                    <TagSetupPage />
-                  </RequireAuth>
-                }
-              />
-              <Route path="/dev/components" element={<ComponentsShowcasePage />} />
-            </Routes>
-          </main>
-          <Footer />
-          <Toaster />
+          <PageTitleProvider initialTitle={APP_NAME}>
+            <AppShell>
+              <Routes>
+                <Route path="/" element={<TeamPickerPage />} />
+                <Route
+                  path="/tag-setup"
+                  element={
+                    <RequireAuth>
+                      <TagSetupPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="/dev/components" element={<ComponentsShowcasePage />} />
+              </Routes>
+            </AppShell>
+          </PageTitleProvider>
         </Auth0ProviderWithNavigate>
       </BrowserRouter>
     </QueryClientProvider>

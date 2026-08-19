@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { useSelf } from '@/hooks/useSelf'
 import { useUpdateTag } from '@/hooks/useUpdateTag'
+import { PageTitleProvider } from '@/hooks/usePageTitle'
 import { TagSetupPage } from './TagSetupPage'
 
 vi.mock('@/hooks/useSelf')
@@ -10,9 +11,11 @@ vi.mock('@/hooks/useUpdateTag')
 
 function renderPage() {
   return render(
-    <MemoryRouter>
-      <TagSetupPage />
-    </MemoryRouter>,
+    <PageTitleProvider initialTitle="Pick Your Teams">
+      <MemoryRouter>
+        <TagSetupPage />
+      </MemoryRouter>
+    </PageTitleProvider>,
   )
 }
 

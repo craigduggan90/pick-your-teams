@@ -4,6 +4,7 @@ import { TextInput } from '@/components/TextInput'
 import { Modal } from '@/components/Modal'
 import { SelectField } from '@/components/Select'
 import { toast } from '@/components/Toast'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const TEAM_OPTIONS = [
   { value: 'home', label: 'To Home Team' },
@@ -22,6 +23,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function ComponentsShowcasePage() {
+  usePageTitle('Component Showcase')
   const [name, setName] = useState('')
   const [tag, setTag] = useState('taken-tag')
   const [playersPerTeam, setPlayersPerTeam] = useState('7')
