@@ -90,8 +90,15 @@ function ViewTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   )
 }
 
+// Prefers field-level validation messages (e.g. "Game has reached its maximum number of
+// players.") over ProblemDetails' generic ValidationProblemDetails title ("One or more
+// validation errors occurred.") — that generic title is what `error.message` falls back to for
+// any 422 that carries an `errors` dict but no `detail`, which reads as unhelpful noise.
 function apiErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof ApiError ? (error.problem.detail ?? error.message) : fallback
+  if (!(error instanceof ApiError)) return fallback
+  const fieldMessages = Object.values(error.problem.errors ?? {}).flat()
+  if (fieldMessages.length > 0) return fieldMessages.join(' ')
+  return error.problem.detail ?? error.message
 }
 
 function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
@@ -193,6 +200,9 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   // TeamRating, so the header numbers actually reflect in-progress moves before Save.
   const homeRating = homePlayers.reduce((sum, player) => sum + player.rating, 0)
   const awayRating = awayPlayers.reduce((sum, player) => sum + player.rating, 0)
+  // Team assignment doesn't change the roster's total size (moves, not adds/removes), so this
+  // holds regardless of pending overlay state — matches the backend's own Game.MaxPlayers.
+  const atCapacity = homePlayers.length + awayPlayers.length + unassignedPlayers.length >= game.teamSize * 2
 
   function handleTeamChange(playerId: string, team: RosterTeam) {
     setOverlay((prev) => ({ ...prev, [playerId]: team }))
@@ -286,22 +296,25 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
         editable
         onTeamChange={handleTeamChange}
         onRemove={handleRemoveRequest}
-      />
-
-      {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram, disabled
-          until that stage lands. See docs/claude/stage-3.md. */}
-      <Button variant="outline" disabled>
-        Invite Players
-      </Button>
-
-      <AddNonUserPlayerForm
-        key={addPlayerFormKey}
-        onSubmit={(displayName, estimatedRating) =>
-          createDummyMutation.mutate({ displayName, estimatedRating })
+        topContent={
+          <div className="flex flex-wrap gap-2">
+            {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram,
+                disabled until that stage lands. See docs/claude/stage-3.md. */}
+            <Button variant="outline" className="flex-1" disabled>
+              Invite Players
+            </Button>
+            <AddNonUserPlayerForm
+              key={addPlayerFormKey}
+              onSubmit={(displayName, estimatedRating) =>
+                createDummyMutation.mutate({ displayName, estimatedRating })
+              }
+              isPending={createDummyMutation.isPending}
+              displayNameError={displayNameError}
+              ratingError={ratingError}
+              disabled={atCapacity}
+            />
+          </div>
         }
-        isPending={createDummyMutation.isPending}
-        displayNameError={displayNameError}
-        ratingError={ratingError}
       />
 
       <RemovePlayerModal

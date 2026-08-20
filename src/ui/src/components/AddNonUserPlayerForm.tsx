@@ -7,16 +7,21 @@ export interface AddNonUserPlayerFormProps {
   isPending: boolean
   displayNameError?: string
   ratingError?: string
+  /** Collapsed-trigger only — the roster's already at capacity. */
+  disabled?: boolean
 }
 
 // Inline collapsible section per 06-b-view-teams.png, not a modal. The parent remounts this
 // (via a changing `key`) after a successful add, which is what collapses it back and clears the
-// fields — see EditTeamsView.
+// fields — see EditTeamsView. Sized to sit side-by-side with the Invite Players button when
+// collapsed (`flex-1`, in a `flex flex-wrap` row); `w-full` on the expanded form forces it onto
+// its own line in that same wrapping row instead of squeezing next to Invite Players.
 export function AddNonUserPlayerForm({
   onSubmit,
   isPending,
   displayNameError,
   ratingError,
+  disabled = false,
 }: AddNonUserPlayerFormProps) {
   const [open, setOpen] = useState(false)
   const [displayName, setDisplayName] = useState('')
@@ -24,14 +29,14 @@ export function AddNonUserPlayerForm({
 
   if (!open) {
     return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
+      <Button variant="outline" className="flex-1" disabled={disabled} onClick={() => setOpen(true)}>
         Add Non-User Player
       </Button>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border p-3">
+    <div className="flex w-full flex-col gap-3 rounded-lg border border-border p-3">
       <TextInput
         label="Display Name"
         value={displayName}

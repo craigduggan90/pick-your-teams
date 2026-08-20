@@ -14,7 +14,9 @@ import { useDeletePlayer } from '@/hooks/useDeletePlayer'
 import { GameTeamsPage } from './GameTeamsPage'
 import type { GameDetailModel, GameTeamsModel } from '@/api/games'
 import { ApiError } from '@/api/client'
+import { toast } from '@/components/Toast'
 
+vi.mock('@/components/Toast', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('@/hooks/useGame')
 vi.mock('@/hooks/useSelf')
 vi.mock('@/hooks/useGameTeams')
@@ -401,6 +403,41 @@ describe('GameTeamsPage', () => {
       await user.click(screen.getByRole('button', { name: 'Add Non-User Player' }))
 
       expect(screen.getByText('Display name is required.')).toBeInTheDocument()
+    })
+
+    it('disables Add Non-User Player once the roster is at capacity', () => {
+      // teamsFixture has 4 players; a team size of 2 puts MaxPlayers at 4 too.
+      setUp({ ...scheduledGame, teamSize: 2 }, 'organiser-1', teamsFixture)
+
+      renderPage()
+
+      expect(screen.getByRole('button', { name: 'Add Non-User Player' })).toBeDisabled()
+    })
+
+    it('does not disable Add Non-User Player below capacity', () => {
+      setUp({ ...scheduledGame, teamSize: 5 }, 'organiser-1', teamsFixture)
+
+      renderPage()
+
+      expect(screen.getByRole('button', { name: 'Add Non-User Player' })).toBeEnabled()
+    })
+
+    it('toasts the specific field-error message instead of the generic validation title', async () => {
+      setUp(scheduledGame, 'organiser-1', teamsFixture)
+      vi.mocked(useCreateDummyPlayer).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        isSuccess: false,
+        isError: true,
+        error: new ApiError(422, {
+          title: 'One or more validation errors occurred.',
+          errors: { GameId: ['Game has reached its maximum number of players.'] },
+        }),
+      } as any)
+
+      renderPage()
+
+      expect(toast.error).toHaveBeenCalledWith('Game has reached its maximum number of players.')
     })
   })
 })

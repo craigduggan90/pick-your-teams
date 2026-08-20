@@ -96,7 +96,12 @@ export function TeamRosterRow({
                 onTeamChange?.(player.id, value)
               }
             }}
-            className="h-9 w-36 text-sm"
+            // The trigger's placeholder styling is meant for an actually-empty field and reads
+            // too faint for a permanent "Actions" label — overridden to the normal body-text
+            // color specifically for the placeholder state (tailwind-merge resolves this against
+            // the vendor SelectTrigger's own data-placeholder:text-muted-foreground correctly,
+            // since they're the same variant group).
+            className="h-9 w-36 text-sm data-placeholder:text-dark-grey"
           />
         )}
       </div>
