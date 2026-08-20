@@ -113,3 +113,54 @@ export function recordResult(id: string, winner: GameWinner, token: string): Pro
     body: { Winner: winner },
   })
 }
+
+// Tag is nullable because a Dummy player has no linked User to pull it from.
+export interface GameTeamPlayerModel {
+  id: string
+  displayName: string | null
+  tag: string | null
+  rating: number
+}
+
+export interface GameTeamModel {
+  players: GameTeamPlayerModel[]
+  teamRating: number
+}
+
+export interface GameTeamsModel {
+  id: string
+  home: GameTeamModel | null
+  away: GameTeamModel | null
+  unassigned: GameTeamPlayerModel[]
+}
+
+export function getGameTeams(id: string, token: string): Promise<GameTeamsModel> {
+  return apiFetch<GameTeamsModel>(`/v1/games/${id}/teams`, { token })
+}
+
+export interface SetTeamsRequestModel {
+  HomeTeamIds: string[]
+  AwayTeamIds: string[]
+}
+
+export function setGameTeams(
+  id: string,
+  body: SetTeamsRequestModel,
+  token: string,
+): Promise<void> {
+  return apiFetch<void>(`/v1/games/${id}/teams`, { token, method: 'PUT', body })
+}
+
+export interface GenerateTeamsRequestModel {
+  HomeTeamSeedIds: string[]
+  AwayTeamSeedIds: string[]
+  Differential: number
+}
+
+export function generateGameTeams(
+  id: string,
+  body: GenerateTeamsRequestModel,
+  token: string,
+): Promise<GameTeamsModel> {
+  return apiFetch<GameTeamsModel>(`/v1/games/${id}/teams/generate`, { token, method: 'POST', body })
+}
