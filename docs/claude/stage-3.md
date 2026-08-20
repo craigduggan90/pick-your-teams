@@ -105,7 +105,21 @@ Header and Footer are now pinned to the viewport edges (fixed height, `shrink-0`
 sole scrolling region (`overflow-y-auto`, `min-h-0`) so the scrollbar renders at the actual edge
 of the browser window. Previously the whole page — including header/footer — scrolled together.
 
-### 11. Testing
+### 11. Header polish (`components/Header.tsx`, `public/account-settings.png`)
+
+The My Account icon (right side) had never had a real icon — just a decorative placeholder circle
+(`HeaderIconButton`'s fallback when no `children` were passed). Replaced with a real
+`account-settings.png` asset the user supplied, styled the same as the home icon (no circular
+background pill behind it).
+
+### 12. Pointer cursor on every button (`components/ui/button.tsx` + raw `<button>` sites)
+
+Tailwind's Preflight reset sets `cursor: default` on `<button>` elements — see Decisions log.
+`cursor-pointer` added to the shared `Button` component's base classes (covers every screen built
+on it) plus the three raw `<button>` elements that don't use it: `Header`'s icon buttons,
+`GamesSearchForm`'s `ToggleOption`, and `RecordResultModal`'s option buttons.
+
+### 13. Testing
 
 Vitest + RTL as established. New component/hook/page tests throughout; notable patterns worth
 carrying forward:
@@ -234,3 +248,15 @@ traceability — outcomes are already reflected inline above.
   this stage, and explicitly not to add a matching frontend guard proactively. The frontend
   already renders inline `Location` errors from any 422 on both `NewGamePage` and `GameViewPage`,
   so no frontend change is needed once the backend rule lands.
+- **My Account icon.** `HeaderIconButton`'s right-side slot had never had a real icon, just a
+  decorative placeholder circle rendered when no `children` were passed. User supplied a real
+  `account-settings.png` (placed in `public/`); wired in with the same plain styling as the home
+  icon (no circular background pill) once asked to remove that background.
+- **`cursor-pointer` on every button.** Tailwind's Preflight base reset sets `cursor: default` on
+  `<button>` elements (a deliberate normalize.css-style choice, not a bug), so none of this app's
+  buttons showed a pointer cursor without an explicit override. Added to the shared `Button`
+  component's base classes (`components/ui/button.tsx` — one of the few edits made to an
+  otherwise-vendor shadcn file, justified since it's the single source of truth for virtually
+  every button in the app) plus the three raw `<button>` sites that don't use it. General note for
+  later stages: any *new* raw `<button>` element (not going through the shared `Button` component)
+  needs its own explicit `cursor-pointer` — it isn't inherited from anywhere global.
