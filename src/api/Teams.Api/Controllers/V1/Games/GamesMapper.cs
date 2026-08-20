@@ -67,6 +67,7 @@ public static class GamesMapper
     public static GameTeamPlayerModel ToGameTeamPlayerModel(this Player player) => new(
         player.Id,
         player.GetDisplayName(),
+        player.User?.Tag,
         player.Rating);
 
     public static CreateGameCommand ToCommand(this CreateGameRequestModel model) => new(

@@ -149,6 +149,7 @@ public static partial class PlayersControllerTests
             Assert.NotNull(content);
             Assert.Equal(SeedGame.Id, content.GameId);
             Assert.Equal(newUser.Id, content.UserId);
+            Assert.Equal(newUser.Tag, content.Tag);
             Assert.Equal(newUser.DisplayName, content.DisplayName);
             Assert.Equal(newUser.Rating, content.Rating);
             Assert.Equal(nameof(PlayerTypeEnum.User), content.Type);

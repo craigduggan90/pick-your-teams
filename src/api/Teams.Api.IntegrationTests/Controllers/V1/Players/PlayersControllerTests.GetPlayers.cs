@@ -112,6 +112,7 @@ public static partial class PlayersControllerTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(content);
             Assert.Equal([linkedPlayer.Id], content.Data.Select(p => p.Id));
+            Assert.Equal(linkedUser.Tag, content.Data.Single().Tag);
         }
 
         [Fact]

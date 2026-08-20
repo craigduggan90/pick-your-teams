@@ -93,6 +93,36 @@ public static partial class GamesControllerTests
             Assert.Equal(game.Id, content.Id);
             Assert.Equal([homePlayer.Id], content.Home!.Players.Select(p => p.Id));
             Assert.Equal([awayPlayer.Id], content.Away!.Players.Select(p => p.Id));
+            Assert.Null(content.Home.Players.Single().Tag); // dummy players have no linked user
+        }
+
+        [Fact]
+        public async Task ShouldReturnOk_WithPlayerTag_WhenPlayerIsUserLinked()
+        {
+            var organiser = SeedOrganisers[0];
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
+            var linkedUser = EntityFactory.CreateUser(displayName: "Linked User");
+            var homePlayer = EntityFactory.CreatePlayer(
+                game.Id, userId: linkedUser.Id, displayName: linkedUser.Tag, rating: linkedUser.Rating,
+                type: PlayerTypeEnum.User, team: GameTeamEnum.Home);
+
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                await context.Users.AddAsync(linkedUser, TestContext.Current.CancellationToken);
+                await context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+                await context.Players.AddAsync(homePlayer, TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateRequest(HttpMethod.Get, $"{Url}/{game.Id}/teams");
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<GameTeamsModel>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal(linkedUser.Tag, content.Home!.Players.Single().Tag);
         }
     }
 }

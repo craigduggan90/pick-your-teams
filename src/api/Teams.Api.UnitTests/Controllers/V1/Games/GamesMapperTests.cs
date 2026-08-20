@@ -52,14 +52,16 @@ public static class GamesMapperTests
         string? displayName = null,
         int rating = 1000,
         PlayerTypeEnum type = PlayerTypeEnum.Dummy,
-        GameTeamEnum team = GameTeamEnum.None)
+        GameTeamEnum team = GameTeamEnum.None,
+        User? user = null)
     {
         using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
         return new Player(gameId, userId, rating, type, team)
         {
             DisplayName = userId == null
                 ? displayName ?? "Test Player"
-                : null
+                : null,
+            User = user
         };
     }
 
@@ -229,6 +231,27 @@ public static class GamesMapperTests
             Assert.Equal(player.Id, result.Id);
             Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
+        }
+
+        [Fact]
+        public void MapsTagFromLinkedUser_WhenPlayerIsUserLinked()
+        {
+            var user = GetUser(tag: "marcusaurelius");
+            var player = GetPlayer(userId: user.Id, user: user, type: PlayerTypeEnum.User);
+
+            var result = player.ToGameTeamPlayerModel();
+
+            Assert.Equal(user.Tag, result.Tag);
+        }
+
+        [Fact]
+        public void SetsTagToNull_WhenPlayerHasNoLinkedUser()
+        {
+            var player = GetPlayer();
+
+            var result = player.ToGameTeamPlayerModel();
+
+            Assert.Null(result.Tag);
         }
     }
 
