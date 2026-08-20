@@ -16,6 +16,7 @@ import { ChangeTagPage } from '@/pages/ChangeTagPage'
 import { MyAccountPage } from '@/pages/MyAccountPage'
 import { GameViewPage } from '@/pages/GameViewPage'
 import { NewGamePage } from '@/pages/NewGamePage'
+import { GameTeamsPage } from '@/pages/GameTeamsPage'
 
 const queryClient = new QueryClient()
 
@@ -95,6 +96,14 @@ export default function App() {
                     element={
                       <RequireAuthAndTag>
                         <GameViewPage />
+                      </RequireAuthAndTag>
+                    }
+                  />
+                  <Route
+                    path="/games/:id/teams"
+                    element={
+                      <RequireAuthAndTag>
+                        <GameTeamsPage />
                       </RequireAuthAndTag>
                     }
                   />

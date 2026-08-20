@@ -165,14 +165,14 @@ export function GameViewPage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        {/* Invite Players / Manage Teams have no built screen yet (Stage 4/5) — rendered per the
-            diagram, disabled until those stages land. See docs/claude/stage-3.md. */}
+        {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram, disabled
+            until that stage lands. See docs/claude/stage-3.md. */}
         {isOrganiser && isScheduled && (
           <Button variant="outline" disabled>
             Invite Players
           </Button>
         )}
-        <Button variant="outline" disabled>
+        <Button variant="outline" onClick={() => navigate(`/games/${id}/teams`)}>
           {isOrganiser && isScheduled ? 'Manage Teams' : 'View Teams'}
         </Button>
         {isOrganiser && isScheduled && (
