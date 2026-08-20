@@ -50,6 +50,7 @@ describe('Header', () => {
       const user = userEvent.setup()
       renderHeader()
 
+      expect(screen.getByTestId('account-icon')).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: 'My Account' }))
 
       expect(screen.getByText('My account page')).toBeInTheDocument()

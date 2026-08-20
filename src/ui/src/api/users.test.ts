@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { apiFetch } from './client'
-import { getSelf, updateUser } from './users'
+import { deleteUser, getSelf, updateUser } from './users'
 
 vi.mock('./client', () => ({
   apiFetch: vi.fn(),
@@ -25,6 +25,17 @@ describe('users api', () => {
       token: 'token123',
       method: 'PATCH',
       body: { Tag: 'bob' },
+    })
+  })
+
+  it('deleteUser DELETEs the given id', async () => {
+    vi.mocked(apiFetch).mockResolvedValue(undefined)
+
+    await deleteUser('1', 'token123')
+
+    expect(apiFetch).toHaveBeenCalledWith('/v1/users/1', {
+      token: 'token123',
+      method: 'DELETE',
     })
   })
 })
