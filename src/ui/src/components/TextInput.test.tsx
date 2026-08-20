@@ -68,4 +68,29 @@ describe('TextInput', () => {
 
     expect(onChange).toHaveBeenCalled()
   })
+
+  describe('native date/time picker types', () => {
+    it('is always floated, even with no value and no focus', () => {
+      render(<TextInput label="Start Time" type="datetime-local" value="" onChange={() => {}} />)
+
+      const label = screen.getByText('Start Time')
+      expect(label).toHaveAttribute('data-floated', 'true')
+      expect(screen.getByLabelText('Start Time')).toHaveAttribute('type', 'datetime-local')
+    })
+
+    it('still shows an inline error for native picker types', () => {
+      render(
+        <TextInput
+          label="Start Time"
+          type="datetime-local"
+          value=""
+          onChange={() => {}}
+          error="Start time is required."
+        />,
+      )
+
+      expect(screen.getByText('Start time is required.')).toBeInTheDocument()
+      expect(screen.getByLabelText('Start Time')).toHaveAttribute('aria-invalid', 'true')
+    })
+  })
 })

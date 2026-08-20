@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
@@ -57,6 +57,12 @@ function mockEmptyGames() {
 }
 
 describe('GamesListPage', () => {
+  afterEach(() => {
+    // Defensive: a test that uses fake timers and fails/times out before reaching its own
+    // vi.useRealTimers() would otherwise leak fake timers into the next test.
+    vi.useRealTimers()
+  })
+
   it('shows a loading state', () => {
     vi.mocked(useGames).mockReturnValue({
       isPending: true,
@@ -175,5 +181,47 @@ describe('GamesListPage', () => {
 
     expect(screen.getByRole('heading')).toHaveTextContent('Games')
     expect(useGames).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'Scheduled' }))
+  })
+
+  it('rolls the applied Game Start To date forward by one day for the actual request', async () => {
+    // Deliberately no fake timers here — combining vi.useFakeTimers() with userEvent's click
+    // simulation reliably deadlocks (userEvent's internals depend on real-time scheduling that
+    // never resolves once faked without being manually advanced). Asserting the *relationship*
+    // between the emitted dates instead of pinning a fixed calendar date sidesteps needing fake
+    // time at all, and is exercised precisely (against fixed dates) in GamesSearchForm.test.tsx
+    // and format.test.ts already.
+    mockEmptyGames()
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    const lastCall = vi.mocked(useGames).mock.calls.at(-1)?.[0]
+    const from = new Date(lastCall!.startTimeFrom!)
+    const to = new Date(lastCall!.startTimeTo!)
+
+    // Form default range is 14 days (inclusive); the request's upper bound is exclusive, so it
+    // should land exactly 15 days after "from" — both at UTC midnight.
+    expect(from.getUTCHours()).toBe(0)
+    expect(to.getUTCHours()).toBe(0)
+    expect((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)).toBe(15)
+  })
+
+  it('remembers the organiser toggle selection the next time the search form is opened', async () => {
+    mockEmptyGames()
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    await user.click(screen.getByRole('button', { name: "Games I've Organised" }))
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+
+    expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 })

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { apiFetch } from './client'
-import { deleteGame, getGameById, getGames, recordResult, updateGame } from './games'
+import { createGame, deleteGame, getGameById, getGames, recordResult, updateGame } from './games'
 
 vi.mock('./client', () => ({
   apiFetch: vi.fn(),
@@ -31,6 +31,22 @@ describe('games api', () => {
     expect(query.get('TeamSize')).toBe('5')
     expect(query.get('PageSize')).toBe('20')
     expect(query.get('Cursor')).toBe('abc')
+  })
+
+  it('createGame POSTs the body and returns the created game', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({ id: 'game-1' })
+
+    const result = await createGame(
+      { StartTime: '2026-08-10T20:00:00.000Z', Duration: 60, TeamSize: 5, OrganiserId: 'user-1' },
+      'token123',
+    )
+
+    expect(apiFetch).toHaveBeenCalledWith('/v1/games', {
+      token: 'token123',
+      method: 'POST',
+      body: { StartTime: '2026-08-10T20:00:00.000Z', Duration: 60, TeamSize: 5, OrganiserId: 'user-1' },
+    })
+    expect(result).toEqual({ id: 'game-1' })
   })
 
   it('getGameById fetches the game detail', async () => {

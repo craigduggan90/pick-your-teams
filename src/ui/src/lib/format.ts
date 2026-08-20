@@ -44,3 +44,31 @@ export function toDateTimeLocalValue(iso: string): string {
 export function fromDateTimeLocalValue(value: string): string {
   return `${value}:00.000Z`
 }
+
+/** The top of the next hour (UTC), as a datetime-local value — the sensible default for a new
+ * game's start time rather than leaving the field blank. */
+export function nextHourStart(): string {
+  const date = new Date()
+  date.setUTCMinutes(0, 0, 0)
+  date.setUTCHours(date.getUTCHours() + 1)
+  return toDateTimeLocalValue(date.toISOString())
+}
+
+/** "2026-08-20", for use inside a plain date input. */
+export function toDateValue(iso: string): string {
+  return toDateTimeLocalValue(iso).slice(0, 10)
+}
+
+/** Inverse of toDateValue — treats the naive "YYYY-MM-DD" value as UTC midnight. */
+export function fromDateValue(value: string): string {
+  return `${value}T00:00:00.000Z`
+}
+
+/** Rolls an ISO day-boundary forward by one day — for turning a picked "end date" into an
+ * exclusive upper bound that still includes everything on that date (e.g. a "Game Start To" of
+ * 3rd September should include games starting any time on the 3rd, not just at 00:00). */
+export function nextDayBoundary(iso: string): string {
+  const date = new Date(iso)
+  date.setUTCDate(date.getUTCDate() + 1)
+  return date.toISOString()
+}

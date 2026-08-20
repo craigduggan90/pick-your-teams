@@ -2,12 +2,16 @@ import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
 import { cn } from '@/lib/utils'
-import { toDateTimeLocalValue, fromDateTimeLocalValue } from '@/lib/format'
+import { toDateValue, fromDateValue } from '@/lib/format'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
 import type { GameStatus } from '@/api/games'
 
 export interface GamesSearchFilters {
+  // Not sent to the API (GetGamesQuery doesn't expose OrganiserId/UserId yet — see
+  // docs/claude/stage-3.md), but still part of the persisted/applied filter state so reopening
+  // the search form shows what was last selected, not a reset toggle.
+  organiserOnly?: boolean
   startTimeFrom?: string
   startTimeTo?: string
   teamSize?: number
@@ -26,10 +30,10 @@ function defaultStartTimeFrom(): string {
   return date.toISOString()
 }
 
-function defaultStartTimeTo(from: string | undefined): string {
-  const base = from ? new Date(from) : new Date(defaultStartTimeFrom())
-  const date = new Date(base)
-  date.setUTCDate(date.getUTCDate() + 7)
+function defaultStartTimeTo(): string {
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() + 14)
+  date.setUTCHours(0, 0, 0, 0)
   return date.toISOString()
 }
 
@@ -68,18 +72,20 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
 
   // "Games I'm In" / "Games I've Organised" is visual only — GetGamesQuery doesn't expose
   // OrganiserId/UserId yet (see docs/claude/stage-3.md), so this toggle can't actually filter.
-  const [organiserOnly, setOrganiserOnly] = useState(false)
-  const [startFromEnabled, setStartFromEnabled] = useState(Boolean(filters.startTimeFrom))
+  const [organiserOnly, setOrganiserOnly] = useState(filters.organiserOnly ?? false)
+  // Always shown, always defaulted, date-only — nobody's filtering games by time of day, and a
+  // native date input already displays its own placeholder mask ("dd/mm/yyyy") even when empty,
+  // so an enable/disable checkbox on top of that just adds a step without adding clarity.
   const [startFrom, setStartFrom] = useState(filters.startTimeFrom ?? defaultStartTimeFrom())
-  const [startToEnabled, setStartToEnabled] = useState(Boolean(filters.startTimeTo))
-  const [startTo, setStartTo] = useState(filters.startTimeTo ?? defaultStartTimeTo(filters.startTimeFrom))
+  const [startTo, setStartTo] = useState(filters.startTimeTo ?? defaultStartTimeTo())
   const [teamSize, setTeamSize] = useState(filters.teamSize?.toString() ?? '')
   const [status, setStatus] = useState<GameStatus | undefined>(filters.status)
 
   const handleApply = () => {
     onApply({
-      startTimeFrom: startFromEnabled ? startFrom : undefined,
-      startTimeTo: startToEnabled ? startTo : undefined,
+      organiserOnly,
+      startTimeFrom: startFrom,
+      startTimeTo: startTo,
       teamSize: teamSize ? Number(teamSize) : undefined,
       status,
     })
@@ -112,43 +118,18 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex items-end gap-2">
-          <label className="flex items-center gap-2 text-sm text-dark-grey">
-            <input
-              type="checkbox"
-              checked={startFromEnabled}
-              onChange={(event) => setStartFromEnabled(event.target.checked)}
-            />
-            Game Start From
-          </label>
-          {startFromEnabled && (
-            <input
-              type="datetime-local"
-              value={toDateTimeLocalValue(startFrom)}
-              onChange={(event) => setStartFrom(fromDateTimeLocalValue(event.target.value))}
-              className="h-10 flex-1 rounded-lg border border-input bg-background px-2 text-sm"
-            />
-          )}
-        </div>
-
-        <div className="flex items-end gap-2">
-          <label className="flex items-center gap-2 text-sm text-dark-grey">
-            <input
-              type="checkbox"
-              checked={startToEnabled}
-              onChange={(event) => setStartToEnabled(event.target.checked)}
-            />
-            Game Start To
-          </label>
-          {startToEnabled && (
-            <input
-              type="datetime-local"
-              value={toDateTimeLocalValue(startTo)}
-              onChange={(event) => setStartTo(fromDateTimeLocalValue(event.target.value))}
-              className="h-10 flex-1 rounded-lg border border-input bg-background px-2 text-sm"
-            />
-          )}
-        </div>
+        <TextInput
+          label="Game Start From"
+          type="date"
+          value={toDateValue(startFrom)}
+          onChange={(event) => setStartFrom(fromDateValue(event.target.value))}
+        />
+        <TextInput
+          label="Game Start To"
+          type="date"
+          value={toDateValue(startTo)}
+          onChange={(event) => setStartTo(fromDateValue(event.target.value))}
+        />
 
         <TextInput
           label="Players per Team"

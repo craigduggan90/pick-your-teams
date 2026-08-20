@@ -34,7 +34,7 @@ export function Header({ title }: HeaderProps) {
   const { isAuthenticated } = useAuth0()
 
   return (
-    <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
+    <header className="flex shrink-0 items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
       {isAuthenticated ? (
         <HeaderIconButton label="Home" onClick={() => navigate('/')}>
           {homeIcon}

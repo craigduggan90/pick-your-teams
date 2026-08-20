@@ -11,7 +11,7 @@ export interface FooterProps {
 export function Footer({ actions }: FooterProps) {
   if (actions) {
     return (
-      <footer className="mt-auto flex flex-col">
+      <footer className="flex shrink-0 flex-col">
         <div className="mx-auto flex w-full max-w-md justify-center border-t border-border">
           {actions}
         </div>
@@ -20,7 +20,7 @@ export function Footer({ actions }: FooterProps) {
   }
 
   return (
-    <footer className="mt-auto flex flex-col">
+    <footer className="flex shrink-0 flex-col">
       <p className="px-4 py-3 text-center text-xs text-light-grey">{APP_NAME}</p>
     </footer>
   )

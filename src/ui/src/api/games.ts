@@ -74,6 +74,18 @@ export function getGameById(id: string, token: string): Promise<GameDetailModel>
   return apiFetch<GameDetailModel>(`/v1/games/${id}`, { token })
 }
 
+export interface CreateGameRequestModel {
+  Location?: string
+  StartTime: string
+  Duration: number
+  TeamSize: number
+  OrganiserId: string
+}
+
+export function createGame(body: CreateGameRequestModel, token: string): Promise<GameModel> {
+  return apiFetch<GameModel>('/v1/games', { token, method: 'POST', body })
+}
+
 // Request body stays PascalCase, matching UpdateGameRequestModel directly (TeamSize isn't part
 // of it — team size can't be changed after a game is created).
 export interface UpdateGameRequestModel {

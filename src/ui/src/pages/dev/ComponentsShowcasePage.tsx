@@ -27,6 +27,7 @@ export function ComponentsShowcasePage() {
   const [name, setName] = useState('')
   const [tag, setTag] = useState('taken-tag')
   const [playersPerTeam, setPlayersPerTeam] = useState('7')
+  const [startTime, setStartTime] = useState('')
   const [team, setTeam] = useState<string>('home')
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -65,6 +66,12 @@ export function ComponentsShowcasePage() {
           min={1}
           value={playersPerTeam}
           onChange={(e) => setPlayersPerTeam(e.target.value)}
+        />
+        <TextInput
+          label="Start Time"
+          type="datetime-local"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
         />
       </Section>
 

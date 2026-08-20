@@ -8,6 +8,7 @@ import { GamesSearchForm, type GamesSearchFilters } from '@/components/GamesSear
 import { useGames } from '@/hooks/useGames'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
+import { nextDayBoundary } from '@/lib/format'
 
 // A thin switch between two mutually-exclusive "pages" sharing this route — deliberately doesn't
 // call usePageTitle/usePageFooterActions itself. Both branches below are components that do, and
@@ -43,7 +44,16 @@ function GamesListContent({
 }) {
   usePageTitle('Games')
   const navigate = useNavigate()
-  const gamesQuery = useGames(filters)
+  // GamesSearchFilters.startTimeTo is the last-picked, inclusive end date (day @ 00:00); the
+  // request needs an exclusive upper bound, so it's rolled forward to the start of the next day
+  // only here — never baked into the persisted filter state, or the search form would show the
+  // wrong date (day+1) when reopened. See docs/claude/stage-3.md.
+  const gamesQuery = useGames({
+    startTimeFrom: filters.startTimeFrom,
+    startTimeTo: filters.startTimeTo ? nextDayBoundary(filters.startTimeTo) : undefined,
+    teamSize: filters.teamSize,
+    status: filters.status,
+  })
   const games = gamesQuery.data?.pages.flatMap((page) => page.data) ?? []
 
   usePageFooterActions(
