@@ -50,7 +50,8 @@ public static class GamesMapper
             TeamRating: game.HomeTeamRating ?? 0),
         Away: new GameTeamModel(
             Players: [.. game.Players.Where(player => player.Team == GameTeamEnum.Away).Select(ToGameTeamPlayerModel)],
-            TeamRating: game.AwayTeamRating ?? 0));
+            TeamRating: game.AwayTeamRating ?? 0),
+        Unassigned: [.. game.Players.Where(player => player.Team == GameTeamEnum.None).Select(ToGameTeamPlayerModel)]);
 
     public static GameTeamsModel ToModel(this TeamSuggestion teams, string gameId) => new(
             Id: gameId,
@@ -61,7 +62,8 @@ public static class GamesMapper
             Away: new GameTeamModel(
                 Players: [.. teams.Away.Select(ToGameTeamPlayerModel)],
                 TeamRating: teams.AwayRating
-            )
+            ),
+            Unassigned: []
         );
 
     public static GameTeamPlayerModel ToGameTeamPlayerModel(this Player player) => new(

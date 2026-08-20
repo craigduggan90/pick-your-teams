@@ -135,6 +135,9 @@ public static partial class GamesControllerTests
             Assert.NotNull(content);
             Assert.Empty(content.Home!.Players);
             Assert.Empty(content.Away!.Players);
+            Assert.Equal(
+                new[] { homePlayer.Id, awayPlayer.Id }.OrderBy(id => id),
+                content.Unassigned.Select(p => p.Id).OrderBy(id => id));
         }
     }
 }

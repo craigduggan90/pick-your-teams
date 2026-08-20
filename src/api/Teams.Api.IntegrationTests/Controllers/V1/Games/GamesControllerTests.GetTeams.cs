@@ -65,6 +65,7 @@ public static partial class GamesControllerTests
             Assert.NotNull(content);
             Assert.Empty(content.Home!.Players);
             Assert.Empty(content.Away!.Players);
+            Assert.Empty(content.Unassigned);
         }
 
         [Fact]
@@ -94,6 +95,33 @@ public static partial class GamesControllerTests
             Assert.Equal([homePlayer.Id], content.Home!.Players.Select(p => p.Id));
             Assert.Equal([awayPlayer.Id], content.Away!.Players.Select(p => p.Id));
             Assert.Null(content.Home.Players.Single().Tag); // dummy players have no linked user
+        }
+
+        [Fact]
+        public async Task ShouldReturnOk_WithUnassignedPlayers_WhenPlayersHaveNoTeam()
+        {
+            var organiser = SeedOrganisers[0];
+            var game = EntityFactory.CreateGame(organiser.Id, teamSize: 3);
+            var homePlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Home Player", rating: 1000, team: GameTeamEnum.Home);
+            var unassignedPlayer = EntityFactory.CreatePlayer(game.Id, displayName: "Unassigned Player", rating: 900, team: GameTeamEnum.None);
+
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                await context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+                await context.Players.AddRangeAsync([homePlayer, unassignedPlayer], TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateRequest(HttpMethod.Get, $"{Url}/{game.Id}/teams");
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<GameTeamsModel>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal([unassignedPlayer.Id], content.Unassigned.Select(p => p.Id));
+            Assert.DoesNotContain(content.Home!.Players, p => p.Id == unassignedPlayer.Id);
         }
 
         [Fact]

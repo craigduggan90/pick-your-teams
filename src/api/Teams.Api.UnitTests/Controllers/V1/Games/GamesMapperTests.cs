@@ -155,12 +155,12 @@ public static class GamesMapperTests
     public class ToTeamsModel
     {
         [Fact]
-        public void MapsHomeAndAwayPlayersAndExcludesUnassigned_WhenCalled()
+        public void MapsHomeAwayAndUnassignedPlayersToTheirRespectiveBuckets_WhenCalled()
         {
             var game = GetGame();
             var homePlayer = GetPlayer(gameId: game.Id, displayName: "Home Player", rating: 900, team: GameTeamEnum.Home);
             var awayPlayer = GetPlayer(gameId: game.Id, displayName: "Away Player", rating: 850, team: GameTeamEnum.Away);
-            var unassignedPlayer = GetPlayer(gameId: game.Id, team: GameTeamEnum.None);
+            var unassignedPlayer = GetPlayer(gameId: game.Id, displayName: "Unassigned Player", team: GameTeamEnum.None);
             game.Players.Add(homePlayer);
             game.Players.Add(awayPlayer);
             game.Players.Add(unassignedPlayer);
@@ -180,6 +180,11 @@ public static class GamesMapperTests
             var resultAwayPlayer = Assert.Single(result.Away!.Players);
             Assert.Equal(awayPlayer.Id, resultAwayPlayer.Id);
             Assert.Equal(game.AwayTeamRating, result.Away.TeamRating);
+
+            var resultUnassignedPlayer = Assert.Single(result.Unassigned);
+            Assert.Equal(unassignedPlayer.Id, resultUnassignedPlayer.Id);
+            Assert.Equal(unassignedPlayer.GetDisplayName(), resultUnassignedPlayer.DisplayName);
+            Assert.Equal(unassignedPlayer.Rating, resultUnassignedPlayer.Rating);
         }
 
         [Fact]
@@ -193,6 +198,7 @@ public static class GamesMapperTests
             Assert.Equal(0, result.Away!.TeamRating);
             Assert.Empty(result.Home.Players);
             Assert.Empty(result.Away.Players);
+            Assert.Empty(result.Unassigned);
         }
     }
 
@@ -216,6 +222,8 @@ public static class GamesMapperTests
             var resultAwayPlayer = Assert.Single(result.Away!.Players);
             Assert.Equal(awayPlayer.Id, resultAwayPlayer.Id);
             Assert.Equal(suggestion.AwayRating, result.Away.TeamRating);
+
+            Assert.Empty(result.Unassigned);
         }
     }
 

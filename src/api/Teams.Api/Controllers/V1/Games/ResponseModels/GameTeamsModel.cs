@@ -2,19 +2,21 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Teams.Api.Controllers.V1.Games.ResponseModels;
 
-public record GameTeamsModel(string Id, GameTeamModel? Home, GameTeamModel? Away)
+public record GameTeamsModel(string Id, GameTeamModel? Home, GameTeamModel? Away, IReadOnlyCollection<GameTeamPlayerModel> Unassigned)
 {
     [ExcludeFromCodeCoverage]
     public static GameTeamsModel Example => new(
         "d40b639aa73b427f9eb47da3491b9097",
         GameTeamModel.HomeTeamExample,
-        GameTeamModel.AwayTeamExample);
+        GameTeamModel.AwayTeamExample,
+        Unassigned: [new GameTeamPlayerModel("2c68e6df1b5e46b6a1a3e3a6f0d8f142", "Priya Shah", "priyashah", 1020)]);
 
     [ExcludeFromCodeCoverage]
     public static GameTeamsModel Empty => new(
         "d40b639aa73b427f9eb47da3491b9097",
         null,
-        null);
+        null,
+        Unassigned: []);
 }
 
 public record GameTeamModel(IReadOnlyCollection<GameTeamPlayerModel> Players, int TeamRating)

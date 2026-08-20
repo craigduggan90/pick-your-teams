@@ -198,6 +198,9 @@ public static partial class GamesControllerTests
             Assert.NotNull(content);
             Assert.Equal([players[0].Id], content.Home!.Players.Select(p => p.Id));
             Assert.Equal([players[1].Id], content.Away!.Players.Select(p => p.Id));
+            Assert.Equal(
+                new[] { players[2].Id, players[3].Id }.OrderBy(id => id),
+                content.Unassigned.Select(p => p.Id).OrderBy(id => id));
         }
 
         [Fact]
