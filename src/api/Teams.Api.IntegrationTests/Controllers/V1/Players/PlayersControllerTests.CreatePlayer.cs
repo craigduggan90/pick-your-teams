@@ -135,6 +135,36 @@ public static partial class PlayersControllerTests
         }
 
         [Fact]
+        public async Task ShouldReturnUnprocessableEntity_WhenGameIsAtMaxPlayers()
+        {
+            var fullGame = EntityFactory.CreateGame(Organiser.Id, teamSize: 1); // MaxPlayers 2
+            var newUser = await SeedUserAsync();
+
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                var existingPlayers = Enumerable.Range(1, 2)
+                    .Select(i => EntityFactory.CreatePlayer(fullGame.Id, displayName: $"Player {i}"))
+                    .ToList();
+                await context.Games.AddAsync(fullGame, TestContext.Current.CancellationToken);
+                await context.Players.AddRangeAsync(existingPlayers, TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateJsonRequest(HttpMethod.Post, Url, new CreatePlayerRequestModel(fullGame.Id, newUser.Id));
+            WithActorHeaders(request, Organiser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            Assert.NotNull(problem);
+            Assert.Contains(
+                "Game has reached its maximum number of players.",
+                GetValidationErrors(problem, nameof(CreatePlayerRequestModel.GameId)));
+        }
+
+        [Fact]
         public async Task ShouldReturnCreated_WithPlayerContent_WhenActorIsTheTargetUser()
         {
             var newUser = await SeedUserAsync();
@@ -149,6 +179,7 @@ public static partial class PlayersControllerTests
             Assert.NotNull(content);
             Assert.Equal(SeedGame.Id, content.GameId);
             Assert.Equal(newUser.Id, content.UserId);
+            Assert.Equal(newUser.Tag, content.Tag);
             Assert.Equal(newUser.DisplayName, content.DisplayName);
             Assert.Equal(newUser.Rating, content.Rating);
             Assert.Equal(nameof(PlayerTypeEnum.User), content.Type);

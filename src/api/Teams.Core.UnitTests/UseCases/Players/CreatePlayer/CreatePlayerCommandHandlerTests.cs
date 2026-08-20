@@ -124,6 +124,24 @@ public static class CreatePlayerCommandHandlerTests
         }
 
         [Fact]
+        public async Task ShouldThrowCommandValidationException_WhenGameIsAtMaxPlayers()
+        {
+            var game = CreateExistingGame(); // TeamSize 5, MaxPlayers 10
+            for (var i = 0; i < game.MaxPlayers; i++)
+                game.Players.Add(new Player(gameId: game.Id, userId: null, rating: 1000, type: Domain.Enums.PlayerTypeEnum.Dummy, team: Domain.Enums.GameTeamEnum.None) { DisplayName = $"Player {i}" });
+
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            var command = new CreatePlayerCommand(game.Id, "user-id");
+            var sut = CreateSut();
+
+            var exception = await Assert.ThrowsAsync<CommandValidationException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            Assert.Contains(exception.Errors, error => error.PropertyName == nameof(CreatePlayerCommand.GameId));
+            await UsersRepository.DidNotReceive().GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
         public async Task ShouldThrowNotFoundException_WhenUserDoesNotExist_AndActorIsOrganiser()
         {
             var game = CreateExistingGame();

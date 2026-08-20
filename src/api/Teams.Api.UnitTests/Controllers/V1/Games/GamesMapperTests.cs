@@ -52,14 +52,16 @@ public static class GamesMapperTests
         string? displayName = null,
         int rating = 1000,
         PlayerTypeEnum type = PlayerTypeEnum.Dummy,
-        GameTeamEnum team = GameTeamEnum.None)
+        GameTeamEnum team = GameTeamEnum.None,
+        User? user = null)
     {
         using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
         return new Player(gameId, userId, rating, type, team)
         {
             DisplayName = userId == null
                 ? displayName ?? "Test Player"
-                : null
+                : null,
+            User = user
         };
     }
 
@@ -153,12 +155,12 @@ public static class GamesMapperTests
     public class ToTeamsModel
     {
         [Fact]
-        public void MapsHomeAndAwayPlayersAndExcludesUnassigned_WhenCalled()
+        public void MapsHomeAwayAndUnassignedPlayersToTheirRespectiveBuckets_WhenCalled()
         {
             var game = GetGame();
             var homePlayer = GetPlayer(gameId: game.Id, displayName: "Home Player", rating: 900, team: GameTeamEnum.Home);
             var awayPlayer = GetPlayer(gameId: game.Id, displayName: "Away Player", rating: 850, team: GameTeamEnum.Away);
-            var unassignedPlayer = GetPlayer(gameId: game.Id, team: GameTeamEnum.None);
+            var unassignedPlayer = GetPlayer(gameId: game.Id, displayName: "Unassigned Player", team: GameTeamEnum.None);
             game.Players.Add(homePlayer);
             game.Players.Add(awayPlayer);
             game.Players.Add(unassignedPlayer);
@@ -178,6 +180,11 @@ public static class GamesMapperTests
             var resultAwayPlayer = Assert.Single(result.Away!.Players);
             Assert.Equal(awayPlayer.Id, resultAwayPlayer.Id);
             Assert.Equal(game.AwayTeamRating, result.Away.TeamRating);
+
+            var resultUnassignedPlayer = Assert.Single(result.Unassigned);
+            Assert.Equal(unassignedPlayer.Id, resultUnassignedPlayer.Id);
+            Assert.Equal(unassignedPlayer.GetDisplayName(), resultUnassignedPlayer.DisplayName);
+            Assert.Equal(unassignedPlayer.Rating, resultUnassignedPlayer.Rating);
         }
 
         [Fact]
@@ -191,6 +198,7 @@ public static class GamesMapperTests
             Assert.Equal(0, result.Away!.TeamRating);
             Assert.Empty(result.Home.Players);
             Assert.Empty(result.Away.Players);
+            Assert.Empty(result.Unassigned);
         }
     }
 
@@ -214,6 +222,8 @@ public static class GamesMapperTests
             var resultAwayPlayer = Assert.Single(result.Away!.Players);
             Assert.Equal(awayPlayer.Id, resultAwayPlayer.Id);
             Assert.Equal(suggestion.AwayRating, result.Away.TeamRating);
+
+            Assert.Empty(result.Unassigned);
         }
     }
 
@@ -229,6 +239,27 @@ public static class GamesMapperTests
             Assert.Equal(player.Id, result.Id);
             Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
+        }
+
+        [Fact]
+        public void MapsTagFromLinkedUser_WhenPlayerIsUserLinked()
+        {
+            var user = GetUser(tag: "marcusaurelius");
+            var player = GetPlayer(userId: user.Id, user: user, type: PlayerTypeEnum.User);
+
+            var result = player.ToGameTeamPlayerModel();
+
+            Assert.Equal(user.Tag, result.Tag);
+        }
+
+        [Fact]
+        public void SetsTagToNull_WhenPlayerHasNoLinkedUser()
+        {
+            var player = GetPlayer();
+
+            var result = player.ToGameTeamPlayerModel();
+
+            Assert.Null(result.Tag);
         }
     }
 

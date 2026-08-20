@@ -43,6 +43,9 @@ public class AcceptInvitationCommandHandler(
             return invitation;
         }
 
+        if (invitation.Game.Players.Count >= invitation.Game.MaxPlayers)
+            throw RequestHandlerException.ForCommandRequest("Unable to accept: game is already at capacity.");
+
         invitation.Accept();
         await uow.Invitations.UpdateAsync(invitation, cancellationToken);
 

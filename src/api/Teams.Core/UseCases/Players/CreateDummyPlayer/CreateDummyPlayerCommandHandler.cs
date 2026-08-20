@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
@@ -24,6 +25,9 @@ public class CreateDummyPlayerCommandHandler(
             ?? throw new NotFoundException(typeof(Game), request.GameId);
 
         actor.Current.ThrowIfNotOrganiser(game.OrganiserId);
+
+        if (game.Players.Count >= game.MaxPlayers)
+            throw new CommandValidationException([new ValidationFailure(nameof(CreateDummyPlayerCommand.GameId), "Game has reached its maximum number of players.")]);
 
         // Create the player
         var player = await uow.Players.CreateAsync(

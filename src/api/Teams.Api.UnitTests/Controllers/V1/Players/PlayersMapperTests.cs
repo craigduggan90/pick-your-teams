@@ -16,14 +16,16 @@ public static class PlayersMapperTests
         string displayName = "Test Player",
         int rating = 1000,
         PlayerTypeEnum type = PlayerTypeEnum.Dummy,
-        GameTeamEnum team = GameTeamEnum.None)
+        GameTeamEnum team = GameTeamEnum.None,
+        User? user = null)
     {
         using var idFix = new IdentifierProviderContext(id ?? Guid.NewGuid().ToString("N"));
         return new Player(gameId, userId, rating, type, team)
         {
             DisplayName = userId == null
                 ? displayName
-                : null
+                : null,
+            User = user
         };
     }
 
@@ -32,22 +34,36 @@ public static class PlayersMapperTests
         [Fact]
         public void MapsAllProperties_WhenCalled()
         {
+            var user = new User("Marcus Aurelius", "external-id", "marcus@test.net", null);
+            user.Update("marcusaurelius", null, null, null);
             var player = GetPlayer(
                 userId: "test-user-id",
                 displayName: "Marcus Aurelius",
                 rating: 900,
                 type: PlayerTypeEnum.User,
-                team: GameTeamEnum.Home);
+                team: GameTeamEnum.Home,
+                user: user);
 
             var result = player.ToPlayerModel();
 
             Assert.Equal(player.Id, result.Id);
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
+            Assert.Equal(user.Tag, result.Tag);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
             Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);
+        }
+
+        [Fact]
+        public void SetsTagToNull_WhenPlayerHasNoLinkedUser()
+        {
+            var player = GetPlayer(type: PlayerTypeEnum.Dummy);
+
+            var result = player.ToPlayerModel();
+
+            Assert.Null(result.Tag);
         }
     }
 
@@ -56,18 +72,22 @@ public static class PlayersMapperTests
         [Fact]
         public void MapsAllProperties_WhenCalled()
         {
+            var user = new User("Marcus Aurelius", "external-id", "marcus@test.net", null);
+            user.Update("marcusaurelius", null, null, null);
             var player = GetPlayer(
                 userId: "test-user-id",
                 displayName: "Marcus Aurelius",
                 rating: 900,
                 type: PlayerTypeEnum.User,
-                team: GameTeamEnum.Home);
+                team: GameTeamEnum.Home,
+                user: user);
 
             var result = player.ToPlayerDetailModel();
 
             Assert.Equal(player.Id, result.Id);
             Assert.Equal(player.GameId, result.GameId);
             Assert.Equal(player.UserId, result.UserId);
+            Assert.Equal(user.Tag, result.Tag);
             Assert.Equal(nameof(PlayerTypeEnum.User), result.Type);
             Assert.Equal(player.GetDisplayName(), result.DisplayName);
             Assert.Equal(player.Rating, result.Rating);
@@ -75,6 +95,16 @@ public static class PlayersMapperTests
             Assert.Equal(nameof(GameTeamEnum.Home), result.Team);
             Assert.Equal(player.DateCreated, result.Created);
             Assert.Equal(player.DateModified, result.Modified);
+        }
+
+        [Fact]
+        public void SetsTagToNull_WhenPlayerHasNoLinkedUser()
+        {
+            var player = GetPlayer(type: PlayerTypeEnum.Dummy);
+
+            var result = player.ToPlayerDetailModel();
+
+            Assert.Null(result.Tag);
         }
 
         [Fact]

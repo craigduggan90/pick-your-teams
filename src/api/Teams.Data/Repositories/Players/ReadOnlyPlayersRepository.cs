@@ -15,6 +15,7 @@ public class ReadOnlyPlayersRepository(ApiDbContext context)
     public async Task<Player?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
         await Context.Players
             .Include(p => p.Game)
+            .Include(p => p.User)
             .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
     /// <inheritdoc />
@@ -29,6 +30,7 @@ public class ReadOnlyPlayersRepository(ApiDbContext context)
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default) =>
         await Context.Players
+            .Include(p => p.User)
             .ApplyGameIdFilter(gameId)
             .ApplyDisplayNameFilter(displayName)
             .ApplyUserIdFilter(userId)

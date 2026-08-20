@@ -24,6 +24,9 @@ public class CreatePlayerCommandHandler(
         if (game.Players.Any(player => player.UserId == request.UserId))
             throw new CommandValidationException([new ValidationFailure(nameof(CreatePlayerCommand.UserId), "User is already associated with game.")]);
 
+        if (game.Players.Count >= game.MaxPlayers)
+            throw new CommandValidationException([new ValidationFailure(nameof(CreatePlayerCommand.GameId), "Game has reached its maximum number of players.")]);
+
         var user = await uow.Users.GetByIdAsync(request.UserId, cancellationToken)
                    ?? throw new NotFoundException(typeof(User), request.UserId);
 

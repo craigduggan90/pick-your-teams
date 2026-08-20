@@ -148,6 +148,7 @@ public static partial class GamesControllerTests
             Assert.All(
                 content.Home.Players.Concat(content.Away.Players),
                 player => Assert.Contains(players, p => p.Id == player.Id));
+            Assert.Empty(content.Unassigned);
         }
     }
 }

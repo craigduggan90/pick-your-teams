@@ -65,6 +65,7 @@ public static partial class PlayersControllerTests
             Assert.Equal(existingPlayer.GetDisplayName(), content.DisplayName);
             Assert.Equal(existingPlayer.Rating, content.Rating);
             Assert.Equal(existingPlayer.Team.ToString(), content.Team);
+            Assert.Null(content.Tag); // seeded players are dummy players with no linked user
         }
     }
 }

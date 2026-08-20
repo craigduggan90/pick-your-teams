@@ -19,7 +19,9 @@ public static partial class PlayersControllerTests
         protected User Organiser { get; } = EntityFactory.CreateUser(
             id: "organiser-001", displayName: "Test Organiser", dateCreated: BaseDate);
 
-        protected Game SeedGame => field ??= EntityFactory.CreateGame(Organiser.Id, id: "game-001", dateCreated: BaseDate);
+        // TeamSize 20 (MaxPlayers 40) so the 30 seeded players below leave room for CreatePlayer/CreateDummyPlayer
+        // tests to add one more without tripping the game's max-player-count cap.
+        protected Game SeedGame => field ??= EntityFactory.CreateGame(Organiser.Id, id: "game-001", teamSize: 20, dateCreated: BaseDate);
 
         /// <summary>
         /// 30 dummy players attached to <see cref="SeedGame"/> - enough variety for GetPlayers' filter and pagination

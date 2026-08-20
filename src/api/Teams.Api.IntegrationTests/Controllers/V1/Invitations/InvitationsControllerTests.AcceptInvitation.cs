@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Teams.Api.Controllers.V1.Invitations.ResponseModels;
 using Teams.Api.Controllers.V1.Players.ResponseModel;
 using Teams.Common.Pagination;
+using Teams.Data.Context;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
 
@@ -157,6 +159,35 @@ public static partial class InvitationsControllerTests
 
             Assert.NotNull(detail);
             Assert.Equal(nameof(InvitationStatusEnum.Failed), detail.Status);
+        }
+
+        [Fact]
+        public async Task ShouldReturnUnprocessableEntity_WhenGameIsAtMaxPlayers()
+        {
+            var organiser = EntityFactory.CreateUser(displayName: "Dedicated Organiser");
+            var invitee = EntityFactory.CreateUser(displayName: "Dedicated Invitee");
+            var fullGame = EntityFactory.CreateGame(organiser.Id, teamSize: 1); // MaxPlayers 2
+            var invitation = EntityFactory.CreateInvitation(fullGame.Id, invitee.Id, invitee.EmailAddress);
+
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                var existingPlayers = Enumerable.Range(1, 2)
+                    .Select(i => EntityFactory.CreatePlayer(fullGame.Id, displayName: $"Player {i}"))
+                    .ToList();
+                await context.Users.AddRangeAsync([organiser, invitee], TestContext.Current.CancellationToken);
+                await context.Games.AddAsync(fullGame, TestContext.Current.CancellationToken);
+                await context.Players.AddRangeAsync(existingPlayers, TestContext.Current.CancellationToken);
+                await context.Invitations.AddAsync(invitation, TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateRequest(HttpMethod.Post, $"{Url}/{invitation.Id}");
+            WithActorHeaders(request, invitee);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         }
 
         [Fact]
