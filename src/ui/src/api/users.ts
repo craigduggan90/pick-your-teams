@@ -33,3 +33,7 @@ export function updateUser(
 ): Promise<void> {
   return apiFetch<void>(`/v1/users/${id}`, { token, method: 'PATCH', body })
 }
+
+export function deleteUser(id: string, token: string): Promise<void> {
+  return apiFetch<void>(`/v1/users/${id}`, { token, method: 'DELETE' })
+}
