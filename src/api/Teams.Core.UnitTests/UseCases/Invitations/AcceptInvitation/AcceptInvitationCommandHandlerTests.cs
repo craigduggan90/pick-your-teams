@@ -124,6 +124,28 @@ public static class AcceptInvitationCommandHandlerTests
         }
 
         [Fact]
+        public async Task ShouldThrowRequestHandlerExceptionAndNotPersistChanges_WhenGameIsAtMaxPlayers()
+        {
+            var game = CreateGame(); // TeamSize 5, MaxPlayers 10
+            var user = CreateUser();
+            for (var i = 0; i < game.MaxPlayers; i++)
+                game.Players.Add(new Player(gameId: game.Id, userId: null, rating: 1000, type: PlayerTypeEnum.Dummy, team: GameTeamEnum.None) { DisplayName = $"Player {i}" });
+
+            var invitation = CreateInvitation(game, user);
+            InvitationsRepository.GetByIdAsync(invitation.Id, Arg.Any<CancellationToken>()).Returns(invitation);
+            ActorAccessor.Current.Returns(new Actor(user.Id, user.Tag, user.DisplayName));
+            var command = new AcceptInvitationCommand(invitation.Id);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<RequestHandlerException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            await InvitationsRepository.DidNotReceive().UpdateAsync(Arg.Any<Invitation>(), Arg.Any<CancellationToken>());
+            await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
         public async Task ShouldAcceptInvitationCreatePlayerAndPublishEvent_WhenOpen()
         {
             var game = CreateGame();

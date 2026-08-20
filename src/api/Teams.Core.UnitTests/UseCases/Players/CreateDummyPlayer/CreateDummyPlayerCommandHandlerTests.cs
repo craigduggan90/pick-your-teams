@@ -86,6 +86,25 @@ public static class CreateDummyPlayerCommandHandlerTests
         }
 
         [Fact]
+        public async Task ShouldThrowCommandValidationExceptionAndNotCreatePlayer_WhenGameIsAtMaxPlayers()
+        {
+            var game = CreateExistingGame(); // TeamSize 5, MaxPlayers 10
+            for (var i = 0; i < game.MaxPlayers; i++)
+                game.Players.Add(new Player(gameId: game.Id, userId: null, rating: 1000, type: Domain.Enums.PlayerTypeEnum.Dummy, team: Domain.Enums.GameTeamEnum.None) { DisplayName = $"Player {i}" });
+
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            var command = CreateValidCommand(game.Id);
+            var sut = CreateSut();
+
+            var exception = await Assert.ThrowsAsync<CommandValidationException>(
+                () => sut.HandleAsync(command, TestContext.Current.CancellationToken));
+
+            Assert.Contains(exception.Errors, error => error.PropertyName == nameof(CreateDummyPlayerCommand.GameId));
+            await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
         public async Task ShouldCreateDummyPlayer_WithRequestValues_WhenGameExists()
         {
             var game = CreateExistingGame();
