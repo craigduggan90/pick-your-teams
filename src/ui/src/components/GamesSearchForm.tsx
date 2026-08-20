@@ -52,7 +52,7 @@ function ToggleOption({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        'flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
+        'flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
         active
           ? 'border-info bg-info/10 text-info'
           : 'border-border bg-background text-light-grey hover:bg-muted',

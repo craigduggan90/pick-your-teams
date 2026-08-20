@@ -20,14 +20,17 @@ function HeaderIconButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 transition-colors hover:bg-primary-foreground/30"
+      className="flex size-8 shrink-0 cursor-pointer items-center justify-center"
     >
-      {children ?? <span aria-hidden="true" className="size-4 rounded-full bg-primary-foreground/60" />}
+      {children}
     </button>
   )
 }
 
 const homeIcon = <img src="/icon-192.png" alt="" data-testid="home-icon" className="size-8 rounded-full" />
+const accountIcon = (
+  <img src="/account-settings.png" alt="" data-testid="account-icon" className="size-8 rounded-full" />
+)
 
 export function Header({ title }: HeaderProps) {
   const navigate = useNavigate()
@@ -44,7 +47,9 @@ export function Header({ title }: HeaderProps) {
       )}
       <h1 className="flex-1 truncate text-lg font-medium">{title}</h1>
       {isAuthenticated && (
-        <HeaderIconButton label="My Account" onClick={() => navigate('/account')} />
+        <HeaderIconButton label="My Account" onClick={() => navigate('/account')}>
+          {accountIcon}
+        </HeaderIconButton>
       )}
     </header>
   )

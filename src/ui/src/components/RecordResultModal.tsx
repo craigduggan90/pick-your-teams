@@ -57,7 +57,7 @@ export function RecordResultModal({ open, onOpenChange, onConfirm, isPending }: 
             onClick={() => setWinner(option.value)}
             disabled={isPending}
             className={cn(
-              'rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors',
+              'cursor-pointer rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50',
               winner === option.value
                 ? 'border-info bg-info/10 text-info'
                 : 'border-border bg-background text-dark-grey hover:bg-muted',
