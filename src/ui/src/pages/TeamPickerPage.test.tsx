@@ -5,12 +5,14 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useSearchParams } from 'react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useSelf } from '@/hooks/useSelf'
+import { useGames } from '@/hooks/useGames'
 import { PageTitleProvider } from '@/hooks/usePageTitle'
 import { toast } from '@/components/Toast'
 import { TeamPickerPage } from './TeamPickerPage'
 
 vi.mock('@auth0/auth0-react')
 vi.mock('@/hooks/useSelf')
+vi.mock('@/hooks/useGames')
 vi.mock('@/components/Toast', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }))
@@ -89,7 +91,7 @@ describe('TeamPickerPage', () => {
     expect(screen.getByText('Change tag screen')).toBeInTheDocument()
   })
 
-  it('renders the home placeholder once tagged', () => {
+  it('renders the games list once tagged', () => {
     vi.mocked(useAuth0).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -100,10 +102,17 @@ describe('TeamPickerPage', () => {
       isError: false,
       data: { id: '1', tag: 'bob' },
     } as unknown as ReturnType<typeof useSelf>)
+    vi.mocked(useGames).mockReturnValue({
+      data: { pages: [{ data: [], cursor: null, count: 0 }] },
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+      hasNextPage: false,
+    } as unknown as ReturnType<typeof useGames>)
 
     renderPage()
 
-    expect(screen.getByText('Screens land in later stages.')).toBeInTheDocument()
+    expect(screen.getByText('No Games Found!')).toBeInTheDocument()
   })
 
   it('shows a logged-out toast and strips the query param when ?logged_out=true', async () => {

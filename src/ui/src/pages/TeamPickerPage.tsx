@@ -7,10 +7,7 @@ import { Loading } from '@/components/Loading'
 import { toast } from '@/components/Toast'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { APP_NAME, LOGGED_OUT_QUERY_PARAM } from '@/lib/constants'
-
-function HomePlaceholder() {
-  return <p className="p-4 text-sm text-light-grey">Screens land in later stages.</p>
-}
+import { GamesListPage } from './GamesListPage'
 
 export function TeamPickerPage() {
   usePageTitle(APP_NAME)
@@ -42,7 +39,7 @@ export function TeamPickerPage() {
   if (isAuthenticated) {
     return (
       <TagGate>
-        <HomePlaceholder />
+        <GamesListPage />
       </TagGate>
     )
   }
