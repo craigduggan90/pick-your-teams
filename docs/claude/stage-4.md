@@ -88,29 +88,69 @@ touching the overlay, so nobody's in-progress move gets silently discarded.
 - Remove-from-Game / Add-Non-User-Player are independent mutations with their own toast feedback,
   never gated on or gating Save.
 
-### 5. Team color coding
+### 5. Team color coding, and the pending/saved distinction
 
 Home sections/rows use the `primary` color token, Away use `secondary`, Unassigned stays neutral —
 this also happens to match the diagrams' own blue-ish Home / orange-ish Away styling, not purely a
-UI-polish add-on. A row whose player id is present in the edit session's overlay (touched since the
-last Save, by a manual move or by Generate) renders its team color at reduced strength until Save
-succeeds; read-only View Teams has no pending concept and always renders full-strength.
+UI-polish add-on. A row whose player id is present in the edit session's overlay renders its team
+color at reduced strength until Save succeeds; read-only View Teams has no pending concept and
+always renders full-strength.
 
-### 6. Wiring
+**Revised after live testing — the faded color alone read as too subtle.** Two fixes, both from
+direct user feedback on the running app:
+- A small red corner flag (CSS border-triangle, top-left) now renders on top of the faded color
+  for any pending row — a much harder-to-miss signal than a color-strength difference alone.
+- `pendingPlayerIds` was overlay-*presence*-based, which broke badly for Generate specifically:
+  Generate rebuilds the overlay from every player in its response, including ones whose seeded
+  position didn't actually move, so a presence check flagged everyone as pending and the
+  distinction disappeared entirely right when it mattered most. Fixed to compare each player's
+  effective team against their last-***saved*** bucket instead — only players Generate (or a
+  manual move) actually relocated show as pending now.
 
-`GameViewPage`'s "Manage Teams"/"View Teams" button (previously `disabled`, per Stage 3) now
-navigates to `/games/:id/teams`. New route added in `App.tsx`, guarded by the existing
-`RequireAuthAndTag`.
+### 6. Default landing swap — Teams first, Game Details as a sheet
+
+**Not in the original plan — added from live feedback after the screen was working.** The user
+wanted tapping a game to land straight on Teams (something people do far more often than edit
+time/location), with the old `GameViewPage` becoming a secondary destination — a swap already
+flagged as a possible future move right after Stage 3 (see the now-resolved
+`future_manage_teams_default_landing` memory). Concretely:
+
+- `GameListItem` now links to `/games/:id/teams` instead of `/games/:id`.
+- `GameTeamsPage` (both `ViewTeamsView` and `EditTeamsView`) now also takes `game` and
+  `isOrganiser`, and renders `components/GameDetailsSheet.tsx` — a read-only summary
+  (Location/Start Time/Duration/Team Size/Status/Winner) that pops up from the bottom, over the
+  footer, rather than an inline accordion pushing the roster down (an inline version was
+  considered and explicitly rejected in favor of this after the user pictured it more concretely
+  mid-conversation). Its footer trigger sits where the old disabled "Invite" placeholder used to
+  be: `Back | Game Details | Save`.
+- **The sheet's "Manage Game" button — the only way to reach `GameViewPage` now — only renders for
+  the organiser**, regardless of scheduled/finished (an organiser still wants Delete Game on a
+  finished game, say). There's no read-only "View Game" variant at all: a non-organiser has
+  nothing to do on that screen that the sheet doesn't already show them read-only, so the link
+  simply isn't offered to them — `showManageLink` is exactly `isOrganiser`, not `canEdit`.
+- The real "Invite Players" placeholder (still `disabled`, Stage 5) moved from `GameViewPage`'s
+  footer-adjacent button stack onto the Teams screen instead, positioned above `AddNonUserPlayerForm`
+  in `EditTeamsView`'s content — `GameViewPage` keeps its own copy too, since removing it wasn't
+  asked for and it's harmless being disabled in both places.
+- Back-navigation was rethought for the new hierarchy: `GameTeamsPage`'s `Back` now goes to `/`
+  (the games list, since Teams is the entry point now), and `GameViewPage`'s `Back` now returns to
+  `/games/:id/teams` (since Game View is reached from there now, not the list directly).
+- **`GameViewPage`'s own "Manage Teams"/"View Teams" button moved into its footer**, positioned in
+  the same middle slot as the Teams screen's "Game Details" button — a follow-up bit of feedback
+  asking for visually symmetric navigation between the two screens. It was previously one of the
+  stacked content buttons alongside Invite Players/Record Result/Delete Game.
 
 ### 7. Testing
 
-New `GameTeamsPage.test.tsx` (mirrors `GameViewPage.test.tsx`'s hook-mocking approach) covers:
-loading/error states, read-only rendering for a non-organiser and for a finished game, a `<select>`
-move staying pending (no Save call), Save sending the merged ids, Reset discarding a pending move,
-Generate seeding from the last-saved split, Remove from Game's modal-vs-immediate split by
-tag/no-tag, Add Non-User Player's submit and inline field-error paths. New `TeamRosterRow.test.tsx`
-covers the current-state-aware option list directly. `GameViewPage.test.tsx` gained one test for
-the new Manage Teams navigation.
+`GameTeamsPage.test.tsx` (mirrors `GameViewPage.test.tsx`'s hook-mocking approach) covers: loading/
+error states, read-only rendering for a non-organiser and for a finished game, a `<select>` move
+staying pending (no Save call), Save sending the merged ids, Reset discarding a pending move,
+Generate seeding from the last-saved split (and *not* marking unchanged seeded players as
+pending — a direct regression test for the bug above), Remove from Game's modal-vs-immediate split
+by tag/no-tag, Add Non-User Player's submit and inline field-error paths, the Game Details sheet's
+content and its organiser-only Manage Game link, and both screens' Back destinations.
+`TeamRosterRow.test.tsx` covers the current-state-aware option list directly. `GameViewPage.test.tsx`
+and `GameListItem.test.tsx` were updated for the new navigation targets.
 
 ## Explicitly out of scope for this stage
 
@@ -123,15 +163,14 @@ the new Manage Teams navigation.
 
 ## Verification
 
-- `npm run build`, `npm run lint`, `npm run test -- --run` — all clean, 191 tests passing (up from
+- `npm run build`, `npm run lint`, `npm run test -- --run` — all clean, 197 tests passing (up from
   171 at the end of Stage 3).
-- Browser-verified what's actually checkable without a real Auth0 session: the public landing page
-  loads with no console errors, and navigating directly to `/games/:id/teams` while logged out
-  correctly redirects to `/` via the existing route guard rather than crashing. The authenticated
-  Edit/View Teams flow itself needs a human with real Auth0 credentials to exercise end to end —
-  same limitation Stage 3 hit and documented, not something this session could drive itself.
-- Branch pushed as `stage-4-teams-management`; draft PR not created programmatically (`gh` CLI
-  unavailable in this environment) — link handed to the user instead.
+- Browser-verified what's checkable without a real Auth0 session (public landing loads clean,
+  guarded routes redirect correctly rather than crashing) early on; the rest of this stage's
+  verification — including all the live-feedback rounds that reshaped the pending styling and the
+  navigation structure — was the user testing the running app directly with real credentials, not
+  something this session could drive itself. Branch not pushed yet at the time of writing; the
+  user is testing locally first.
 
 ## Decisions log
 
@@ -168,9 +207,9 @@ reflected inline above.
   faint tint on changed rows only, or full home/away color-coding with saved-vs-pending strength —
   the user picked the bigger option. Resolved as: Home/Away color-coded throughout (matches the
   diagrams' own blue/orange styling, not just a UI-polish add-on), with pending rows at reduced
-  color strength until Save. `isPending` is a simple "is this player id present in the overlay"
-  check, not a deep-equality check against the original bucket (a Home→Away→Home ping-pong in one
-  session still shows pending) — an accepted v1 simplification.
+  color strength until Save. **Superseded by the next two entries** — the strength difference alone
+  turned out too subtle in practice, and the original presence-based `isPending` check was actually
+  wrong, not just a simplification; both fixed after live testing.
 - **The `<select>` is deliberately uncontrolled.** Considered making it a controlled component
   showing the current team as its value, but base-ui's `Select` (like most headless-UI select
   primitives) only stays continuously controlled if `value` is non-`undefined` on every render —
@@ -187,3 +226,23 @@ reflected inline above.
   last save; showing it unchanged while the organiser moves players around client-side would look
   wrong. Recomputed as a simple sum of the merged roster's player ratings per team instead — cheap
   given every `GameTeamPlayerModel` already carries its own `rating`.
+- **Pending/saved distinction — live feedback, two rounds.** First round: "the difference is too
+  subtle" (the color-strength fade alone), fixed by adding a red corner flag on top of it. Second
+  round, more serious: "when you hit generate, we lose the pending/saved distinction" — root cause
+  was `pendingPlayerIds` being presence-based (`Object.keys(overlay)`), and Generate's own success
+  handler rebuilding the overlay from *every* player in its response, seeded-and-unchanged ones
+  included. So after any Generate, literally every player in the game read as "pending," which is
+  indistinguishable from the feature not existing at all. Fixed by making `isPending` a value
+  comparison against each player's last-*saved* bucket instead of an overlay-presence check —
+  correct for Generate, and also fixes the ping-pong edge case the original design had explicitly
+  accepted as a simplification (a Home→Away→Home round-trip in one session no longer falsely shows
+  pending either, now that it's judged by fact rather than by touch history).
+- **Default landing swap: Teams first, Game Details as a bottom sheet.** See Approach section 6 for
+  the mechanics. Went through several rounds of live refinement in one sitting: first framed as
+  "print game details at the top of the page in a closed-by-default accordion," then "the Manage
+  Game link should live in that expando, organiser-only," then "actually pop it from the bottom,
+  where the Invite button currently sits — move the real Invite Players button up above Add
+  Non-User Player instead," then a follow-up asking `GameViewPage`'s own reverse-navigation button
+  to sit in the same footer position as "Game Details" for visual symmetry between the two screens.
+  Each round was implemented and left for the user to react to live rather than re-confirmed in
+  chat first — matched how the rest of this stage's live-feedback loop was already running.
