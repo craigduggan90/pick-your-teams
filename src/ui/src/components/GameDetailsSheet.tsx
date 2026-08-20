@@ -6,9 +6,9 @@ import type { GameDetailModel } from '@/api/games'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-2 text-sm">
-      <span className="text-light-grey">{label}</span>
-      <span className="font-medium text-dark-grey">{value}</span>
+    <div className="flex items-start justify-between gap-2 text-sm">
+      <span className="shrink-0 text-light-grey">{label}</span>
+      <span className="min-w-0 break-words text-right font-medium text-dark-grey">{value}</span>
     </div>
   )
 }
