@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Modal } from './Modal'
+import { Sheet } from './Sheet'
 import { Button } from './Button'
 
-describe('Modal', () => {
+describe('Sheet', () => {
   it('renders nothing when closed', () => {
     render(
-      <Modal open={false} onOpenChange={() => {}} title="Remove @bob?">
+      <Sheet open={false} onOpenChange={() => {}} title="Remove @bob?">
         Body copy
-      </Modal>,
+      </Sheet>,
     )
 
     expect(screen.queryByText('Remove @bob?')).not.toBeInTheDocument()
@@ -17,14 +17,14 @@ describe('Modal', () => {
 
   it('renders the title, description, and body when open', () => {
     render(
-      <Modal
+      <Sheet
         open
         onOpenChange={() => {}}
         title="Remove @bob?"
         description="This cannot be undone."
       >
         <p>Body copy</p>
-      </Modal>,
+      </Sheet>,
     )
 
     expect(screen.getByText('Remove @bob?')).toBeInTheDocument()
@@ -34,7 +34,7 @@ describe('Modal', () => {
 
   it('renders footer actions', () => {
     render(
-      <Modal
+      <Sheet
         open
         onOpenChange={() => {}}
         title="Remove @bob?"
@@ -55,9 +55,9 @@ describe('Modal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     render(
-      <Modal open onOpenChange={onOpenChange} title="Remove @bob?">
+      <Sheet open onOpenChange={onOpenChange} title="Remove @bob?">
         Body copy
-      </Modal>,
+      </Sheet>,
     )
 
     await user.click(screen.getByRole('button', { name: 'Close' }))

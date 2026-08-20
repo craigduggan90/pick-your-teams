@@ -1,4 +1,4 @@
-import { Modal } from '@/components/Modal'
+import { Sheet } from '@/components/Sheet'
 import { Button } from '@/components/Button'
 import type { GameTeamPlayerModel } from '@/api/games'
 
@@ -9,7 +9,7 @@ export interface RemovePlayerModalProps {
   isPending: boolean
 }
 
-// Reuses the shared Modal shell — the "Remove @Tag?" pattern from 06-a-view-teams.png / claude.md.
+// Reuses the shared Sheet shell — the "Remove @Tag?" pattern from 06-a-view-teams.png / claude.md.
 // Only rendered for a User-linked player (has a Tag); a Dummy player is removed with no
 // confirmation, so this component is never mounted for one.
 export function RemovePlayerModal({
@@ -19,7 +19,7 @@ export function RemovePlayerModal({
   isPending,
 }: RemovePlayerModalProps) {
   return (
-    <Modal
+    <Sheet
       open={player !== null}
       onOpenChange={onOpenChange}
       title={player ? `Remove @${player.tag}?` : 'Remove player?'}

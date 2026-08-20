@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal } from '@/components/Modal'
+import { Sheet } from '@/components/Sheet'
 import { Button } from '@/components/Button'
 import { cn } from '@/lib/utils'
 import type { GameWinner } from '@/api/games'
@@ -29,7 +29,7 @@ export function RecordResultModal({ open, onOpenChange, onConfirm, isPending }: 
   }, [open])
 
   return (
-    <Modal
+    <Sheet
       open={open}
       onOpenChange={onOpenChange}
       title="Record Result"
@@ -67,6 +67,6 @@ export function RecordResultModal({ open, onOpenChange, onConfirm, isPending }: 
           </button>
         ))}
       </div>
-    </Modal>
+    </Sheet>
   )
 }
