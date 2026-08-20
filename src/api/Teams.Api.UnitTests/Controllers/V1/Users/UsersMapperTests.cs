@@ -2,6 +2,7 @@ using Teams.Api.Controllers.V1.Users;
 using Teams.Api.Controllers.V1.Users.RequestModels;
 using Teams.Common.Pagination;
 using Teams.Common.Providers.Identifiers;
+using Teams.Core.UseCases.Users;
 using Teams.Domain.Entities;
 
 namespace Teams.Api.UnitTests.Controllers.V1.Users;
@@ -45,8 +46,9 @@ public static class UsersMapperTests
         public void MapsAllProperties_WhenCalled()
         {
             var user = GetUser(email: "jane.smith@example.com", mobile: "+447700900123");
+            var detail = new UserDetail(user, PendingInvitations: 3);
 
-            var result = user.ToDetailedModel();
+            var result = detail.ToDetailedModel();
 
             Assert.Equal(user.Id, result.Id);
             Assert.Equal(user.Tag, result.Tag);
@@ -56,14 +58,16 @@ public static class UsersMapperTests
             Assert.Equal(user.Mobile, result.Mobile);
             Assert.Equal(user.DateCreated, result.Created);
             Assert.Equal(user.DateModified, result.Modified);
+            Assert.Equal(3, result.PendingInvitations);
         }
 
         [Fact]
         public void SetsMobileToNull_WhenUserHasNoMobile()
         {
             var user = GetUser(mobile: null);
+            var detail = new UserDetail(user, PendingInvitations: 0);
 
-            var result = user.ToDetailedModel();
+            var result = detail.ToDetailedModel();
 
             Assert.Null(result.Mobile);
         }

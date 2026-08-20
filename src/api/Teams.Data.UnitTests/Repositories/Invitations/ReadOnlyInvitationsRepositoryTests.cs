@@ -178,4 +178,48 @@ public static class ReadOnlyInvitationsRepositoryTests
             Assert.Equivalent(page, actual, true);
         }
     }
+
+    public class CountInvitationsAsync : RepositoryTestBase
+    {
+        private ReadOnlyInvitationsRepository CreateSut() => new(Context);
+
+        [Fact]
+        public async Task ShouldReturnCountOfMatchingInvitations_WhenUserHasOpenInvitations()
+        {
+            var userId = Context.Invitations.Where(i => i.UserId != null && i.Status == InvitationStatusEnum.Open)
+                .Select(i => i.UserId)
+                .First()!;
+            var expected = Context.Invitations.Count(i => i.UserId == userId && i.Status == InvitationStatusEnum.Open);
+
+            var sut = CreateSut();
+            var actual = await sut.CountInvitationsAsync(userId, InvitationStatusEnum.Open, TestContext.Current.CancellationToken);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task ShouldReturnZero_WhenUserHasNoMatchingInvitations()
+        {
+            const string userId = "does-not-exist";
+
+            var sut = CreateSut();
+            var actual = await sut.CountInvitationsAsync(userId, InvitationStatusEnum.Open, TestContext.Current.CancellationToken);
+
+            Assert.Equal(0, actual);
+        }
+
+        [Fact]
+        public async Task ShouldNotCountInvitationsInOtherStatuses_WhenFilteringByStatus()
+        {
+            var userId = Context.Invitations.Where(i => i.UserId != null && i.Status == InvitationStatusEnum.Accepted)
+                .Select(i => i.UserId)
+                .First()!;
+
+            var sut = CreateSut();
+            var actual = await sut.CountInvitationsAsync(userId, InvitationStatusEnum.Declined, TestContext.Current.CancellationToken);
+
+            var expected = Context.Invitations.Count(i => i.UserId == userId && i.Status == InvitationStatusEnum.Declined);
+            Assert.Equal(expected, actual);
+        }
+    }
 }

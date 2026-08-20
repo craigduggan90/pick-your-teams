@@ -39,4 +39,12 @@ public class ReadOnlyInvitationsRepository(ApiDbContext context) : RepositoryBas
             .ApplyPagination(pagination?.PageSize ?? Constants.DefaultPageSize)
             .ToListAsync(cancellationToken);
 
+    public async Task<int> CountInvitationsAsync(
+        string userId,
+        InvitationStatusEnum status,
+        CancellationToken cancellationToken = default) =>
+        await Context.Invitations
+            .ApplyUserIdFilter(userId)
+            .ApplyStatusFilter(status)
+            .CountAsync(cancellationToken);
 }
