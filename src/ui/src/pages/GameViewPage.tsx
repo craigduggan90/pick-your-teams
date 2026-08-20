@@ -16,14 +16,7 @@ import { useRecordResult } from '@/hooks/useRecordResult'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
 import { ApiError } from '@/api/client'
-import { fromDateTimeLocalValue, toDateTimeLocalValue } from '@/lib/format'
-import type { GameWinner } from '@/api/games'
-
-const WINNER_LABELS: Record<GameWinner, string> = {
-  Home: 'Home Team!',
-  Away: 'Away Team!',
-  None: "It's a Draw!",
-}
+import { formatGameWinner, fromDateTimeLocalValue, toDateTimeLocalValue } from '@/lib/format'
 
 export function GameViewPage() {
   usePageTitle('Game')
@@ -94,9 +87,12 @@ export function GameViewPage() {
 
   usePageFooterActions(
     game && (
-      <div className="flex w-full justify-between gap-2 p-4">
-        <Button variant="outline" onClick={() => navigate('/')}>
+      <div className="flex w-full items-center justify-between gap-2 p-4">
+        <Button variant="outline" onClick={() => navigate(`/games/${id}/teams`)}>
           Back
+        </Button>
+        <Button variant="outline" onClick={() => navigate(`/games/${id}/teams`)}>
+          {canEdit ? 'Manage Teams' : 'View Teams'}
         </Button>
         {canEdit && (
           <Button
@@ -129,7 +125,7 @@ export function GameViewPage() {
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4">
       {game.status === 'Finished' && game.winner && (
         <div className="rounded-lg bg-success/10 p-3 text-center font-medium text-success">
-          Winner: {WINNER_LABELS[game.winner]}
+          Winner: {formatGameWinner(game.winner)}
         </div>
       )}
 
@@ -172,9 +168,6 @@ export function GameViewPage() {
             Invite Players
           </Button>
         )}
-        <Button variant="outline" onClick={() => navigate(`/games/${id}/teams`)}>
-          {isOrganiser && isScheduled ? 'Manage Teams' : 'View Teams'}
-        </Button>
         {isOrganiser && isScheduled && (
           <Button variant="outline" onClick={() => setRecordResultOpen(true)}>
             Record Result

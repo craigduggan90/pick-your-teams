@@ -32,10 +32,10 @@ describe('GameListItem', () => {
     expect(screen.getByText('Organised by @little-bobby-tables')).toBeInTheDocument()
   })
 
-  it('links to the game detail route', () => {
+  it('links to the teams screen — the default landing for a game now', () => {
     renderItem(baseGame)
 
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/games/game-1')
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/games/game-1/teams')
   })
 
   it('falls back to placeholder text when location is null', () => {

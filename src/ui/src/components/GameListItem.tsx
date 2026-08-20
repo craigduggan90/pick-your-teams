@@ -6,7 +6,7 @@ import type { GameModel } from '@/api/games'
 export function GameListItem({ game }: { game: GameModel }) {
   return (
     <Link
-      to={`/games/${game.id}`}
+      to={`/games/${game.id}/teams`}
       className="flex flex-col gap-1 rounded-lg border border-border p-3 text-sm transition-colors hover:bg-muted"
     >
       <span className="font-medium text-dark-grey">{formatGameDateTime(game.startTime)}</span>

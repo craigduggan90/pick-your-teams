@@ -238,7 +238,7 @@ describe('GameViewPage', () => {
     expect(screen.getByText('Teams screen')).toBeInTheDocument()
   })
 
-  it('navigates home via Back', async () => {
+  it('navigates back to the Teams screen via Back — Game View is reached from there now', async () => {
     vi.mocked(useGame).mockReturnValue({
       isPending: false,
       isError: false,
@@ -251,6 +251,6 @@ describe('GameViewPage', () => {
     renderPage()
     await user.click(screen.getByRole('button', { name: 'Back' }))
 
-    expect(screen.getByText('Games list')).toBeInTheDocument()
+    expect(screen.getByText('Teams screen')).toBeInTheDocument()
   })
 })

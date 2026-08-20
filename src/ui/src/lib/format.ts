@@ -64,6 +64,17 @@ export function fromDateValue(value: string): string {
   return `${value}T00:00:00.000Z`
 }
 
+const GAME_WINNER_LABELS = {
+  Home: 'Home Team!',
+  Away: 'Away Team!',
+  None: "It's a Draw!",
+} as const
+
+/** "Home Team!" / "Away Team!" / "It's a Draw!" — matches 04-view-game.png's finished-game banner. */
+export function formatGameWinner(winner: 'Home' | 'Away' | 'None'): string {
+  return GAME_WINNER_LABELS[winner]
+}
+
 /** Rolls an ISO day-boundary forward by one day — for turning a picked "end date" into an
  * exclusive upper bound that still includes everything on that date (e.g. a "Game Start To" of
  * 3rd September should include games starting any time on the 3rd, not just at 00:00). */

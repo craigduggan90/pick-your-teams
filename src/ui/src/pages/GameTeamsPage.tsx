@@ -6,6 +6,7 @@ import { ErrorMessage } from '@/components/ErrorMessage'
 import { TeamRosterSection } from '@/components/TeamRosterSection'
 import { RemovePlayerModal } from '@/components/RemovePlayerModal'
 import { AddNonUserPlayerForm } from '@/components/AddNonUserPlayerForm'
+import { GameDetailsSheet } from '@/components/GameDetailsSheet'
 import { toast } from '@/components/Toast'
 import { useGame } from '@/hooks/useGame'
 import { useSelf } from '@/hooks/useSelf'
@@ -17,7 +18,7 @@ import { useDeletePlayer } from '@/hooks/useDeletePlayer'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
 import { ApiError } from '@/api/client'
-import type { GameTeamPlayerModel, GameTeamsModel } from '@/api/games'
+import type { GameDetailModel, GameTeamPlayerModel, GameTeamsModel } from '@/api/games'
 import type { RosterTeam } from '@/components/TeamRosterRow'
 
 export function GameTeamsPage() {
@@ -43,20 +44,31 @@ export function GameTeamsPage() {
   const canEdit = isOrganiser && game.status === 'Scheduled'
 
   return canEdit ? (
-    <EditTeamsView gameId={id} teams={teams} />
+    <EditTeamsView gameId={id} game={game} teams={teams} isOrganiser={isOrganiser} />
   ) : (
-    <ViewTeamsView gameId={id} teams={teams} />
+    <ViewTeamsView gameId={id} game={game} teams={teams} isOrganiser={isOrganiser} />
   )
 }
 
-function ViewTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsModel }) {
+interface TeamsViewProps {
+  gameId: string
+  game: GameDetailModel
+  teams: GameTeamsModel
+  isOrganiser: boolean
+}
+
+function ViewTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   usePageTitle('Teams')
   const navigate = useNavigate()
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   usePageFooterActions(
-    <div className="flex w-full p-4">
-      <Button variant="outline" onClick={() => navigate(`/games/${gameId}`)}>
+    <div className="flex w-full items-center justify-between gap-2 p-4">
+      <Button variant="outline" onClick={() => navigate('/')}>
         Back
+      </Button>
+      <Button variant="outline" onClick={() => setDetailsOpen(true)}>
+        Game Details
       </Button>
     </div>,
   )
@@ -66,6 +78,14 @@ function ViewTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
       <TeamRosterSection team="Home" players={teams.home?.players ?? []} rating={teams.home?.teamRating} />
       <TeamRosterSection team="Away" players={teams.away?.players ?? []} rating={teams.away?.teamRating} />
       <TeamRosterSection team="None" players={teams.unassigned} />
+
+      <GameDetailsSheet
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        game={game}
+        showManageLink={isOrganiser}
+        onManage={() => navigate(`/games/${gameId}`)}
+      />
     </div>
   )
 }
@@ -74,9 +94,10 @@ function apiErrorMessage(error: unknown, fallback: string): string {
   return error instanceof ApiError ? (error.problem.detail ?? error.message) : fallback
 }
 
-function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsModel }) {
+function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   usePageTitle('Teams')
   const navigate = useNavigate()
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   // Pending team moves, keyed by player id — not sent to the API until Save. Layering this over
   // the last-fetched server roster (rather than copying the whole roster into local state) is
@@ -196,11 +217,11 @@ function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
 
   usePageFooterActions(
     <div className="flex w-full items-center justify-between gap-2 p-4">
-      <Button variant="outline" onClick={() => navigate(`/games/${gameId}`)}>
+      <Button variant="outline" onClick={() => navigate('/')}>
         Back
       </Button>
-      <Button variant="outline" disabled>
-        Invite
+      <Button variant="outline" onClick={() => setDetailsOpen(true)}>
+        Game Details
       </Button>
       <Button
         variant="primary"
@@ -267,6 +288,12 @@ function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
         onRemove={handleRemoveRequest}
       />
 
+      {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram, disabled
+          until that stage lands. See docs/claude/stage-3.md. */}
+      <Button variant="outline" disabled>
+        Invite Players
+      </Button>
+
       <AddNonUserPlayerForm
         key={addPlayerFormKey}
         onSubmit={(displayName, estimatedRating) =>
@@ -282,6 +309,14 @@ function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
         onOpenChange={(open) => !open && setRemoveTarget(null)}
         onConfirm={(player) => deleteMutation.mutate(player.id)}
         isPending={deleteMutation.isPending}
+      />
+
+      <GameDetailsSheet
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        game={game}
+        showManageLink={isOrganiser}
+        onManage={() => navigate(`/games/${gameId}`)}
       />
     </div>
   )

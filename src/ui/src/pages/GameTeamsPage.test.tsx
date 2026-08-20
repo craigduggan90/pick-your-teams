@@ -121,6 +121,7 @@ function renderPage() {
           <Routes>
             <Route path="/games/:id/teams" element={<GameTeamsPage />} />
             <Route path="/games/:id" element={<p>Game view</p>} />
+            <Route path="/" element={<p>Games list</p>} />
           </Routes>
           <FooterActionsStub />
         </MemoryRouter>
@@ -173,6 +174,27 @@ describe('GameTeamsPage', () => {
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     })
+
+    it('Back returns to the games list', async () => {
+      setUp(scheduledGame, 'someone-else')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Back' }))
+
+      expect(screen.getByText('Games list')).toBeInTheDocument()
+    })
+
+    it('Game Details has no Manage Game link for a non-organiser', async () => {
+      setUp(scheduledGame, 'someone-else')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Game Details' }))
+
+      expect(screen.getByText('Oak Leaf Leisure Centre')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Manage Game' })).not.toBeInTheDocument()
+    })
   })
 
   describe('read-only (finished game, even for the organiser)', () => {
@@ -183,6 +205,17 @@ describe('GameTeamsPage', () => {
 
       expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+    })
+
+    it('Game Details still offers Manage Game, since this viewer is the organiser', async () => {
+      setUp(finishedGame, 'organiser-1')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Game Details' }))
+      await user.click(screen.getByRole('button', { name: 'Manage Game' }))
+
+      expect(screen.getByText('Game view')).toBeInTheDocument()
     })
   })
 
@@ -195,7 +228,34 @@ describe('GameTeamsPage', () => {
       expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Generate' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Invite Players' })).toBeDisabled()
       expect(screen.getByRole('button', { name: 'Add Non-User Player' })).toBeInTheDocument()
+    })
+
+    it('Back returns to the games list, not the game-details screen', async () => {
+      setUp(scheduledGame, 'organiser-1')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Back' }))
+
+      expect(screen.getByText('Games list')).toBeInTheDocument()
+    })
+
+    it('Game Details opens from the footer and links through to Manage Game', async () => {
+      setUp(scheduledGame, 'organiser-1')
+      const user = userEvent.setup()
+      renderPage()
+
+      expect(screen.queryByText('Oak Leaf Leisure Centre')).not.toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Game Details' }))
+
+      expect(screen.getByText('Oak Leaf Leisure Centre')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Manage Game' }))
+
+      expect(screen.getByText('Game view')).toBeInTheDocument()
     })
 
     it('moving a player to a team stays pending — no Save call yet', async () => {
