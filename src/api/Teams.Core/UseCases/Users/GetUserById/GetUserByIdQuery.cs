@@ -1,6 +1,6 @@
 using Teams.Core.CQRS;
-using Teams.Domain.Entities;
+using Teams.Core.UseCases.Users;
 
 namespace Teams.Core.UseCases.Users.GetUserById;
 
-public record GetUserByIdQuery(string Id) : IRequest<User>;
+public record GetUserByIdQuery(string Id) : IRequest<UserDetail>;

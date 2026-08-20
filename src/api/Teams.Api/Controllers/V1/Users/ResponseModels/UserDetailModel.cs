@@ -10,7 +10,8 @@ public record UserDetailModel(
     string Email,
     string? Mobile,
     DateTime Created,
-    DateTime Modified)
+    DateTime Modified,
+    int PendingInvitations)
 {
     [ExcludeFromCodeCoverage]
     public static UserDetailModel Example => new(
@@ -21,5 +22,6 @@ public record UserDetailModel(
         Email: "jane.smith@example.com",
         Mobile: "+447700900123",
         Created: new DateTime(2026, 07, 30, 12, 14, 17, DateTimeKind.Utc),
-        Modified: new DateTime(2026, 07, 31, 22, 18, 31, DateTimeKind.Utc));
+        Modified: new DateTime(2026, 07, 31, 22, 18, 31, DateTimeKind.Utc),
+        PendingInvitations: 2);
 }

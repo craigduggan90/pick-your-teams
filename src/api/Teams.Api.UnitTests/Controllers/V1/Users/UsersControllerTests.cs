@@ -7,6 +7,7 @@ using Teams.Api.Controllers.V1.Users.ResponseModels;
 using Teams.Common.Pagination;
 using Teams.Common.Providers.Identifiers;
 using Teams.Core.CQRS;
+using Teams.Core.UseCases.Users;
 using Teams.Core.UseCases.Users.CreateUser;
 using Teams.Core.UseCases.Users.DeleteUser;
 using Teams.Core.UseCases.Users.GetSelf;
@@ -129,11 +130,12 @@ public static class UsersControllerTests
         public async Task ShouldReturnOk_WhenSuccess()
         {
             var user = GetUser();
+            var detail = new UserDetail(user, PendingInvitations: 2);
 
             Mediator.SendAsync(Arg.Any<GetSelfQuery>(), Arg.Any<CancellationToken>())
-                .Returns(user);
+                .Returns(detail);
 
-            var expected = user.ToDetailedModel();
+            var expected = detail.ToDetailedModel();
 
             var sut = GetOrCreateSut();
             var rawResult = await sut.GetSelf(TestContext.Current.CancellationToken);
@@ -151,11 +153,12 @@ public static class UsersControllerTests
         {
             const string id = "test-id";
             var user = GetUser(id: id);
+            var detail = new UserDetail(user, PendingInvitations: 0);
 
             Mediator.SendAsync(Arg.Any<GetUserByIdQuery>(), Arg.Any<CancellationToken>())
-                .Returns(user);
+                .Returns(detail);
 
-            var expected = user.ToDetailedModel();
+            var expected = detail.ToDetailedModel();
 
             var sut = GetOrCreateSut();
             var rawResult = await sut.GetUserById(id, TestContext.Current.CancellationToken);

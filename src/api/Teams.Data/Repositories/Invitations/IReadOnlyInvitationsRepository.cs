@@ -14,4 +14,9 @@ public interface IReadOnlyInvitationsRepository : IReadOnlyRepository<Invitation
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default);
+
+    Task<int> CountInvitationsAsync(
+        string userId,
+        InvitationStatusEnum status,
+        CancellationToken cancellationToken = default);
 }

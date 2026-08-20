@@ -1,6 +1,7 @@
 using Teams.Api.Controllers.V1.Users.RequestModels;
 using Teams.Api.Controllers.V1.Users.ResponseModels;
 using Teams.Common.Pagination;
+using Teams.Core.UseCases.Users;
 using Teams.Core.UseCases.Users.CreateUser;
 using Teams.Core.UseCases.Users.GetUsers;
 using Teams.Core.UseCases.Users.UpdateUser;
@@ -16,15 +17,16 @@ public static class UsersMapper
         DisplayName: user.DisplayName,
         Rating: user.Rating);
 
-    public static UserDetailModel ToDetailedModel(this User user) => new(
-        Id: user.Id,
-        Tag: user.Tag,
-        DisplayName: user.DisplayName,
-        Rating: user.Rating,
-        Email: user.EmailAddress,
-        Mobile: user.Mobile,
-        Created: user.DateCreated,
-        Modified: user.DateModified);
+    public static UserDetailModel ToDetailedModel(this UserDetail detail) => new(
+        Id: detail.User.Id,
+        Tag: detail.User.Tag,
+        DisplayName: detail.User.DisplayName,
+        Rating: detail.User.Rating,
+        Email: detail.User.EmailAddress,
+        Mobile: detail.User.Mobile,
+        Created: detail.User.DateCreated,
+        Modified: detail.User.DateModified,
+        PendingInvitations: detail.PendingInvitations);
 
     public static CreateUserCommand ToCommand(this CreateUserRequestModel model) => new(
         DisplayName: model.DisplayName,

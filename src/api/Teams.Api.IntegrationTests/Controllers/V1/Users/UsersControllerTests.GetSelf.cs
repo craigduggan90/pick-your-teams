@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Teams.Api.Controllers.V1.Users.ResponseModels;
+using Teams.Data.Context;
 using Teams.Domain.Entities;
 
 namespace Teams.Api.IntegrationTests.Controllers.V1.Users;
@@ -8,6 +10,21 @@ public static partial class UsersControllerTests
 {
     public class GetSelf(ApiWebApplicationFactory factory) : UsersControllerTestsBase(factory)
     {
+        private async Task<Invitation> SeedOpenInvitationAsync(User invitee, string organiserId)
+        {
+            await using var scope = Factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+            var game = EntityFactory.CreateGame(organiserId);
+            await context.Games.AddAsync(game, TestContext.Current.CancellationToken);
+
+            var invitation = EntityFactory.CreateInvitation(game.Id, invitee.Id, invitee.EmailAddress);
+            await context.Invitations.AddAsync(invitation, TestContext.Current.CancellationToken);
+
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            return invitation;
+        }
+
         [Fact]
         public async Task ShouldReturnBadRequest_WhenVersionIsUnsupported()
         {
@@ -103,6 +120,26 @@ public static partial class UsersControllerTests
             Assert.Equal(existingUser.Rating, content.Rating);
             Assert.Equal(existingUser.EmailAddress, content.Email);
             Assert.Equal(existingUser.Mobile, content.Mobile);
+            Assert.Equal(0, content.PendingInvitations);
+        }
+
+        [Fact]
+        public async Task ShouldReturnPendingInvitationsCount_WhenActorHasOpenInvitations()
+        {
+            var existingUser = SeedUsers[0];
+            var organiser = SeedUsers[1];
+            await SeedOpenInvitationAsync(existingUser, organiser.Id);
+            await SeedOpenInvitationAsync(existingUser, organiser.Id);
+
+            var request = CreateRequest(HttpMethod.Get, $"{Url}/self");
+            WithActorHeaders(request, existingUser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<UserDetailModel>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal(2, content.PendingInvitations);
         }
     }
 }
