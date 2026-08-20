@@ -101,17 +101,26 @@ describe('MyAccountPage', () => {
     expect(screen.getByText('Something went wrong loading your account.')).toBeInTheDocument()
   })
 
-  it('sets the header title and shows the profile fields prefilled', () => {
+  it('sets the header title to the user\'s tag and shows the profile fields prefilled', () => {
     vi.mocked(useAuth0).mockReturnValue({ logout: vi.fn() } as any)
     vi.mocked(useSelf).mockReturnValue({ isPending: false, isError: false, data: self } as any)
     mockMutations()
 
     renderPage()
 
-    expect(screen.getByRole('heading')).toHaveTextContent('My Account')
+    expect(screen.getByRole('heading')).toHaveTextContent('@little-bobby-tables')
     expect(screen.getByLabelText('Display Name')).toHaveValue('Robert D. Tables')
     expect(screen.getByLabelText('Email Address')).toHaveValue('bob@example.com')
-    expect(screen.getByText('@little-bobby-tables')).toBeInTheDocument()
+  })
+
+  it('shows a placeholder header title while the user is still loading', () => {
+    vi.mocked(useAuth0).mockReturnValue({ logout: vi.fn() } as any)
+    vi.mocked(useSelf).mockReturnValue({ isPending: true, isError: false, data: undefined } as any)
+    mockMutations()
+
+    renderPage()
+
+    expect(screen.getByRole('heading')).toHaveTextContent('My Account')
   })
 
   it('saves the display name and email via the footer Save button', async () => {

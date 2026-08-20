@@ -17,7 +17,6 @@ import type { ChangeTagLocationState } from '@/lib/navigation'
 import { LOGGED_OUT_QUERY_PARAM } from '@/lib/constants'
 
 export function MyAccountPage() {
-  usePageTitle('My Account')
   const navigate = useNavigate()
   const location = useLocation()
   const { logout } = useAuth0()
@@ -30,6 +29,8 @@ export function MyAccountPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const self = selfQuery.data
+  // Matches 03-my-account.png's header, which shows "@MyTag" rather than a generic screen name.
+  usePageTitle(self ? `@${self.tag}` : 'My Account')
 
   useEffect(() => {
     if (self) {
@@ -110,8 +111,6 @@ export function MyAccountPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4">
-      <p className="text-sm text-light-grey">@{self.tag}</p>
-
       <TextInput
         label="Display Name"
         value={displayName}
@@ -129,11 +128,16 @@ export function MyAccountPage() {
       <Button variant="outline" onClick={goToChangeTag}>
         Change Tag
       </Button>
-      <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
-        Delete Account
-      </Button>
       <Button variant="outline" onClick={returnToLoggedOut}>
         Log Out
+      </Button>
+
+      {/* Deliberate breathing room before the destructive action, roughly one button's height,
+          so it isn't sitting right next to Log Out/Change Tag. */}
+      <div className="h-12" />
+
+      <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
+        Delete Account
       </Button>
 
       <Modal
