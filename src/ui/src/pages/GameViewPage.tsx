@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router'
 import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
 import { GameStatusBadge } from '@/components/GameStatusBadge'
-import { Modal } from '@/components/Modal'
+import { Sheet } from '@/components/Sheet'
 import { RecordResultModal } from '@/components/RecordResultModal'
 import { Loading } from '@/components/Loading'
 import { ErrorMessage } from '@/components/ErrorMessage'
@@ -180,7 +180,7 @@ export function GameViewPage() {
         )}
       </div>
 
-      <Modal
+      <Sheet
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Delete Game?"

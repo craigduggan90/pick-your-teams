@@ -3,7 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useLocation, useNavigate } from 'react-router'
 import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
-import { Modal } from '@/components/Modal'
+import { Sheet } from '@/components/Sheet'
 import { Loading } from '@/components/Loading'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { toast } from '@/components/Toast'
@@ -140,7 +140,7 @@ export function MyAccountPage() {
         Delete Account
       </Button>
 
-      <Modal
+      <Sheet
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Delete Account?"

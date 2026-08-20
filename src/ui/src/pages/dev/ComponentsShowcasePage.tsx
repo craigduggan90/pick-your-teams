@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
-import { Modal } from '@/components/Modal'
+import { Sheet } from '@/components/Sheet'
 import { SelectField } from '@/components/Select'
 import { toast } from '@/components/Toast'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -84,11 +84,11 @@ export function ComponentsShowcasePage() {
         />
       </Section>
 
-      <Section title="Modal">
+      <Section title="Sheet">
         <Button variant="destructive" onClick={() => setModalOpen(true)}>
           Remove @bob?
         </Button>
-        <Modal
+        <Sheet
           open={modalOpen}
           onOpenChange={setModalOpen}
           title="Remove @bob?"
