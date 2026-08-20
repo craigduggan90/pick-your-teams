@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+ * Semantic palette from claude.md's Design Tokens section, mapped onto shadcn/ui's variable
+ * slots. Primary (#465775, blue) and Secondary (#EF6F6C, coral) are temporary — explicitly not
+ * final, just something to build against for now (see Decisions log in docs/claude/stage-2.md).
+ * Everything else (Tertiary/Success/Warning/Info/Dark Grey/Light Grey) is still a placeholder —
+ * the
+ * Excalidraw diagrams only label these roles ("Colour Placeholder") with no real hex values, so
+ * swap the :root values for the rest later without touching anything that consumes the tokens.
+ * Tertiary/Success/Warning/Info have no shadcn-native slot, so they're exposed as extra
+ * --color-* tokens alongside the standard ones.
+ */
+@theme inline {
+  --font-sans: var(--font-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-dark-grey: var(--dark-grey);
+  --color-light-grey: var(--light-grey);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.5rem;
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --background: #ffffff;
+  --foreground: #3f3f46;
+  --popover: #ffffff;
+  --popover-foreground: #3f3f46;
+
+  --primary: #465775;
+  --primary-foreground: #ffffff;
+  --secondary: #ef6f6c;
+  --secondary-foreground: #ffffff;
+  --tertiary: #9333ea;
+  --tertiary-foreground: #ffffff;
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #ca8a04;
+  --warning-foreground: #ffffff;
+  --error: #dc2626;
+  --error-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
+  --destructive: var(--error);
+
+  --dark-grey: #3f3f46;
+  --light-grey: #a1a1aa;
+
+  --muted: #f4f4f5;
+  --muted-foreground: var(--light-grey);
+  --accent: #f4f4f5;
+  --accent-foreground: #3f3f46;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: var(--primary);
+
+  /* Read by sonner's richColors mode (Toast primitive) for per-type toast coloring. */
+  --success-bg: var(--success);
+  --success-text: var(--success-foreground);
+  --success-border: var(--success);
+  --error-bg: var(--error);
+  --error-text: var(--error-foreground);
+  --error-border: var(--error);
+  --warning-bg: var(--warning);
+  --warning-text: var(--warning-foreground);
+  --warning-border: var(--warning);
+  --info-bg: var(--info);
+  --info-text: var(--info-foreground);
+  --info-border: var(--info);
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/*
+ * sonner (Toast primitive) injects its own stylesheet at runtime after ours, so this needs
+ * !important to reliably win. Moves the dismiss button from its LTR default (top-left) to the
+ * top-right of the toast.
+ */
+[data-sonner-toaster] {
+  --toast-close-button-start: unset !important;
+  --toast-close-button-end: 0 !important;
+  --toast-close-button-transform: translate(35%, -35%) !important;
+}
