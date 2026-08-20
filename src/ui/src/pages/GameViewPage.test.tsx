@@ -81,6 +81,7 @@ function renderPage() {
         <MemoryRouter initialEntries={['/games/game-1']}>
           <Routes>
             <Route path="/games/:id" element={<GameViewPage />} />
+            <Route path="/games/:id/teams" element={<p>Teams screen</p>} />
             <Route path="/" element={<p>Games list</p>} />
           </Routes>
           <FooterActionsStub />
@@ -219,6 +220,22 @@ describe('GameViewPage', () => {
       expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.getByLabelText('Location')).toBeDisabled()
     })
+  })
+
+  it('navigates to the Teams screen via Manage Teams', async () => {
+    vi.mocked(useGame).mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: scheduledGame,
+    } as any)
+    vi.mocked(useSelf).mockReturnValue({ isPending: false, data: { id: 'organiser-1' } } as any)
+    mockMutations()
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.click(screen.getByRole('button', { name: 'Manage Teams' }))
+
+    expect(screen.getByText('Teams screen')).toBeInTheDocument()
   })
 
   it('navigates home via Back', async () => {
