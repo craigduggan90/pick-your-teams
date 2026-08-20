@@ -9,9 +9,30 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { APP_NAME, LOGGED_OUT_QUERY_PARAM } from '@/lib/constants'
 import { GamesListPage } from './GamesListPage'
 
+// A thin switch, same reasoning as GamesListPage: it doesn't call usePageTitle itself, since
+// exactly one of TeamPickerLanding or GamesListPage renders below it, and each owns its own title
+// — see docs/claude/stage-3.md on why a parent calling it too would stomp the child's value.
 export function TeamPickerPage() {
+  const { isAuthenticated, isLoading } = useAuth0()
+
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (isAuthenticated) {
+    return (
+      <TagGate>
+        <GamesListPage />
+      </TagGate>
+    )
+  }
+
+  return <TeamPickerLanding />
+}
+
+function TeamPickerLanding() {
   usePageTitle(APP_NAME)
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+  const { loginWithRedirect } = useAuth0()
   const [searchParams, setSearchParams] = useSearchParams()
   const hasShownLoggedOutToast = useRef(false)
 
@@ -31,18 +52,6 @@ export function TeamPickerPage() {
       { replace: true },
     )
   }, [searchParams, setSearchParams])
-
-  if (isLoading) {
-    return <Loading />
-  }
-
-  if (isAuthenticated) {
-    return (
-      <TagGate>
-        <GamesListPage />
-      </TagGate>
-    )
-  }
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-6 p-8 text-center">

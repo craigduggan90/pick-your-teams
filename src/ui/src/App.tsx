@@ -8,11 +8,14 @@ import { Toaster } from '@/components/Toast'
 import { RequireAuth } from '@/components/RequireAuth'
 import { RequireAuthAndTag } from '@/components/RequireAuthAndTag'
 import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
+import { PageActionsProvider, useFooterActions } from '@/hooks/usePageActions'
 import { APP_NAME } from '@/lib/constants'
 import { ComponentsShowcasePage } from '@/pages/dev/ComponentsShowcasePage'
 import { TeamPickerPage } from '@/pages/TeamPickerPage'
 import { ChangeTagPage } from '@/pages/ChangeTagPage'
 import { MyAccountPage } from '@/pages/MyAccountPage'
+import { GameViewPage } from '@/pages/GameViewPage'
+import { NewGamePage } from '@/pages/NewGamePage'
 
 const queryClient = new QueryClient()
 
@@ -41,12 +44,13 @@ function Auth0ProviderWithNavigate({ children }: { children: ReactNode }) {
 
 function AppShell({ children }: { children: ReactNode }) {
   const title = useHeaderTitle()
+  const footerActions = useFooterActions()
 
   return (
     <>
       <Header title={title} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer actions={footerActions} />
       <Toaster />
     </>
   )
@@ -58,28 +62,46 @@ export default function App() {
       <BrowserRouter>
         <Auth0ProviderWithNavigate>
           <PageTitleProvider initialTitle={APP_NAME}>
-            <AppShell>
-              <Routes>
-                <Route path="/" element={<TeamPickerPage />} />
-                <Route
-                  path="/change-tag"
-                  element={
-                    <RequireAuth>
-                      <ChangeTagPage />
-                    </RequireAuth>
-                  }
-                />
-                <Route
-                  path="/account"
-                  element={
-                    <RequireAuthAndTag>
-                      <MyAccountPage />
-                    </RequireAuthAndTag>
-                  }
-                />
-                <Route path="/dev/components" element={<ComponentsShowcasePage />} />
-              </Routes>
-            </AppShell>
+            <PageActionsProvider>
+              <AppShell>
+                <Routes>
+                  <Route path="/" element={<TeamPickerPage />} />
+                  <Route
+                    path="/change-tag"
+                    element={
+                      <RequireAuth>
+                        <ChangeTagPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/account"
+                    element={
+                      <RequireAuthAndTag>
+                        <MyAccountPage />
+                      </RequireAuthAndTag>
+                    }
+                  />
+                  <Route
+                    path="/games/new"
+                    element={
+                      <RequireAuthAndTag>
+                        <NewGamePage />
+                      </RequireAuthAndTag>
+                    }
+                  />
+                  <Route
+                    path="/games/:id"
+                    element={
+                      <RequireAuthAndTag>
+                        <GameViewPage />
+                      </RequireAuthAndTag>
+                    }
+                  />
+                  <Route path="/dev/components" element={<ComponentsShowcasePage />} />
+                </Routes>
+              </AppShell>
+            </PageActionsProvider>
           </PageTitleProvider>
         </Auth0ProviderWithNavigate>
       </BrowserRouter>

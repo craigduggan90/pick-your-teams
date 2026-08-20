@@ -1,32 +1,49 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { GamesSearchPanel } from './GamesSearchPanel'
+import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
+import { PageActionsProvider, useFooterActions } from '@/hooks/usePageActions'
+import { GamesSearchForm } from './GamesSearchForm'
 
-describe('GamesSearchPanel', () => {
-  it('renders nothing when closed', () => {
-    render(<GamesSearchPanel open={false} onOpenChange={vi.fn()} filters={{}} onApply={vi.fn()} />)
+function HeaderTitleStub() {
+  return <h1>{useHeaderTitle()}</h1>
+}
 
-    expect(screen.queryByText('Games / Search')).not.toBeInTheDocument()
+function FooterActionsStub() {
+  return <>{useFooterActions()}</>
+}
+
+function renderForm({ onApply = vi.fn(), onCancel = vi.fn() } = {}) {
+  render(
+    <PageTitleProvider initialTitle="Pick Your Teams">
+      <PageActionsProvider>
+        <HeaderTitleStub />
+        <GamesSearchForm filters={{}} onApply={onApply} onCancel={onCancel} />
+        <FooterActionsStub />
+      </PageActionsProvider>
+    </PageTitleProvider>,
+  )
+  return { onApply, onCancel }
+}
+
+describe('GamesSearchForm', () => {
+  it('sets the header title to Games / Search', () => {
+    renderForm()
+    expect(screen.getByRole('heading')).toHaveTextContent('Games / Search')
   })
 
-  it('closes without applying on Cancel', async () => {
-    const onOpenChange = vi.fn()
-    const onApply = vi.fn()
+  it('calls onCancel via the footer Cancel button', async () => {
     const user = userEvent.setup()
-    render(<GamesSearchPanel open onOpenChange={onOpenChange} filters={{}} onApply={onApply} />)
+    const { onCancel } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-    expect(onApply).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalled()
   })
 
-  it('applies the selected status filter and closes', async () => {
-    const onOpenChange = vi.fn()
-    const onApply = vi.fn()
+  it('applies the selected status filter', async () => {
     const user = userEvent.setup()
-    render(<GamesSearchPanel open onOpenChange={onOpenChange} filters={{}} onApply={onApply} />)
+    const { onApply } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Scheduled' }))
     await user.click(screen.getByRole('button', { name: 'Apply' }))
@@ -34,13 +51,11 @@ describe('GamesSearchPanel', () => {
     expect(onApply).toHaveBeenCalledWith(
       expect.objectContaining({ status: 'Scheduled', startTimeFrom: undefined, startTimeTo: undefined }),
     )
-    expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
   it('deselects a status filter when clicked again', async () => {
-    const onApply = vi.fn()
     const user = userEvent.setup()
-    render(<GamesSearchPanel open onOpenChange={vi.fn()} filters={{}} onApply={onApply} />)
+    const { onApply } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Complete' }))
     await user.click(screen.getByRole('button', { name: 'Complete' }))
@@ -50,9 +65,8 @@ describe('GamesSearchPanel', () => {
   })
 
   it('includes team size only when a value is entered', async () => {
-    const onApply = vi.fn()
     const user = userEvent.setup()
-    render(<GamesSearchPanel open onOpenChange={vi.fn()} filters={{}} onApply={onApply} />)
+    const { onApply } = renderForm()
 
     await user.type(screen.getByLabelText('Players per Team'), '5')
     await user.click(screen.getByRole('button', { name: 'Apply' }))
@@ -61,9 +75,8 @@ describe('GamesSearchPanel', () => {
   })
 
   it('only includes the start-from date when its checkbox is enabled', async () => {
-    const onApply = vi.fn()
     const user = userEvent.setup()
-    render(<GamesSearchPanel open onOpenChange={vi.fn()} filters={{}} onApply={onApply} />)
+    const { onApply } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Apply' }))
     expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ startTimeFrom: undefined }))

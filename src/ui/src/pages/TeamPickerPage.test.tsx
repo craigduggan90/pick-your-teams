@@ -7,6 +7,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useSelf } from '@/hooks/useSelf'
 import { useGames } from '@/hooks/useGames'
 import { PageTitleProvider } from '@/hooks/usePageTitle'
+import { PageActionsProvider } from '@/hooks/usePageActions'
 import { toast } from '@/components/Toast'
 import { TeamPickerPage } from './TeamPickerPage'
 
@@ -25,13 +26,15 @@ function SearchParamsProbe() {
 function renderPage(initialEntry = '/', { strict = false } = {}) {
   const tree = (
     <PageTitleProvider initialTitle="Pick Your Teams">
-      <MemoryRouter initialEntries={[initialEntry]}>
-        <SearchParamsProbe />
-        <Routes>
-          <Route path="/" element={<TeamPickerPage />} />
-          <Route path="/change-tag" element={<p>Change tag screen</p>} />
-        </Routes>
-      </MemoryRouter>
+      <PageActionsProvider>
+        <MemoryRouter initialEntries={[initialEntry]}>
+          <SearchParamsProbe />
+          <Routes>
+            <Route path="/" element={<TeamPickerPage />} />
+            <Route path="/change-tag" element={<p>Change tag screen</p>} />
+          </Routes>
+        </MemoryRouter>
+      </PageActionsProvider>
     </PageTitleProvider>
   )
   return render(strict ? <StrictMode>{tree}</StrictMode> : tree)

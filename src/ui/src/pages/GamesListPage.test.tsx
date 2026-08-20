@@ -2,13 +2,22 @@ import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
-import { PageTitleProvider } from '@/hooks/usePageTitle'
+import { MemoryRouter, Route, Routes } from 'react-router'
+import { PageTitleProvider, useHeaderTitle } from '@/hooks/usePageTitle'
+import { PageActionsProvider, useFooterActions } from '@/hooks/usePageActions'
 import { useGames } from '@/hooks/useGames'
 import { GamesListPage } from './GamesListPage'
 import type { GameModel } from '@/api/games'
 
 vi.mock('@/hooks/useGames')
+
+function HeaderTitleStub() {
+  return <h1>{useHeaderTitle()}</h1>
+}
+
+function FooterActionsStub() {
+  return <>{useFooterActions()}</>
+}
 
 const baseGame: GameModel = {
   id: 'game-1',
@@ -23,9 +32,28 @@ const baseGame: GameModel = {
 function renderPage(children: ReactNode = <GamesListPage />) {
   return render(
     <PageTitleProvider initialTitle="Pick Your Teams">
-      <MemoryRouter>{children}</MemoryRouter>
+      <PageActionsProvider>
+        <HeaderTitleStub />
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={children} />
+            <Route path="/games/new" element={<p>New game screen</p>} />
+          </Routes>
+        </MemoryRouter>
+        <FooterActionsStub />
+      </PageActionsProvider>
     </PageTitleProvider>,
   )
+}
+
+function mockEmptyGames() {
+  vi.mocked(useGames).mockReturnValue({
+    isPending: false,
+    isError: false,
+    isSuccess: true,
+    data: { pages: [{ data: [], cursor: null, count: 0 }] },
+    hasNextPage: false,
+  } as unknown as ReturnType<typeof useGames>)
 }
 
 describe('GamesListPage', () => {
@@ -54,17 +82,19 @@ describe('GamesListPage', () => {
   })
 
   it('shows an empty state', () => {
-    vi.mocked(useGames).mockReturnValue({
-      isPending: false,
-      isError: false,
-      isSuccess: true,
-      data: { pages: [{ data: [], cursor: null, count: 0 }] },
-      hasNextPage: false,
-    } as unknown as ReturnType<typeof useGames>)
+    mockEmptyGames()
 
     renderPage()
 
     expect(screen.getByText('No Games Found!')).toBeInTheDocument()
+  })
+
+  it('sets the header title to Games', () => {
+    mockEmptyGames()
+
+    renderPage()
+
+    expect(screen.getByRole('heading')).toHaveTextContent('Games')
   })
 
   it('renders a page of results', () => {
@@ -100,33 +130,50 @@ describe('GamesListPage', () => {
     expect(fetchNextPage).toHaveBeenCalled()
   })
 
-  it('opens the search panel from the Search button', async () => {
-    vi.mocked(useGames).mockReturnValue({
-      isPending: false,
-      isError: false,
-      isSuccess: true,
-      data: { pages: [{ data: [], cursor: null, count: 0 }] },
-      hasNextPage: false,
-    } as unknown as ReturnType<typeof useGames>)
+  it('navigates to /games/new via New Game', async () => {
+    mockEmptyGames()
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.click(screen.getByRole('button', { name: 'New Game' }))
+
+    expect(screen.getByText('New game screen')).toBeInTheDocument()
+  })
+
+  it('replaces the list with the search form on Search, and the header title updates', async () => {
+    mockEmptyGames()
     const user = userEvent.setup()
 
     renderPage()
     await user.click(screen.getByRole('button', { name: 'Search' }))
 
-    expect(screen.getByText('Games / Search')).toBeInTheDocument()
+    expect(screen.getByRole('heading')).toHaveTextContent('Games / Search')
+    expect(screen.getByLabelText('Players per Team')).toBeInTheDocument()
+    expect(screen.queryByText('No Games Found!')).not.toBeInTheDocument()
   })
 
-  it('renders New Game disabled — no create-game screen exists yet', () => {
-    vi.mocked(useGames).mockReturnValue({
-      isPending: false,
-      isError: false,
-      isSuccess: true,
-      data: { pages: [{ data: [], cursor: null, count: 0 }] },
-      hasNextPage: false,
-    } as unknown as ReturnType<typeof useGames>)
+  it('returns to the list on Cancel, restoring the Games title', async () => {
+    mockEmptyGames()
+    const user = userEvent.setup()
 
     renderPage()
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
-    expect(screen.getByRole('button', { name: 'New Game' })).toBeDisabled()
+    expect(screen.getByRole('heading')).toHaveTextContent('Games')
+    expect(screen.getByText('No Games Found!')).toBeInTheDocument()
+  })
+
+  it('returns to the list on Apply, passing the new filters to useGames', async () => {
+    mockEmptyGames()
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    await user.click(screen.getByRole('button', { name: 'Scheduled' }))
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    expect(screen.getByRole('heading')).toHaveTextContent('Games')
+    expect(useGames).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'Scheduled' }))
   })
 })
