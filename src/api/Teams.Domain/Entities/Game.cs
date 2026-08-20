@@ -19,13 +19,9 @@ public class Game(
 
     public int Duration { get; private set; } = duration;
 
-    public string OrganiserId { get; private set; } = organiserId;
+    public string? OrganiserId { get; private set; } = organiserId;
 
-    public User Organiser
-    {
-        get => field ?? throw UninitializedPropertyException.For(nameof(Organiser));
-        init;
-    }
+    public User? Organiser { get; init; }
 
     public GameStatusEnum Status { get; private set; } = GameStatusEnum.Scheduled;
 

@@ -139,7 +139,7 @@ public static class AcceptInvitationCommandHandlerTests
             Assert.Equal(InvitationStatusEnum.Accepted, result.Status);
             await InvitationsRepository.Received(1).UpdateAsync(invitation, Arg.Any<CancellationToken>());
             await PlayersRepository.Received(1).CreateAsync(
-                Arg.Is<Player>(p => p.UserId == user.Id && p.GameId == game.Id),
+                Arg.Is<Player>(p => p!.UserId == user.Id && p.GameId == game.Id),
                 Arg.Any<CancellationToken>());
             await UnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
             await EventPublisher.Received(1).PublishEventAsync(

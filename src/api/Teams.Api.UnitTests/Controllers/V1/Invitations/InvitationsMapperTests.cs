@@ -16,6 +16,9 @@ public static class InvitationsMapperTests
             Organiser = organiser
         };
 
+    private static Game GetGameWithoutOrganiser() =>
+        new("missing-organiser-id", "Oak Leaf Leisure Centre", new DateTime(2026, 8, 10, 19, 0, 0, DateTimeKind.Utc), 60, 5);
+
     private static Invitation GetInvitation(Game game) =>
         new(game.Id, "user-id", "invitee@test.net") { Game = game };
 
@@ -39,9 +42,20 @@ public static class InvitationsMapperTests
             Assert.Equal(game.Duration, result.Game.Duration);
             Assert.Equal(game.Location, result.Game.Location);
 
-            Assert.Equal(organiser.Id, result.Organiser.Id);
+            Assert.Equal(organiser.Id, result.Organiser!.Id);
             Assert.Equal(organiser.Tag, result.Organiser.Tag);
             Assert.Equal(organiser.DisplayName, result.Organiser.DisplayName);
+        }
+
+        [Fact]
+        public void SetsOrganiserToNull_WhenGameHasNoOrganiser()
+        {
+            var game = GetGameWithoutOrganiser();
+            var invitation = GetInvitation(game);
+
+            var result = invitation.ToModel();
+
+            Assert.Null(result.Organiser);
         }
     }
 
@@ -65,12 +79,23 @@ public static class InvitationsMapperTests
             Assert.Equal(game.Duration, result.Game.Duration);
             Assert.Equal(game.Location, result.Game.Location);
 
-            Assert.Equal(organiser.Id, result.Organiser.Id);
+            Assert.Equal(organiser.Id, result.Organiser!.Id);
             Assert.Equal(organiser.Tag, result.Organiser.Tag);
             Assert.Equal(organiser.DisplayName, result.Organiser.DisplayName);
 
             Assert.Equal(invitation.DateCreated, result.Created);
             Assert.Equal(invitation.DateModified, result.Modified);
+        }
+
+        [Fact]
+        public void SetsOrganiserToNull_WhenGameHasNoOrganiser()
+        {
+            var game = GetGameWithoutOrganiser();
+            var invitation = GetInvitation(game);
+
+            var result = invitation.ToDetailModel();
+
+            Assert.Null(result.Organiser);
         }
     }
 

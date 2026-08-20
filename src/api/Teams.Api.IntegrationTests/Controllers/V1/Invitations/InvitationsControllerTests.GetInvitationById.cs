@@ -99,7 +99,7 @@ public static partial class InvitationsControllerTests
             Assert.Equal(existingInvitation.Id, content.Id);
             Assert.Equal(existingInvitation.Status.ToString(), content.Status);
             Assert.Equal(SeedGame.Id, content.Game.Id);
-            Assert.Equal(Organiser.Id, content.Organiser.Id);
+            Assert.Equal(Organiser.Id, content.Organiser!.Id);
         }
 
         [Fact]

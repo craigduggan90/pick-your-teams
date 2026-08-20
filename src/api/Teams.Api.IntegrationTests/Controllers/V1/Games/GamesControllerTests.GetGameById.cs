@@ -66,6 +66,11 @@ public static partial class GamesControllerTests
             Assert.Equal(existingGame.Duration, content.Duration);
             Assert.Equal(existingGame.TeamSize, content.TeamSize);
             Assert.Equal(existingGame.Status.ToString(), content.Status);
+
+            var organiser = SeedOrganisers.Single(o => o.Id == existingGame.OrganiserId);
+            Assert.Equal(organiser.Id, content.Organiser!.Id);
+            Assert.Equal(organiser.Tag, content.Organiser.Tag);
+            Assert.Equal(organiser.DisplayName, content.Organiser.DisplayName);
         }
 
         [Fact]

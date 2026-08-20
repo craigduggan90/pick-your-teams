@@ -104,7 +104,7 @@ public static class CreateInvitationsCommandHandlerTests
                 Arg.Is<Invitation>(i => i!.GameId == game.Id && i.UserId == userTwo.Id), Arg.Any<CancellationToken>());
             await UnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
             await EventPublisher.Received(1).PublishEventsAsync(
-                Arg.Is<IEnumerable<IEvent>>(events => events.Count() == 2 &&
+                Arg.Is<IEnumerable<IEvent>>(events => events != null && events.Count() == 2 &&
                     events.OfType<InvitationCreatedEvent>().Any(e => e.UserId == userOne.Id) &&
                     events.OfType<InvitationCreatedEvent>().Any(e => e.UserId == userTwo.Id)),
                 Arg.Any<CancellationToken>());

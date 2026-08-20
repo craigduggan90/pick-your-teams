@@ -14,7 +14,8 @@ public record GameDetailModel(
     int? HomeTeamRating,
     int? AwayTeamRating,
     DateTime Created,
-    DateTime Modified)
+    DateTime Modified,
+    GameOrganiserModel? Organiser)
 {
     [ExcludeFromCodeCoverage]
     public static GameDetailModel Example => new(
@@ -28,5 +29,6 @@ public record GameDetailModel(
         HomeTeamRating: 5378,
         AwayTeamRating: 6417,
         Created: new DateTime(2026, 07, 30, 12, 14, 17, DateTimeKind.Utc),
-        Modified: new DateTime(2026, 07, 31, 22, 18, 31, DateTimeKind.Utc));
+        Modified: new DateTime(2026, 07, 31, 22, 18, 31, DateTimeKind.Utc),
+        Organiser: GameOrganiserModel.Example);
 }

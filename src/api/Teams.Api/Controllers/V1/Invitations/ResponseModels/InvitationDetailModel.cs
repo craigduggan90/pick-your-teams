@@ -7,7 +7,7 @@ public record InvitationDetailModel(
     string Id,
     string Status,
     InvitationGameModel Game,
-    InvitationOrganiserModel Organiser,
+    InvitationOrganiserModel? Organiser,
     DateTime Created,
     DateTime Modified)
 {
