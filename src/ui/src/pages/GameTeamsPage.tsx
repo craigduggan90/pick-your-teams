@@ -150,6 +150,11 @@ function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
   const homePlayers: GameTeamPlayerModel[] = []
   const awayPlayers: GameTeamPlayerModel[] = []
   const unassignedPlayers: GameTeamPlayerModel[] = []
+  // Pending is a value comparison against the last-*saved* bucket, not just "has an overlay
+  // entry" — Generate rebuilds the overlay for every player it returns, including ones whose
+  // seeded position didn't actually move, and a presence-only check would show all of them as
+  // pending, washing out the distinction entirely.
+  const pendingPlayerIds = new Set<string>()
   for (const [savedTeam, players] of [
     ['Home', teams.home?.players ?? []],
     ['Away', teams.away?.players ?? []],
@@ -160,9 +165,9 @@ function EditTeamsView({ gameId, teams }: { gameId: string; teams: GameTeamsMode
       if (effectiveTeam === 'Home') homePlayers.push(player)
       else if (effectiveTeam === 'Away') awayPlayers.push(player)
       else unassignedPlayers.push(player)
+      if (effectiveTeam !== savedTeam) pendingPlayerIds.add(player.id)
     }
   }
-  const pendingPlayerIds = new Set(Object.keys(overlay))
   // Ratings are recomputed live from the pending roster rather than the server's last-saved
   // TeamRating, so the header numbers actually reflect in-progress moves before Save.
   const homeRating = homePlayers.reduce((sum, player) => sum + player.rating, 0)

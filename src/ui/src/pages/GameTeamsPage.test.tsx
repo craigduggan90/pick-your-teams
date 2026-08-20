@@ -254,6 +254,35 @@ describe('GameTeamsPage', () => {
       })
     })
 
+    it('only marks players Generate actually moved as pending, not ones already seeded there', () => {
+      // Generate rebuilds the overlay from every player in its response, including ones whose
+      // seeded position didn't change (p-home, p-away) — only p-bench actually moved (Unassigned
+      // -> Home). Pending must be judged against the last-saved bucket, not overlay presence, or
+      // every returned player — seeded or not — would show as pending.
+      setUp(scheduledGame, 'organiser-1')
+      vi.mocked(useGenerateGameTeams).mockReturnValue({
+        mutate: vi.fn(),
+        isPending: false,
+        isSuccess: true,
+        isError: false,
+        error: null,
+        data: {
+          id: 'game-1',
+          home: { players: [homePlayer, benchPlayer], teamRating: 1600 },
+          away: { players: [awayPlayer], teamRating: 850 },
+          unassigned: [dummyPlayer],
+        },
+      } as any)
+
+      renderPage()
+
+      expect(screen.getByTestId('team-roster-row-p-home')).toHaveClass('border-primary')
+      expect(screen.getByTestId('team-roster-row-p-home')).not.toHaveClass('border-primary/30')
+      expect(screen.getByTestId('team-roster-row-p-bench')).toHaveClass('border-primary/30')
+      expect(screen.getByTestId('team-roster-row-p-away')).toHaveClass('border-secondary')
+      expect(screen.getByTestId('team-roster-row-p-away')).not.toHaveClass('border-secondary/30')
+    })
+
     it('Remove from Game shows a confirmation modal for a tagged (User) player', async () => {
       const { deleteMutate } = setUp(scheduledGame, 'organiser-1')
       const user = userEvent.setup()

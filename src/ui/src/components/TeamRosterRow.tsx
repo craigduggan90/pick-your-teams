@@ -54,14 +54,24 @@ export function TeamRosterRow({
   onTeamChange,
   onRemove,
 }: TeamRosterRowProps) {
+  const showPending = editable && isPending
+
   return (
     <div
       data-testid={`team-roster-row-${player.id}`}
       className={cn(
-        'flex items-center justify-between gap-2 rounded-lg border p-2.5 text-sm',
-        rowColorClasses(team, editable && isPending),
+        'relative flex items-center justify-between gap-2 overflow-hidden rounded-lg border p-2.5 text-sm',
+        rowColorClasses(team, showPending),
       )}
     >
+      {showPending && (
+        // Corner flag, on top of the faded team color — that alone read as too subtle a
+        // distinction between pending and saved rows.
+        <span
+          aria-hidden
+          className="absolute top-0 left-0 h-0 w-0 border-t-[14px] border-r-[14px] border-t-error border-r-transparent"
+        />
+      )}
       <div className="min-w-0">
         <p className="truncate font-medium text-dark-grey">
           {player.displayName ?? 'Unknown player'}
