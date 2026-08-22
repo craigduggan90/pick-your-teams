@@ -38,6 +38,7 @@ const invitation1: InvitationModel = {
   game: { id: 'game-1', startTime: scheduledGame.startTime, duration: 60, location: scheduledGame.location },
   organiser,
   invitee: { id: 'user-2', tag: 'monkey-duster', displayName: 'Jordan Monk' },
+  created: '2026-08-01T09:00:00.000Z',
 }
 
 const invitation2: InvitationModel = {
@@ -46,6 +47,7 @@ const invitation2: InvitationModel = {
   game: { id: 'game-1', startTime: scheduledGame.startTime, duration: 60, location: scheduledGame.location },
   organiser,
   invitee: { id: 'user-3', tag: 'f30', displayName: 'Sam Forster' },
+  created: '2026-08-02T09:00:00.000Z',
 }
 
 function FooterActionsStub() {

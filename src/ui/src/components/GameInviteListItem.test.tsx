@@ -14,13 +14,15 @@ const baseInvitation: InvitationModel = {
   },
   organiser: { id: 'organiser-1', tag: 'the-organiser', displayName: 'The Organiser' },
   invitee: { id: 'user-2', tag: 'monkey-duster', displayName: 'Jordan Monk' },
+  created: '2026-08-01T09:00:00.000Z',
 }
 
 describe('GameInviteListItem', () => {
-  it('renders the invitee display name, tag, and status', () => {
+  it('renders the invitee display name, tag, sent date, and status', () => {
     render(<GameInviteListItem invitation={baseInvitation} />)
 
     expect(screen.getByText('Jordan Monk (@monkey-duster)')).toBeInTheDocument()
+    expect(screen.getByText('Sent Saturday 1st August @ 09:00 (UTC)')).toBeInTheDocument()
     expect(screen.getByText('Accepted')).toBeInTheDocument()
   })
 

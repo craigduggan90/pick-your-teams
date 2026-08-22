@@ -15,6 +15,7 @@ const baseInvitation: InvitationModel = {
   },
   organiser: { id: 'user-1', tag: 'little-bobby-tables', displayName: 'Robert D. Tables' },
   invitee: { id: 'user-2', tag: 'monkey-duster', displayName: 'Jordan Monk' },
+  created: '2026-08-01T09:00:00.000Z',
 }
 
 describe('InvitationListItem', () => {

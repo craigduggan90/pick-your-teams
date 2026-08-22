@@ -31,6 +31,7 @@ export interface InvitationModel {
   game: InvitationGameModel
   organiser: InvitationOrganiserModel | null
   invitee: InvitationInviteeModel | null
+  created: string
 }
 
 export interface InvitationsPage {

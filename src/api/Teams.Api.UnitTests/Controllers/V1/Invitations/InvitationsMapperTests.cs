@@ -30,7 +30,7 @@ public static class InvitationsMapperTests
     public class ToModel
     {
         [Fact]
-        public void MapsInvitationGameOrganiserAndInvitee_WhenCalled()
+        public void MapsInvitationGameOrganiserInviteeAndCreated_WhenCalled()
         {
             var organiser = GetOrganiser();
             var invitee = GetInvitee();
@@ -55,6 +55,8 @@ public static class InvitationsMapperTests
             Assert.Equal(invitee.Id, result.Invitee!.Id);
             Assert.Equal(invitee.Tag, result.Invitee.Tag);
             Assert.Equal(invitee.DisplayName, result.Invitee.DisplayName);
+
+            Assert.Equal(invitation.DateCreated, result.Created);
         }
 
         [Fact]

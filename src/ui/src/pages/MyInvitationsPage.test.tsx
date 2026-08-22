@@ -25,6 +25,7 @@ const invitation1: InvitationModel = {
   game: { id: 'game-1', startTime: '2026-08-10T20:00:00.000Z', duration: 60, location: 'Oak Leaf Leisure Centre' },
   organiser: { id: 'organiser-1', tag: 'the-organiser', displayName: 'The Organiser' },
   invitee: { id: 'user-1', tag: 'my-tag', displayName: 'Me' },
+  created: '2026-08-01T09:00:00.000Z',
 }
 
 const invitation2: InvitationModel = {
@@ -33,6 +34,7 @@ const invitation2: InvitationModel = {
   game: { id: 'game-2', startTime: '2026-08-12T18:00:00.000Z', duration: 90, location: 'The Pitch' },
   organiser: { id: 'organiser-2', tag: 'another-organiser', displayName: 'Another Organiser' },
   invitee: { id: 'user-1', tag: 'my-tag', displayName: 'Me' },
+  created: '2026-08-02T09:00:00.000Z',
 }
 
 function FooterActionsStub() {
