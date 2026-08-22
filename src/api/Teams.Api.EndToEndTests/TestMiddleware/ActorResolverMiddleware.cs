@@ -16,7 +16,7 @@ public class ActorResolverMiddleware(RequestDelegate next)
         if (authorizationHeader.StartsWith(BearerPrefix, StringComparison.OrdinalIgnoreCase))
         {
             var id = authorizationHeader[BearerPrefix.Length..].Trim();
-            
+
             var user = await usersRepository.GetByIdAsync(id, context.RequestAborted);
 
             if (user is not null)

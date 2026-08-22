@@ -9,8 +9,8 @@ public static class SeedDataFactory
     public static User[] SeedUsers => field ??= GetSeedUsers();
 
     private static readonly DateTimeOffset BaseDate = DateTimeOffsetProvider.Now;
-    
-    private record UserDetail(int Seed, string UserName, string? Tag);
+
+    private sealed record UserDetail(int Seed, string UserName, string? Tag);
 
     private static UserDetail[] UserDetails =>
     [
@@ -40,10 +40,10 @@ public static class SeedDataFactory
         new(24, "Keith Gillespie", "gillespie"),
         new(25, "David Ginola", "beforeTheNameChange")
     ];
-    
+
     private static User[] GetSeedUsers() =>
         UserDetails.Select(tuple =>
-            { 
+            {
                 tuple.Deconstruct(out var seed, out var name, out var tag);
                 using var idFix = new IdentifierProviderContext($"user-{seed:D3}");
                 using var dtFix = new DateTimeOffsetProviderContext(BaseDate.AddSeconds(seed));
