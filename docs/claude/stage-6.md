@@ -87,13 +87,22 @@ Stage 5 test fixtures that construct `InvitationModel` object literals directly
 (`InvitationListItem.test.tsx`, `MyInvitationsPage.test.tsx`) — needed an `invitee` field once the
 type gained one.
 
+### 8. Follow-up: sent date (`InvitationModel.Created`)
+
+Added right after the rest of the stage landed — the user asked whether a sent date was available
+and wanted it in the UI. `InvitationModel` (the list envelope's item type) didn't carry
+`Created`/`Modified` at all, only `InvitationDetailModel` did; added `Created` to `InvitationModel`
+the same way `Invitee` was added — mirrors `invitation.DateCreated`, no repository change needed.
+`GameInviteListItem` now shows a `Sent {formatGameDateTime(invitation.created)}` line under the
+invitee's name, reusing the existing date formatter rather than writing a new one. **Unlike the
+`Invitee` field, this went on the same branch/PR as the rest of the stage** — the user explicitly
+asked for backend and frontend together this time, rather than the separate
+`backend/stage6-invitee-field` + `stage-6-view-invites` split used for the first field.
+
 ## Explicitly out of scope for this stage
 
 - No diagram exists for this screen at all — built directly from the user's description, not
   against any `docs/ui-design` reference.
-- No date-sent timestamp on each row — `InvitationModel` (the list envelope's item type) doesn't
-  carry `Created`/`Modified`, only `InvitationDetailModel` does. Not worth a per-row detail fetch
-  just for a sent date; the status is the useful information here.
 - No filtering/sorting controls on this screen (by status, by date, etc.) — the user's ask was
   "list the invites and their status," nothing about filtering it further. Easy to add later if
   wanted.
@@ -132,3 +141,7 @@ type gained one.
   `isOrganiser && isScheduled` (acting on a scheduled game only); View Invites is
   `isOrganiser` only, since reviewing past invitations for a finished game is still a legitimate
   thing to want, unlike sending a new invite or recording a result twice.
+- **Sent date: one branch, not two.** The `Invitee` field used a separate `backend/...` branch,
+  merged before the frontend branch started, matching Stage 4's precedent. For `Created`, the user
+  explicitly asked to combine backend and frontend into a single change this time rather than
+  repeat that split — both landed as one commit on `stage-6-view-invites` instead.
