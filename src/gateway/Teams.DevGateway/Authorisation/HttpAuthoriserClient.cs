@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Amazon.Lambda.APIGatewayEvents;
 
 namespace Teams.DevGateway.Authorisation;
