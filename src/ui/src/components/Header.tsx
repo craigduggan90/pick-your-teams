@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useNavigate } from 'react-router'
+import { useSelf } from '@/hooks/useSelf'
 
 export interface HeaderProps {
   title: string
@@ -31,28 +32,25 @@ const homeIcon = <img src="/icon-192.png" alt="" data-testid="home-icon" classNa
 const accountIcon = (
   <img src="/account-settings.png" alt="" data-testid="account-icon" className="size-8 rounded-full" />
 )
-// TEMPORARY: hover-swap is just for previewing the pending-icon color, not final behavior —
-// the real trigger will be the pendingInvitations count from GET /users/self, not :hover.
-const invitationsIcon = (
-  <span className="relative block size-8">
-    <img
-      src="/invitations.png"
-      alt=""
-      data-testid="invitations-icon"
-      className="absolute inset-0 size-8 transition-opacity duration-150 group-hover:opacity-0"
-    />
+
+function InvitationsIcon({ pending }: { pending: boolean }) {
+  return pending ? (
     <img
       src="/invitations-pending.png"
       alt=""
       data-testid="invitations-pending-icon"
-      className="absolute inset-0 size-8 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+      className="size-8"
     />
-  </span>
-)
+  ) : (
+    <img src="/invitations.png" alt="" data-testid="invitations-icon" className="size-8" />
+  )
+}
 
 export function Header({ title }: HeaderProps) {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth0()
+  const selfQuery = useSelf()
+  const hasPendingInvitations = Boolean(selfQuery.data && selfQuery.data.pendingInvitations > 0)
 
   return (
     <header className="flex shrink-0 items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
@@ -66,7 +64,7 @@ export function Header({ title }: HeaderProps) {
       <h1 className="flex-1 truncate text-lg font-medium">{title}</h1>
       {isAuthenticated && (
         <HeaderIconButton label="My Invitations" onClick={() => navigate('/invitations')}>
-          {invitationsIcon}
+          <InvitationsIcon pending={hasPendingInvitations} />
         </HeaderIconButton>
       )}
       {isAuthenticated && (

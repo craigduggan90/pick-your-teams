@@ -1,11 +1,17 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useSelf } from '@/hooks/useSelf'
 import { Header } from './Header'
 
 vi.mock('@auth0/auth0-react')
+vi.mock('@/hooks/useSelf')
+
+beforeEach(() => {
+  vi.mocked(useSelf).mockReturnValue({ data: { pendingInvitations: 0 } } as any)
+})
 
 function renderHeader() {
   return render(
@@ -14,6 +20,7 @@ function renderHeader() {
         <Route path="/games" element={<Header title="Games" />} />
         <Route path="/" element={<p>Home page</p>} />
         <Route path="/account" element={<p>My account page</p>} />
+        <Route path="/invitations" element={<p>My invitations page</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -54,6 +61,42 @@ describe('Header', () => {
       await user.click(screen.getByRole('button', { name: 'My Account' }))
 
       expect(screen.getByText('My account page')).toBeInTheDocument()
+    })
+
+    it('shows the plain invitations icon when there are no pending invitations', () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: true,
+      } as unknown as ReturnType<typeof useAuth0>)
+      vi.mocked(useSelf).mockReturnValue({ data: { pendingInvitations: 0 } } as any)
+
+      renderHeader()
+
+      expect(screen.getByTestId('invitations-icon')).toBeInTheDocument()
+      expect(screen.queryByTestId('invitations-pending-icon')).not.toBeInTheDocument()
+    })
+
+    it('shows the pending invitations icon when pendingInvitations is greater than zero', () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: true,
+      } as unknown as ReturnType<typeof useAuth0>)
+      vi.mocked(useSelf).mockReturnValue({ data: { pendingInvitations: 2 } } as any)
+
+      renderHeader()
+
+      expect(screen.getByTestId('invitations-pending-icon')).toBeInTheDocument()
+      expect(screen.queryByTestId('invitations-icon')).not.toBeInTheDocument()
+    })
+
+    it('navigates to /invitations when the invitations icon is clicked', async () => {
+      vi.mocked(useAuth0).mockReturnValue({
+        isAuthenticated: true,
+      } as unknown as ReturnType<typeof useAuth0>)
+      const user = userEvent.setup()
+      renderHeader()
+
+      await user.click(screen.getByRole('button', { name: 'My Invitations' }))
+
+      expect(screen.getByText('My invitations page')).toBeInTheDocument()
     })
   })
 
