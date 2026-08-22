@@ -1,42 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using Teams.Api.Infrastructure.Converters;
-using Teams.Api.Infrastructure.Errors;
-using Teams.Api.Infrastructure.Swagger;
-using Teams.Api.Infrastructure.Versioning;
-using Teams.Api.Services;
-using Teams.Common;
-using Teams.Core;
-using Teams.Core.Services;
-using Teams.Data;
+using Teams.Api.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
-builder
-    .AddCommonServices()
-    .AddCoreServices()
-    .AddDataServices()
-    .AddVersioning()
-    .AddSwaggerDocumentation()
-    .AddErrorHandling();
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IActorAccessor, ActorAccessor>();
-
-builder.Services
-    .AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
-        options.JsonSerializerOptions.Converters.Add(new UtcNullableDateTimeConverter());
-    });
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
-
-var app = builder.Build();
-
-app.UseSwaggerDocumentation();
-app.UseErrorHandling();
-
-app.UseRouting();
-app.MapControllers();
+var builder = WebApplication.CreateBuilder(args).ConfigureTeamsServices();
+var app = builder.Build().ConfigureTeamsApplication();
 
 app.Run();
 

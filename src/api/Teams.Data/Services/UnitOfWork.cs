@@ -20,7 +20,7 @@ public class UnitOfWork(IApiDbContextFactory factory) : IUnitOfWork, IDisposable
     private ApiDbContext? _context;
 
     /// <summary>The database context for this unit of work.</summary>
-    private ApiDbContext Context => _context ??= factory.CreateDbContext(ContextType.ReadWrite);
+    public ApiDbContext Context => _context ??= factory.CreateDbContext(ContextType.ReadWrite);
 
     /// <inheritdoc />
     public IPlayersRepository Players => field ??= new PlayersRepository(Context);
