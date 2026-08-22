@@ -87,6 +87,7 @@ public static partial class InvitationsControllerTests
         public async Task ShouldReturnOk_WhenActorIsOrganiser()
         {
             var existingInvitation = SeedInvitations[0];
+            var invitee = SeedInvitees.Single(u => u.Id == existingInvitation.UserId);
 
             var request = CreateRequest(HttpMethod.Get, $"{Url}/{existingInvitation.Id}");
             WithActorHeaders(request, Organiser);
@@ -100,6 +101,9 @@ public static partial class InvitationsControllerTests
             Assert.Equal(existingInvitation.Status.ToString(), content.Status);
             Assert.Equal(SeedGame.Id, content.Game.Id);
             Assert.Equal(Organiser.Id, content.Organiser!.Id);
+            Assert.Equal(invitee.Id, content.Invitee!.Id);
+            Assert.Equal(invitee.Tag, content.Invitee.Tag);
+            Assert.Equal(invitee.DisplayName, content.Invitee.DisplayName);
         }
 
         [Fact]

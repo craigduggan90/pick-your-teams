@@ -10,6 +10,8 @@ public static class InvitationsMapperTests
 {
     private static User GetOrganiser() => new("Test Organiser", "external-id", "organiser@test.net", null);
 
+    private static User GetInvitee() => new("Test Invitee", "external-id-2", "invitee@test.net", null);
+
     private static Game GetGame(User organiser) =>
         new(organiser.Id, "Oak Leaf Leisure Centre", new DateTime(2026, 8, 10, 19, 0, 0, DateTimeKind.Utc), 60, 5)
         {
@@ -19,17 +21,21 @@ public static class InvitationsMapperTests
     private static Game GetGameWithoutOrganiser() =>
         new("missing-organiser-id", "Oak Leaf Leisure Centre", new DateTime(2026, 8, 10, 19, 0, 0, DateTimeKind.Utc), 60, 5);
 
-    private static Invitation GetInvitation(Game game) =>
-        new(game.Id, "user-id", "invitee@test.net") { Game = game };
+    // The User navigation property is only populated by EF Core's .Include (see
+    // ReadOnlyInvitationsRepository) - it must be set explicitly here since these entities are
+    // built in-memory, not loaded from the database.
+    private static Invitation GetInvitation(Game game, User? invitee = null) =>
+        new(game.Id, invitee?.Id ?? "user-id", invitee?.EmailAddress ?? "invitee@test.net") { Game = game, User = invitee };
 
     public class ToModel
     {
         [Fact]
-        public void MapsInvitationGameAndOrganiser_WhenCalled()
+        public void MapsInvitationGameOrganiserAndInvitee_WhenCalled()
         {
             var organiser = GetOrganiser();
+            var invitee = GetInvitee();
             var game = GetGame(organiser);
-            var invitation = GetInvitation(game);
+            var invitation = GetInvitation(game, invitee);
             invitation.Accept();
 
             var result = invitation.ToModel();
@@ -45,6 +51,10 @@ public static class InvitationsMapperTests
             Assert.Equal(organiser.Id, result.Organiser!.Id);
             Assert.Equal(organiser.Tag, result.Organiser.Tag);
             Assert.Equal(organiser.DisplayName, result.Organiser.DisplayName);
+
+            Assert.Equal(invitee.Id, result.Invitee!.Id);
+            Assert.Equal(invitee.Tag, result.Invitee.Tag);
+            Assert.Equal(invitee.DisplayName, result.Invitee.DisplayName);
         }
 
         [Fact]
@@ -57,16 +67,29 @@ public static class InvitationsMapperTests
 
             Assert.Null(result.Organiser);
         }
+
+        [Fact]
+        public void SetsInviteeToNull_WhenInvitationHasNoUser()
+        {
+            var organiser = GetOrganiser();
+            var game = GetGame(organiser);
+            var invitation = GetInvitation(game);
+
+            var result = invitation.ToModel();
+
+            Assert.Null(result.Invitee);
+        }
     }
 
     public class ToDetailModel
     {
         [Fact]
-        public void MapsInvitationGameOrganiserAndTimestamps_WhenCalled()
+        public void MapsInvitationGameOrganiserInviteeAndTimestamps_WhenCalled()
         {
             var organiser = GetOrganiser();
+            var invitee = GetInvitee();
             var game = GetGame(organiser);
-            var invitation = GetInvitation(game);
+            var invitation = GetInvitation(game, invitee);
             invitation.Decline();
 
             var result = invitation.ToDetailModel();
@@ -83,6 +106,10 @@ public static class InvitationsMapperTests
             Assert.Equal(organiser.Tag, result.Organiser.Tag);
             Assert.Equal(organiser.DisplayName, result.Organiser.DisplayName);
 
+            Assert.Equal(invitee.Id, result.Invitee!.Id);
+            Assert.Equal(invitee.Tag, result.Invitee.Tag);
+            Assert.Equal(invitee.DisplayName, result.Invitee.DisplayName);
+
             Assert.Equal(invitation.DateCreated, result.Created);
             Assert.Equal(invitation.DateModified, result.Modified);
         }
@@ -96,6 +123,18 @@ public static class InvitationsMapperTests
             var result = invitation.ToDetailModel();
 
             Assert.Null(result.Organiser);
+        }
+
+        [Fact]
+        public void SetsInviteeToNull_WhenInvitationHasNoUser()
+        {
+            var organiser = GetOrganiser();
+            var game = GetGame(organiser);
+            var invitation = GetInvitation(game);
+
+            var result = invitation.ToDetailModel();
+
+            Assert.Null(result.Invitee);
         }
     }
 
