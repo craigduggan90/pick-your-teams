@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prod": "vite --mode production",
     "watch": "concurrently -n vite,tsc -c blue,yellow \"vite\" \"tsc -b --watch --preserveWatchOutput\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint",

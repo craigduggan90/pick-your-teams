@@ -12,9 +12,11 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "commitlint": "^19.8.1",
+    "concurrently": "^10.0.5",
     "husky": "^9.1.7"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:all": "concurrently -n api,authoriser,gateway,ui -c green,yellow,magenta,blue --kill-others \"dotnet run --project src/api/Teams.Api\" \"dotnet run --project src/authoriser/Teams.Authoriser.LocalHost\" \"dotnet run --project src/gateway/Teams.DevGateway\" \"npm run dev --prefix src/ui\""
   }
 }

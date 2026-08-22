@@ -1,39 +1,122 @@
 name: Build and Test
-on: 
+on:
   - push
+  - pull_request
 
 jobs:
   build-and-test:
     name: build and test project
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Api
+            directory: src/api
+            solution: Teams.sln
+            coverageDir: api
+          - name: Authoriser
+            directory: src/authoriser
+            solution: Teams.Authoriser.sln
+            coverageDir: authoriser
+          - name: Gateway
+            directory: src/gateway
+            solution: Teams.DevGateway.sln
+            coverageDir: gateway
     steps:
       - name: 📩 checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: ⚙️ setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-          
+
       - name: ☁️ install tools
+        if: github.event_name == 'pull_request'
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
-        
+
       - name: 🔨 build solution
-        working-directory: src/api
+        working-directory: ${{ matrix.directory }}
         run: |
           dotnet restore
           dotnet build --no-restore
 
       - name: 🧪 run tests
-        working-directory: src/api
+        if: github.event_name != 'pull_request'
+        working-directory: ${{ matrix.directory }}
+        run: dotnet test ./${{ matrix.solution }} --configuration Release
+
+      - name: 🧪 run tests with coverage
+        if: github.event_name == 'pull_request'
+        working-directory: ${{ matrix.directory }}
         run: |
-          dotnet test ./Teams.sln --configuration Release --collect "XPlat Code Coverage"
-          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:./../../coverage/api -reporttypes:MarkdownSummaryGithub -filefilters:"-*/Migrations/*"
-          
+          dotnet test ./${{ matrix.solution }} --configuration Release --collect "XPlat Code Coverage"
+          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:./../../coverage/${{ matrix.coverageDir }} -reporttypes:MarkdownSummaryGithub -filefilters:"-*/Migrations/*"
+
       - name: 💾 publish coverage report
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v7
         with:
-          name: ApiCoverageReport
-          path: coverage/api/SummaryGithub.md
+          name: ${{ matrix.name }}CoverageReport
+          path: coverage/${{ matrix.coverageDir }}/SummaryGithub.md
+
+  comment-coverage:
+    name: comment coverage on pr
+    needs: build-and-test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: 📥 download coverage reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: "*CoverageReport"
+          path: coverage-reports
+
+      - name: 💬 comment coverage on pr
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs')
+            const path = require('path')
+
+            const reportsDir = 'coverage-reports'
+            const sections = fs.readdirSync(reportsDir)
+              .sort()
+              .map((dir) => {
+                const summaryPath = path.join(reportsDir, dir, 'SummaryGithub.md')
+                const name = dir.replace(/CoverageReport$/, '')
+                const summary = fs.readFileSync(summaryPath, 'utf8')
+                return `<details><summary>${name}</summary>\n\n${summary}\n\n</details>`
+              })
+
+            const marker = '<!-- coverage-report -->'
+            const body = `${marker}\n## Coverage\n\n${sections.join('\n\n')}`
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+
+            const existing = comments.find((comment) => comment.body?.includes(marker))
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              })
+            }
