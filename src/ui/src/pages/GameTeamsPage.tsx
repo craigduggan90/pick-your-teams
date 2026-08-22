@@ -298,9 +298,7 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
         onRemove={handleRemoveRequest}
         topContent={
           <div className="flex flex-wrap gap-2">
-            {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram,
-                disabled until that stage lands. See docs/claude/stage-3.md. */}
-            <Button variant="outline" className="flex-1" disabled>
+            <Button variant="outline" className="flex-1" onClick={() => navigate(`/games/${gameId}/invite`)}>
               Invite Players
             </Button>
             <AddNonUserPlayerForm
