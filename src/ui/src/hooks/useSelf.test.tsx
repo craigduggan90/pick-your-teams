@@ -41,6 +41,7 @@ describe('useSelf', () => {
       mobile: null,
       created: '2026-01-01T00:00:00Z',
       modified: '2026-01-01T00:00:00Z',
+      pendingInvitations: 0,
     })
 
     const { result } = renderHook(() => useSelf(), { wrapper })
