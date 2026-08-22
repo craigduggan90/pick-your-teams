@@ -8,6 +8,7 @@ public record InvitationDetailModel(
     string Status,
     InvitationGameModel Game,
     InvitationOrganiserModel? Organiser,
+    InvitationInviteeModel? Invitee,
     DateTime Created,
     DateTime Modified)
 {
@@ -17,6 +18,7 @@ public record InvitationDetailModel(
         Status: nameof(InvitationStatusEnum.Declined),
         Game: InvitationGameModel.Example,
         Organiser: InvitationOrganiserModel.Example,
+        Invitee: InvitationInviteeModel.Example,
         Created: new DateTime(2026, 07, 27, 9, 31, 46, DateTimeKind.Utc),
         Modified: new DateTime(2026, 07, 31, 17, 42, 17, DateTimeKind.Utc));
 }

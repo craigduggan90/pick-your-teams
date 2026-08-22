@@ -14,7 +14,8 @@ public static class InvitationsMapper
         Id: invitation.Id,
         Status: invitation.Status.ToString(),
         Game: invitation.Game.ToModel(),
-        Organiser: invitation.Game.Organiser?.ToModel());
+        Organiser: invitation.Game.Organiser?.ToModel(),
+        Invitee: invitation.User?.ToInviteeModel());
 
     private static InvitationGameModel ToModel(this Game game) => new(
         Id: game.Id,
@@ -27,11 +28,17 @@ public static class InvitationsMapper
         Tag: user.Tag,
         DisplayName: user.DisplayName);
 
+    private static InvitationInviteeModel ToInviteeModel(this User user) => new(
+        Id: user.Id,
+        Tag: user.Tag,
+        DisplayName: user.DisplayName);
+
     public static InvitationDetailModel ToDetailModel(this Invitation invitation) => new(
         Id: invitation.Id,
         Status: invitation.Status.ToString(),
         Game: invitation.Game.ToModel(),
         Organiser: invitation.Game.Organiser?.ToModel(),
+        Invitee: invitation.User?.ToInviteeModel(),
         Created: invitation.DateCreated,
         Modified: invitation.DateModified);
 

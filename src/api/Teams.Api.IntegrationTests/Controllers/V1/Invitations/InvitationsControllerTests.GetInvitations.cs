@@ -139,6 +139,7 @@ public static partial class InvitationsControllerTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(content);
             Assert.Equal(30, content.Data.Count);
+            Assert.All(content.Data, item => Assert.NotNull(item.Invitee));
         }
 
         [Fact]
