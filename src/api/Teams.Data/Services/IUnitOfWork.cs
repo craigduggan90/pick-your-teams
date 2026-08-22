@@ -1,4 +1,5 @@
-﻿using Teams.Data.Repositories.Games;
+﻿using Teams.Data.Context;
+using Teams.Data.Repositories.Games;
 using Teams.Data.Repositories.Invitations;
 using Teams.Data.Repositories.Players;
 using Teams.Data.Repositories.Users;
@@ -8,6 +9,8 @@ namespace Teams.Data.Services;
 
 public interface IUnitOfWork
 {
+    ApiDbContext Context { get; }
+    
     /// <summary>Accessor for the <see cref="Player"/> repository.</summary>
     IPlayersRepository Players { get; }
 
