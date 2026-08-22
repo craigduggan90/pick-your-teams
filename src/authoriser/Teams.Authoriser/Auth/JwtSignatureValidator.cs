@@ -1,6 +1,6 @@
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Teams.Authoriser.Auth;
 
