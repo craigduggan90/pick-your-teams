@@ -161,6 +161,11 @@ export function GameViewPage() {
       </div>
 
       <div className="flex flex-col gap-2">
+        {isOrganiser && (
+          <Button variant="outline" onClick={() => navigate(`/games/${id}/invites`)}>
+            View Invites
+          </Button>
+        )}
         {isOrganiser && isScheduled && (
           <Button variant="outline" onClick={() => setRecordResultOpen(true)}>
             Record Result

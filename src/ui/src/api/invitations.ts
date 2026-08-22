@@ -13,6 +13,16 @@ export interface InvitationOrganiserModel {
   displayName: string
 }
 
+// Same shape as InvitationOrganiserModel, kept as a distinct type to match the backend's own
+// InvitationInviteeModel — nullable because the domain model's User navigation is nullable
+// end-to-end, though every current invitation resolves a real user (tag-only invites, no
+// email-only fallback).
+export interface InvitationInviteeModel {
+  id: string
+  tag: string
+  displayName: string
+}
+
 export type InvitationStatus = 'Open' | 'Accepted' | 'Declined' | 'Failed'
 
 export interface InvitationModel {
@@ -20,6 +30,8 @@ export interface InvitationModel {
   status: InvitationStatus
   game: InvitationGameModel
   organiser: InvitationOrganiserModel | null
+  invitee: InvitationInviteeModel | null
+  created: string
 }
 
 export interface InvitationsPage {

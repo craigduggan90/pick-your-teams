@@ -8,7 +8,8 @@ public record InvitationModel(
     string Status,
     InvitationGameModel Game,
     InvitationOrganiserModel? Organiser,
-    InvitationInviteeModel? Invitee)
+    InvitationInviteeModel? Invitee,
+    DateTime Created)
 {
     [ExcludeFromCodeCoverage]
     public static InvitationModel Example => new(
@@ -16,5 +17,6 @@ public record InvitationModel(
         Status: nameof(InvitationStatusEnum.Accepted),
         Game: InvitationGameModel.Example,
         Organiser: InvitationOrganiserModel.Example,
-        Invitee: InvitationInviteeModel.Example);
+        Invitee: InvitationInviteeModel.Example,
+        Created: new DateTime(2026, 07, 27, 9, 31, 46, DateTimeKind.Utc));
 }

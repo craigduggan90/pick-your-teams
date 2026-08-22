@@ -140,6 +140,7 @@ public static partial class InvitationsControllerTests
             Assert.NotNull(content);
             Assert.Equal(30, content.Data.Count);
             Assert.All(content.Data, item => Assert.NotNull(item.Invitee));
+            Assert.All(content.Data, item => Assert.NotEqual(default, item.Created));
         }
 
         [Fact]

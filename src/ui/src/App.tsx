@@ -19,6 +19,7 @@ import { NewGamePage } from '@/pages/NewGamePage'
 import { GameTeamsPage } from '@/pages/GameTeamsPage'
 import { InvitePlayersPage } from '@/pages/InvitePlayersPage'
 import { MyInvitationsPage } from '@/pages/MyInvitationsPage'
+import { GameInvitesPage } from '@/pages/GameInvitesPage'
 
 const queryClient = new QueryClient()
 
@@ -114,6 +115,14 @@ export default function App() {
                     element={
                       <RequireAuthAndTag>
                         <InvitePlayersPage />
+                      </RequireAuthAndTag>
+                    }
+                  />
+                  <Route
+                    path="/games/:id/invites"
+                    element={
+                      <RequireAuthAndTag>
+                        <GameInvitesPage />
                       </RequireAuthAndTag>
                     }
                   />

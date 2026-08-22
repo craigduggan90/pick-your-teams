@@ -15,7 +15,8 @@ public static class InvitationsMapper
         Status: invitation.Status.ToString(),
         Game: invitation.Game.ToModel(),
         Organiser: invitation.Game.Organiser?.ToModel(),
-        Invitee: invitation.User?.ToInviteeModel());
+        Invitee: invitation.User?.ToInviteeModel(),
+        Created: invitation.DateCreated);
 
     private static InvitationGameModel ToModel(this Game game) => new(
         Id: game.Id,
