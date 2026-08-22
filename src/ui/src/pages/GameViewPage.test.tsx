@@ -82,6 +82,7 @@ function renderPage() {
           <Routes>
             <Route path="/games/:id" element={<GameViewPage />} />
             <Route path="/games/:id/teams" element={<p>Teams screen</p>} />
+            <Route path="/games/:id/invites" element={<p>Invites screen</p>} />
             <Route path="/" element={<p>Games list</p>} />
           </Routes>
           <FooterActionsStub />
@@ -130,9 +131,20 @@ describe('GameViewPage', () => {
       expect(screen.getByLabelText('Location')).toBeEnabled()
       expect(screen.getByLabelText('Duration')).toBeEnabled()
       expect(screen.getByRole('button', { name: 'Manage Teams' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'View Invites' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Record Result' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+    })
+
+    it('navigates to the invites screen via View Invites', async () => {
+      setUp()
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'View Invites' }))
+
+      expect(screen.getByText('Invites screen')).toBeInTheDocument()
     })
 
     it('saves edits via the footer Save button', async () => {
@@ -193,6 +205,7 @@ describe('GameViewPage', () => {
       expect(screen.getByLabelText('Location')).toBeDisabled()
       expect(screen.queryByRole('button', { name: 'Manage Teams' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Teams' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'View Invites' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Delete Game' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
@@ -213,6 +226,7 @@ describe('GameViewPage', () => {
 
       expect(screen.getByText('Winner: Home Team!')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Teams' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'View Invites' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
