@@ -40,9 +40,13 @@ export async function apiFetch<T>(
     throw new ApiError(response.status, problem)
   }
 
-  if (response.status === 204) {
+  // Not every empty-body success response is a 204 — e.g. CreateInvitations returns a bare
+  // StatusCode(201) with no body. Parsing an empty body as JSON throws a SyntaxError, so check
+  // the actual body instead of assuming only 204 is body-less.
+  const text = await response.text()
+  if (!text) {
     return undefined as T
   }
 
-  return response.json() as Promise<T>
+  return JSON.parse(text) as T
 }

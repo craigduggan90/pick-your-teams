@@ -161,13 +161,6 @@ export function GameViewPage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        {/* Invite Players has no built screen yet (Stage 5) — rendered per the diagram, disabled
-            until that stage lands. See docs/claude/stage-3.md. */}
-        {isOrganiser && isScheduled && (
-          <Button variant="outline" disabled>
-            Invite Players
-          </Button>
-        )}
         {isOrganiser && isScheduled && (
           <Button variant="outline" onClick={() => setRecordResultOpen(true)}>
             Record Result

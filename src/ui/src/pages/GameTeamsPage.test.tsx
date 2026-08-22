@@ -123,6 +123,7 @@ function renderPage() {
           <Routes>
             <Route path="/games/:id/teams" element={<GameTeamsPage />} />
             <Route path="/games/:id" element={<p>Game view</p>} />
+            <Route path="/games/:id/invite" element={<p>Invite players</p>} />
             <Route path="/" element={<p>Games list</p>} />
           </Routes>
           <FooterActionsStub />
@@ -230,8 +231,18 @@ describe('GameTeamsPage', () => {
       expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Generate' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Invite Players' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Invite Players' })).toBeEnabled()
       expect(screen.getByRole('button', { name: 'Add Non-User Player' })).toBeInTheDocument()
+    })
+
+    it('Invite Players navigates to the invite screen', async () => {
+      setUp(scheduledGame, 'organiser-1')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Invite Players' }))
+
+      expect(screen.getByText('Invite players')).toBeInTheDocument()
     })
 
     it('Back returns to the games list, not the game-details screen', async () => {
