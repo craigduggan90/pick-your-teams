@@ -19,10 +19,6 @@ jobs:
             directory: src/authoriser
             solution: Teams.Authoriser.sln
             coverageDir: authoriser
-          - name: Gateway
-            directory: src/gateway
-            solution: Teams.DevGateway.sln
-            coverageDir: gateway
     steps:
       - name: 📩 checkout
         uses: actions/checkout@v4

@@ -18,10 +18,10 @@ No auth logic of its own. On every request:
    `Teams-User-Id`/`Tag`/`Name` headers and forward through to `Teams.Api`. See the `TODO` in
    `Authorisation/AuthorisationHandler.cs`.
 
-Built with ASP.NET Core minimal API + YARP (`Yarp.ReverseProxy`). All of the actual logic —
-building the authorizer request, calling it, interpreting Allow/Deny — lives in
-`Authorisation/`, unit tested (`Teams.DevGateway.UnitTests`, xUnit v3 + NSubstitute). `Program.cs`
-itself is thin: it wires the middleware and YARP together.
+Built with ASP.NET Core minimal API + YARP (`Yarp.ReverseProxy`). The actual logic — building the
+authorizer request, calling it, interpreting Allow/Deny — lives in `Authorisation/`, kept small
+and readable rather than unit tested; this is a dev tool, not a shipped component.
+`Program.cs` itself is thin: it wires the middleware and YARP together.
 
 ## Config
 
