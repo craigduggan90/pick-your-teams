@@ -28,6 +28,16 @@ describe('apiFetch', () => {
     expect(result).toBeUndefined()
   })
 
+  // CreateInvitations returns a bare StatusCode(201) with no body — not every empty-body success
+  // response is a 204, so this must not be treated as a JSON-parse failure.
+  it('returns undefined for a 201 response with no body', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 201 })))
+
+    const result = await apiFetch('/v1/invitations', { token: 'abc123', method: 'POST' })
+
+    expect(result).toBeUndefined()
+  })
+
   it('sends a JSON body and Content-Type when a body is provided', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
     vi.stubGlobal('fetch', fetchMock)

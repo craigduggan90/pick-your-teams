@@ -11,6 +11,7 @@ export interface UserDetailModel {
   mobile: string | null
   created: string
   modified: string
+  pendingInvitations: number
 }
 
 // Request bodies stay PascalCase, matching the C# request DTO directly — ASP.NET Core's model

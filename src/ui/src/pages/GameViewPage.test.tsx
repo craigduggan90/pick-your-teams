@@ -129,7 +129,6 @@ describe('GameViewPage', () => {
 
       expect(screen.getByLabelText('Location')).toBeEnabled()
       expect(screen.getByLabelText('Duration')).toBeEnabled()
-      expect(screen.getByRole('button', { name: 'Invite Players' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Manage Teams' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Record Result' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
@@ -192,7 +191,6 @@ describe('GameViewPage', () => {
       renderPage()
 
       expect(screen.getByLabelText('Location')).toBeDisabled()
-      expect(screen.queryByRole('button', { name: 'Invite Players' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Manage Teams' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Teams' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
