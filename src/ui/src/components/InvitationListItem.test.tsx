@@ -14,6 +14,7 @@ const baseInvitation: InvitationModel = {
     location: 'Oak Leaf Leisure Centre',
   },
   organiser: { id: 'user-1', tag: 'little-bobby-tables', displayName: 'Robert D. Tables' },
+  invitee: { id: 'user-2', tag: 'monkey-duster', displayName: 'Jordan Monk' },
 }
 
 describe('InvitationListItem', () => {
