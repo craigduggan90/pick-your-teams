@@ -254,11 +254,15 @@ controllable fake identity, not a real Auth0 login, so this still goes through
   the backend PR reviewable on its own, and means a dependent frontend branch only ever builds
   against a merged, real API contract — never speculative shared history.
 - Commit in small, logical chunks rather than one commit at the end.
-- **Before pushing any backend change, run `dotnet format --verify-no-changes` from `src/api`**
-  (add `--exclude ./Teams.Data/Context/Migrations/`, matching `.github/workflows/dotnet-linting.yml`)
-  — also run from `src/authoriser`/`src/gateway` if those changed. Nothing local enforces this
-  (no pre-commit/pre-push hook), only CI does, so a formatting slip isn't visible until the PR's
-  checks run — catch it before pushing instead.
+- **Before pushing any backend change, run both `dotnet format --verify-no-changes` and a full
+  `dotnet build` from `src/api`** (add `--exclude ./Teams.Data/Context/Migrations/` to the format
+  command, matching `.github/workflows/dotnet-linting.yml`) — also from `src/authoriser`/
+  `src/gateway` if those changed. **The two checks aren't redundant** — a clean
+  `dotnet format --verify-no-changes` doesn't guarantee a warning-free build; an unused `using`
+  has shown up as a build-only `IDE0005` warning that `dotnet format` didn't flag or fix. Check the
+  build output's warning count is `0 Warning(s)` explicitly. Nothing local enforces either (no
+  pre-commit/pre-push hook), only CI does, so a slip isn't visible until the PR's checks run —
+  catch it before pushing instead.
 - Push the branch and open a **draft PR** — never push directly to `main`. Existing `.husky` hooks
   and CI should run against the PR.
 - Wait for review/merge before branching further work off the updated `main`.
