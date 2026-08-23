@@ -11,6 +11,7 @@ using Teams.Core.UseCases.Users;
 using Teams.Core.UseCases.Users.CreateUser;
 using Teams.Core.UseCases.Users.DeleteUser;
 using Teams.Core.UseCases.Users.GetSelf;
+using Teams.Core.UseCases.Users.GetUserByExternalId;
 using Teams.Core.UseCases.Users.GetUserById;
 using Teams.Core.UseCases.Users.GetUsers;
 using Teams.Core.UseCases.Users.UpdateUser;
@@ -166,6 +167,29 @@ public static class UsersControllerTests
             AssertResultValue<OkObjectResult, UserDetailModel>(rawResult, expected);
 
             await Mediator.Received(1).SendAsync(Arg.Is<GetUserByIdQuery>(q => q.Id == id), Arg.Any<CancellationToken>());
+        }
+    }
+
+    public class GetUserByExternalId : UserControllerTestsBase
+    {
+        [Fact]
+        public async Task ShouldReturnOk_WhenSuccess()
+        {
+            const string externalId = "auth0|test-external-id";
+            var user = GetUser(externalId: externalId);
+
+            Mediator.SendAsync(Arg.Any<GetUserByExternalIdQuery>(), Arg.Any<CancellationToken>())
+                .Returns(user);
+
+            var expected = user.ToModel();
+
+            var sut = GetOrCreateSut();
+            var rawResult = await sut.GetUserByExternalId(externalId, TestContext.Current.CancellationToken);
+
+            AssertResultValue<OkObjectResult, UserModel>(rawResult, expected);
+
+            await Mediator.Received(1).SendAsync(
+                Arg.Is<GetUserByExternalIdQuery>(q => q.ExternalId == externalId), Arg.Any<CancellationToken>());
         }
     }
 
