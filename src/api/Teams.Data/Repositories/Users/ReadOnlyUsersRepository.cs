@@ -24,7 +24,7 @@ public class ReadOnlyUsersRepository(ApiDbContext context)
 
     /// <inheritdoc />
     public async Task<User?> GetByEmailAddressAsync(string emailAddress, CancellationToken cancellationToken) =>
-        await Context.Users.SingleOrDefaultAsync(entity => entity.EmailAddress == emailAddress, cancellationToken);
+        await Context.Users.SingleOrDefaultAsync(entity => entity.EmailAddress.ToLower() == emailAddress.ToLower(), cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> GetByPhoneNumberAsync(string mobile, CancellationToken cancellationToken) =>

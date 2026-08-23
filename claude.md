@@ -74,10 +74,13 @@ silently reconciling it.
 - **`apiFetch` (`api/client.ts`) treats any empty response body as `undefined`, not just a 204.**
   Some endpoints (`CreateInvitations`) return a bare `201` with no body — assuming only 204 is
   empty caused a real bug where a successful request was reported to the user as a generic error.
-- **Tag lookups are case-insensitive on the backend** (`IReadOnlyUsersRepository.GetByTagAsync`,
-  compared via `.ToLower()` since SQLite's default collation is case-sensitive) — this covers both
-  invitation creation and tag-conflict checks on `UpdateUser`. A real bug had invitations silently
-  fail to match a tag that differed only in casing from what the user actually typed.
+- **Tag and email lookups are case-insensitive on the backend** (`IReadOnlyUsersRepository`'s
+  `GetByTagAsync`/`GetByEmailAddressAsync`, both compared via `.ToLower()` since SQLite's default
+  collation is case-sensitive) — this covers invitation creation, the tag-conflict check on
+  `UpdateUser`, and the email-conflict check on `CreateUser`. A real bug had invitations silently
+  fail to match a tag that differed only in casing from what the user actually typed. If this ever
+  moves off SQLite, re-check whether `.ToLower()` is still needed — MySQL/Aurora MySQL's default
+  collations are already case-insensitive, so it'd be redundant there (though harmless).
 - **The confirmation-dialog / bottom-sheet primitive is `Sheet` (`components/Sheet.tsx`), not
   `Modal`.** `Modal` (a centered dialog) was removed and replaced everywhere with `Sheet` (slides
   up from the bottom); same prop shape, drop-in replacement.
