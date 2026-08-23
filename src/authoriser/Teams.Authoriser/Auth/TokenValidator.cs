@@ -13,7 +13,8 @@ public record TokenValidationResult(TokenValidationOutcome Outcome, string? Subj
 
 /// <summary>
 /// Orchestrates the real validation path: parse → fetch JWKS → match `kid` → verify signature.
-/// Does not resolve a token's subject to a Teams.Api user — see the TODO in Function.cs for why.
+/// Only validates the token itself - turning a valid token into a resolved Teams.Api user is
+/// UserResolver's job, not this class's.
 /// </summary>
 public class TokenValidator(IJwksClient jwksClient, string issuer, string audience)
 {
@@ -22,7 +23,8 @@ public class TokenValidator(IJwksClient jwksClient, string issuer, string audien
         if (!BearerTokenParser.TryGetBearerToken(authorizationHeader, out var token)
             || !JwtReader.TryReadJwt(token, out var jwt)
             || jwt is null
-            || string.IsNullOrEmpty(jwt.Header.Kid))
+            || string.IsNullOrEmpty(jwt.Header.Kid)
+            || string.IsNullOrEmpty(jwt.Subject))
         {
             return new TokenValidationResult(TokenValidationOutcome.MissingOrMalformed);
         }

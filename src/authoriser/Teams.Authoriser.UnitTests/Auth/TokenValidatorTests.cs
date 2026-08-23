@@ -50,6 +50,21 @@ public class TokenValidatorTests
     }
 
     [Fact]
+    public async Task ValidateAsync_returns_MissingOrMalformed_without_calling_the_jwks_client_when_subject_is_missing()
+    {
+        var (_, key) = TestTokenFactory.CreateSigningCertificate();
+        var token = TestTokenFactory.CreateSignedJwt(key, "kid-1", Issuer, Audience, subject: "");
+
+        var jwksClient = Substitute.For<IJwksClient>();
+        var validator = new TokenValidator(jwksClient, Issuer, Audience);
+
+        var result = await validator.ValidateAsync($"Bearer {token}", CancellationToken.None);
+
+        Assert.Equal(TokenValidationOutcome.MissingOrMalformed, result.Outcome);
+        await jwksClient.DidNotReceive().GetJwksAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ValidateAsync_returns_SignatureInvalid_when_no_key_matches_the_kid()
     {
         var (_, key) = TestTokenFactory.CreateSigningCertificate();

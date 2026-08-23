@@ -10,47 +10,51 @@ namespace Teams.Authoriser;
 /// <summary>
 /// Local-dev stand-in for the production Lambda authorizer described in claude.md's Auth model
 /// section. Validates the caller's Auth0-issued token for real (JWKS signature check against the
-/// dev tenant, via <see cref="Auth.TokenValidator"/>) but always denies for now: turning a
-/// verified token into a resolved User is blocked on a Teams.Api endpoint that doesn't exist yet
-/// (see the TODO below). Deliberately thin and not unit tested itself — all of the real logic
-/// lives in the Auth/ modules, which are.
+/// dev tenant, via <see cref="Auth.TokenValidator"/>), then resolves it to a Teams.Api user (via
+/// <see cref="Auth.UserResolver"/>) - looking one up by external id, or creating one from the
+/// token's own Auth0 /userinfo profile on first login. Any failure along the way denies.
+/// Deliberately thin and not unit tested itself - all of the real logic lives in the Auth/
+/// modules, which are.
 /// </summary>
 public class Function
 {
     private const string Auth0Domain = "dev-e1zjkp6ynw1uag2f.us.auth0.com";
     private const string Audience = "http://localhost:5199";
+    private const string TeamsApiBaseUrl = "http://localhost:5199";
 
     private readonly TokenValidator tokenValidator = new(
         new Auth0JwksClient(new HttpClient(), Auth0Domain),
         issuer: $"https://{Auth0Domain}/",
         audience: Audience);
 
-    public async Task<APIGatewayCustomAuthorizerResponse> FunctionHandler(
+    private readonly UserResolver userResolver = new(
+        new TeamsApiClient(new HttpClient { BaseAddress = new Uri(TeamsApiBaseUrl) }),
+        new Auth0UserInfoClient(new HttpClient(), Auth0Domain));
+
+    public async Task<APIGatewayCustomAuthorizerV2IamResponse> FunctionHandler(
         APIGatewayCustomAuthorizerRequest request, ILambdaContext context)
     {
         var authorizationHeader = AuthorizationHeaderReader.GetAuthorizationHeader(request.Headers);
         var result = await tokenValidator.ValidateAsync(authorizationHeader, CancellationToken.None);
 
-        switch (result.Outcome)
+        if (result.Outcome != TokenValidationOutcome.Valid || result.Subject is null)
         {
-            case TokenValidationOutcome.MissingOrMalformed:
-                context.Logger.LogInformation("Denying: missing or malformed bearer token.");
-                break;
-            case TokenValidationOutcome.SignatureInvalid:
-                context.Logger.LogInformation("Denying: JWT signature/claims failed validation.");
-                break;
-            case TokenValidationOutcome.Valid:
-                // TODO: look the user up by external id (result.Subject, the JWT 'sub' claim)
-                // once Teams.Api exposes a GetByExternalId lookup; if it returns null, create the
-                // user for that external id (see Teams.Core's CreateUserCommand). Until then a
-                // verified token still denies, and the resolved user's Id/Tag/DisplayName should
-                // be returned via the response's Context so Teams.DevGateway can turn them into
-                // the Teams-User-* headers Teams.Api requires.
-                context.Logger.LogInformation(
-                    $"Token verified for sub={result.Subject}, but user resolution isn't built yet — denying.");
-                break;
+            context.Logger.LogInformation(result.Outcome == TokenValidationOutcome.MissingOrMalformed
+                ? "Denying: missing or malformed bearer token."
+                : "Denying: JWT signature/claims failed validation.");
+            return AuthorizerPolicyFactory.Deny(request.MethodArn);
         }
 
-        return AuthorizerPolicyFactory.Deny(request.MethodArn);
+        BearerTokenParser.TryGetBearerToken(authorizationHeader, out var accessToken);
+        var resolvedUser = await userResolver.ResolveAsync(result.Subject, accessToken, CancellationToken.None);
+
+        if (resolvedUser is null)
+        {
+            context.Logger.LogInformation($"Denying: could not resolve or create a user for sub={result.Subject}.");
+            return AuthorizerPolicyFactory.Deny(request.MethodArn);
+        }
+
+        context.Logger.LogInformation($"Allowing: resolved user {resolvedUser.Id} for sub={result.Subject}.");
+        return AuthorizerPolicyFactory.Allow(request.MethodArn, resolvedUser);
     }
 }
