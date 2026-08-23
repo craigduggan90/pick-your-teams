@@ -112,34 +112,48 @@ Practical implications:
 - **Tag-setup is a hard gate, not a skippable step.** Until a tag is set, the user is redirected
   back into tag-setup at every login.
 
-**No Lambda authorizer exists as deployable code yet** — that's still "on the list." Locally, this
-means:
+### Local dev topology — the real thing now, not a stand-in
 
-- Plain `Teams.Api` (`dotnet run` from `src/api/Teams.Api`) currently has nothing to turn a bearer
-  token into `Teams-User-*` headers, so it doesn't work for interactive local dev right now. This
-  is a known, accepted, temporary state — don't try to fix it by teaching the UI about headers
-  again (that workaround existed once, via a header-injecting Vite dev proxy, and was deliberately
-  removed once the alternative below existed).
-- **Run `Teams.Api.EndToEndTests` instead** (`src/api/Teams.Api.EndToEndTests`, applicationUrl
-  `:5230`) for anything needing a working local backend. It runs the real API (via the same
-  `Startup.ConfigureTeamsServices`/`ConfigureTeamsApplication` extension methods `Teams.Api`'s own
-  `Program.cs` uses) against a real SQLite file that's wiped and re-migrated on every startup,
-  seeded with 25 fixed users (`user-001`…`user-025`). `Teams.Api` never references this project,
-  so none of its test-only code can end up in a production build.
-- **`ActorResolverMiddleware`** (in that project) stands in for the Lambda authorizer: it reads
-  `Authorization: Bearer <id>`, resolves `id` against the seeded database, and sets the
-  `Teams-User-*` headers `ActorAccessor` already expects — leaving them unset if the id doesn't
-  resolve to a real user. It deliberately only understands a raw seeded-user id as the "token,"
-  not a real Auth0 JWT — testing with your own real Auth0 account against this stand-in isn't
-  supported, and isn't planned to be until the real authorizer exists.
-- The Vite dev proxy (`vite.config.ts`) still routes `/api` to avoid a CORS-blocked cross-origin
-  call (the API has no CORS config), but no longer touches headers — whatever `Authorization` the
-  browser sends passes through untouched.
+`src/gateway` (`Teams.DevGateway`) and `src/authoriser` (`Teams.Authoriser`) are a real local
+mirror of AWS API Gateway + the Lambda Authorizer (`docs/arch-design/aws-design.png`), not a
+fake. `npm run dev:all` from the repo root starts all four processes together — `Teams.Api`
+(`:5199`), `Teams.Authoriser.LocalHost` (`:5210`), `Teams.DevGateway` (`:5200`), and the UI dev
+server — see `docs/local-dev-topology.md` for ports, running them individually, and manually
+debugging `Teams.Authoriser`. The UI's Vite proxy targets `Teams.DevGateway` in dev mode
+(`VITE_PROXY_TARGET`, set via `.env.development`/`.env.production`), not `Teams.Api` directly.
+
+What's real: `Teams.Authoriser` validates the token's signature against Auth0's live JWKS (no
+caching — little point inside a Lambda), then resolves it to a `Teams.Api` user via
+`GET /users/external/{externalId}` — creating one from Auth0's `/userinfo` (the caller's own
+access token, not a separate M2M credential) on first login. Any failure anywhere in that chain
+denies; there's no partial-success state. `Teams.DevGateway` turns an Allow into the real
+`Teams-User-*` headers and forwards through to `Teams.Api`, unmodified.
+
+**The `Scopes` header pattern.** `GET /users/external/{externalId}` and `POST /users` are the two
+endpoints only `Teams.Authoriser` may call, gated by `[RequiresScope(Scopes.Authoriser)]`
+(`Teams.Api/Infrastructure/Scopes.cs`) against a `Scopes` header
+(`Teams.Common.Constants.ScopeHeaderKey`, comma-delimited, case-insensitive — this
+infrastructure existed unused since the very first commit; use the same attribute for any future
+internal-only endpoint). `Teams.DevGateway` strips any client-supplied `Scopes` header
+unconditionally before forwarding, and only ever sets it from the authoriser's own response —
+which is always empty for a real end-user request. This isn't a new credential to manage; it
+relies on the same trust boundary the `Teams-User-*` headers already do (nothing but the gateway
+can reach `Teams.Api` directly — see the AWS diagram: the API Lambda has no inbound path except
+from API Gateway and the Authorizer).
+
+`Teams.Api.EndToEndTests` (`ActorResolverMiddleware`, 25 seeded users) still exists, but it's no
+longer "the only way to get a working local backend" — it's specifically for automated/seeded
+testing (see "End-to-end testing" below), where a fast, controllable fake identity beats a real
+Auth0 login. For interactive local dev with your own real Auth0 account, use `npm run dev:all`
+instead.
 
 ## End-to-end testing
 
 Planned, not yet built: a Playwright project at `src/e2e` (sibling to `src/api`/`src/ui`), driving
-a locally-running UI dev server plus `Teams.Api.EndToEndTests`. Agreed direction so far:
+a locally-running UI dev server plus `Teams.Api.EndToEndTests`. Deliberately unrelated to the real
+`Teams.Authoriser`/`Teams.DevGateway` topology described above — E2E tests want a fast,
+controllable fake identity, not a real Auth0 login, so this still goes through
+`ActorResolverMiddleware`'s seeded-user stand-in. Agreed direction so far:
 
 - Auth is faked via a Vite `resolve.alias` swap of the bare `@auth0/auth0-react` import specifier
   to a module owned entirely by `src/e2e` — zero changes to `src/ui/src/**`. The app's whole usage
@@ -178,6 +192,9 @@ a locally-running UI dev server plus `Teams.Api.EndToEndTests`. Agreed direction
   even support it yet. Left out of My Account.
 - No client-side guard against inviting a tag who's already a player, already has an Open
   invitation to the same game, or inviting yourself — the backend doesn't validate these either.
+- `Teams.Authoriser` hits `Teams.Api` (and Auth0's JWKS/`/userinfo`) fresh on every single
+  request — no caching. Planned but not built: an `IDistributedCache` (in-memory provider) in
+  front of the user-resolution call specifically.
 
 ## Screen reference — diagram conflicts, resolved
 

@@ -19,6 +19,9 @@ var app = builder.Build();
 
 app.Use(async (context, next) =>
 {
+    // Never let the caller set their own scopes - only Teams.Authoriser's response, below, may.
+    context.Request.Headers.Remove("Scopes");
+
     var authorisationHandler = context.RequestServices.GetRequiredService<AuthorisationHandler>();
     var authorizationHeader = context.Request.Headers.Authorization.ToString();
 
@@ -33,6 +36,11 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         return;
     }
+
+    context.Request.Headers["Teams-User-Id"] = decision.UserId;
+    context.Request.Headers["Teams-User-Tag"] = decision.UserTag;
+    context.Request.Headers["Teams-User-Name"] = decision.UserName;
+    context.Request.Headers["Scopes"] = decision.Scopes;
 
     await next();
 });

@@ -17,6 +17,11 @@ public class CreateUserCommandHandler(
     {
         CommandValidationException.ThrowIfValidationFailed(await validator.ValidateAsync(request, cancellationToken));
 
+        if (await uow.Users.GetByEmailAddressAsync(request.Email, cancellationToken) is not null)
+        {
+            throw CommandValidationException.ForEmailConflict();
+        }
+
         var user = await uow.Users.CreateAsync(new User(
             request.DisplayName,
             request.ExternalId,

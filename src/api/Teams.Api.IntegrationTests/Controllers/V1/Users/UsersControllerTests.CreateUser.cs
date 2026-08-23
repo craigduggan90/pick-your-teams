@@ -1,6 +1,7 @@
 using System.Net;
 using Teams.Api.Controllers.V1.Users.RequestModels;
 using Teams.Api.Controllers.V1.Users.ResponseModels;
+using Teams.Api.Infrastructure;
 
 namespace Teams.Api.IntegrationTests.Controllers.V1.Users;
 
@@ -15,9 +16,19 @@ public static partial class UsersControllerTests
             Mobile: "+447700900123");
 
         [Fact]
+        public async Task ShouldReturnForbidden_WhenScopeIsMissing()
+        {
+            var request = CreateJsonRequest(HttpMethod.Post, Url, ValidRequest);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
         public async Task ShouldReturnBadRequest_WhenVersionIsUnsupported()
         {
-            var request = CreateJsonRequest(HttpMethod.Post, VersionlessUrl, ValidRequest, apiVersion: "2.0");
+            var request = CreateJsonRequest(HttpMethod.Post, VersionlessUrl, ValidRequest, scopes: Scopes.Authoriser, apiVersion: "2.0");
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
 
@@ -27,7 +38,7 @@ public static partial class UsersControllerTests
         [Fact]
         public async Task ShouldReturnBadRequest_WhenVersionIsNotProvided()
         {
-            var request = CreateJsonRequest(HttpMethod.Post, VersionlessUrl, ValidRequest, apiVersion: null);
+            var request = CreateJsonRequest(HttpMethod.Post, VersionlessUrl, ValidRequest, scopes: Scopes.Authoriser, apiVersion: null);
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
 
@@ -39,7 +50,7 @@ public static partial class UsersControllerTests
         {
             var invalidRequest = ValidRequest with { DisplayName = "" };
 
-            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest);
+            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest, scopes: Scopes.Authoriser);
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
             var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
@@ -54,7 +65,23 @@ public static partial class UsersControllerTests
         {
             var invalidRequest = ValidRequest with { Email = "not-an-email-address" };
 
-            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest);
+            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest, scopes: Scopes.Authoriser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            Assert.NotNull(problem);
+            Assert.NotEmpty(GetValidationErrors(problem, nameof(CreateUserRequestModel.Email)));
+        }
+
+        [Fact]
+        public async Task ShouldReturnUnprocessableEntity_WhenEmailIsAlreadyInUse()
+        {
+            var existingUser = SeedUsers[0];
+            var invalidRequest = ValidRequest with { Email = existingUser.EmailAddress };
+
+            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest, scopes: Scopes.Authoriser);
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
             var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
@@ -69,7 +96,7 @@ public static partial class UsersControllerTests
         {
             var validRequest = ValidRequest;
 
-            var request = CreateJsonRequest(HttpMethod.Post, Url, validRequest);
+            var request = CreateJsonRequest(HttpMethod.Post, Url, validRequest, scopes: Scopes.Authoriser);
 
             var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
             var content = await ReadContentAsync<UserModel>(response, TestContext.Current.CancellationToken);
