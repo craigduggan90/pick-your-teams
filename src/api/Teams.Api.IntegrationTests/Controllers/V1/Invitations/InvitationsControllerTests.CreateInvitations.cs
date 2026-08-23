@@ -1,6 +1,6 @@
-using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 using Teams.Api.Controllers.V1.Invitations.RequestModels;
 using Teams.Api.Controllers.V1.Invitations.ResponseModels;
 using Teams.Common.Pagination;
