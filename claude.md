@@ -74,6 +74,13 @@ silently reconciling it.
 - **`apiFetch` (`api/client.ts`) treats any empty response body as `undefined`, not just a 204.**
   Some endpoints (`CreateInvitations`) return a bare `201` with no body — assuming only 204 is
   empty caused a real bug where a successful request was reported to the user as a generic error.
+- **Tag and email lookups are case-insensitive on the backend** (`IReadOnlyUsersRepository`'s
+  `GetByTagAsync`/`GetByEmailAddressAsync`, both compared via `.ToLower()` since SQLite's default
+  collation is case-sensitive) — this covers invitation creation, the tag-conflict check on
+  `UpdateUser`, and the email-conflict check on `CreateUser`. A real bug had invitations silently
+  fail to match a tag that differed only in casing from what the user actually typed. If this ever
+  moves off SQLite, re-check whether `.ToLower()` is still needed — MySQL/Aurora MySQL's default
+  collations are already case-insensitive, so it'd be redundant there (though harmless).
 - **The confirmation-dialog / bottom-sheet primitive is `Sheet` (`components/Sheet.tsx`), not
   `Modal`.** `Modal` (a centered dialog) was removed and replaced everywhere with `Sheet` (slides
   up from the bottom); same prop shape, drop-in replacement.
@@ -206,8 +213,10 @@ controllable fake identity, not a real Auth0 login, so this still goes through
   /invitations/{id}` already returns everything needed for it).
 - **Mobile number is future state** — `03-my-account.png` shows a field for it; the API may not
   even support it yet. Left out of My Account.
-- No client-side guard against inviting a tag who's already a player, already has an Open
-  invitation to the same game, or inviting yourself — the backend doesn't validate these either.
+- No client-side guard against inviting a tag who's already a player or inviting yourself — the
+  backend doesn't validate these either. (Re-inviting a tag with an existing Open invitation to
+  the same game is handled: the backend silently no-ops that tag rather than creating a duplicate
+  or erroring.)
 
 ## Screen reference — diagram conflicts, resolved
 
@@ -245,6 +254,15 @@ controllable fake identity, not a real Auth0 login, so this still goes through
   the backend PR reviewable on its own, and means a dependent frontend branch only ever builds
   against a merged, real API contract — never speculative shared history.
 - Commit in small, logical chunks rather than one commit at the end.
+- **Before pushing any backend change, run both `dotnet format --verify-no-changes` and a full
+  `dotnet build` from `src/api`** (add `--exclude ./Teams.Data/Context/Migrations/` to the format
+  command, matching `.github/workflows/dotnet-linting.yml`) — also from `src/authoriser`/
+  `src/gateway` if those changed. **The two checks aren't redundant** — a clean
+  `dotnet format --verify-no-changes` doesn't guarantee a warning-free build; an unused `using`
+  has shown up as a build-only `IDE0005` warning that `dotnet format` didn't flag or fix. Check the
+  build output's warning count is `0 Warning(s)` explicitly. Nothing local enforces either (no
+  pre-commit/pre-push hook), only CI does, so a slip isn't visible until the PR's checks run —
+  catch it before pushing instead.
 - Push the branch and open a **draft PR** — never push directly to `main`. Existing `.husky` hooks
   and CI should run against the PR.
 - Wait for review/merge before branching further work off the updated `main`.
