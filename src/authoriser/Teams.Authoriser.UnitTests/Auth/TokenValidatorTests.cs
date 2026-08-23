@@ -19,7 +19,8 @@ public class TokenValidatorTests
     public async Task ValidateAsync_returns_Valid_for_a_correctly_signed_token()
     {
         var (certificate, key) = TestTokenFactory.CreateSigningCertificate();
-        var token = TestTokenFactory.CreateSignedJwt(key, "kid-1", Issuer, Audience, "auth0|user-123");
+        var expiresAt = new DateTime(2099, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var token = TestTokenFactory.CreateSignedJwt(key, "kid-1", Issuer, Audience, "auth0|user-123", expiresAt);
 
         var jwksClient = Substitute.For<IJwksClient>();
         jwksClient.GetJwksAsync(Arg.Any<CancellationToken>())
@@ -31,6 +32,7 @@ public class TokenValidatorTests
 
         Assert.Equal(TokenValidationOutcome.Valid, result.Outcome);
         Assert.Equal("auth0|user-123", result.Subject);
+        Assert.Equal(expiresAt, result.ExpiresAtUtc);
     }
 
     [Theory]

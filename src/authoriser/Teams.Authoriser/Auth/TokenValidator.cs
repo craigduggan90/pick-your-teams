@@ -9,7 +9,7 @@ public enum TokenValidationOutcome
     Valid,
 }
 
-public record TokenValidationResult(TokenValidationOutcome Outcome, string? Subject = null);
+public record TokenValidationResult(TokenValidationOutcome Outcome, string? Subject = null, DateTime? ExpiresAtUtc = null);
 
 /// <summary>
 /// Orchestrates the real validation path: parse → fetch JWKS → match `kid` → verify signature.
@@ -49,7 +49,7 @@ public class TokenValidator(IJwksClient jwksClient, string issuer, string audien
         var isValid = JwtSignatureValidator.IsValid(token, signingCertificate, issuer, audience);
 
         return isValid
-            ? new TokenValidationResult(TokenValidationOutcome.Valid, jwt.Subject)
+            ? new TokenValidationResult(TokenValidationOutcome.Valid, jwt.Subject, jwt.ValidTo)
             : new TokenValidationResult(TokenValidationOutcome.SignatureInvalid);
     }
 }
