@@ -3,11 +3,11 @@ using Teams.Authoriser.Caching;
 
 namespace Teams.Authoriser.UnitTests.Caching;
 
-public class MemoryCacheClientTests
+public class CacheClientTests
 {
     private sealed record CachedValue(string Value);
 
-    private static MemoryCacheClient CreateSut() => new(new MemoryCache(new MemoryCacheOptions()));
+    private static CacheClient CreateSut() => new(new MemoryCache(new MemoryCacheOptions()));
 
     [Fact]
     public async Task GetOrCreateAsync_calls_the_factory_and_returns_its_result_on_a_miss()

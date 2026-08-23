@@ -37,7 +37,7 @@ public class Function
         new TeamsApiClient(new HttpClient { BaseAddress = new Uri(TeamsApiBaseUrl) }),
         new Auth0UserInfoClient(new HttpClient(), Auth0Domain));
 
-    private readonly ICacheClient cacheClient = new MemoryCacheClient(new MemoryCache(new MemoryCacheOptions()));
+    private readonly ICacheClient cacheClient = new CacheClient(new MemoryCache(new MemoryCacheOptions()));
 
     public async Task<APIGatewayCustomAuthorizerV2IamResponse> FunctionHandler(
         APIGatewayCustomAuthorizerRequest request, ILambdaContext context)
