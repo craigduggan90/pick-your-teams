@@ -1,8 +1,6 @@
-﻿using Teams.Data.Services;
+﻿namespace Teams.Api.EndToEndTests.TestServices;
 
-namespace Teams.Api.EndToEndTests.TestServices;
-
-public class TestUnitOfWork(IUnitOfWork uow)
+public class TestUnitOfWork
 {
 
 }
