@@ -110,7 +110,7 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   // the last-fetched server roster (rather than copying the whole roster into local state) is
   // what lets Remove-from-Game/Add-Non-User-Player — both immediate, both triggering a refetch —
   // coexist safely with unsaved moves for *other* players: a refetch changes the base roster
-  // without touching this overlay. See docs/claude/stage-4.md.
+  // without touching this overlay.
   const [overlay, setOverlay] = useState<Record<string, RosterTeam>>({})
   const [removeTarget, setRemoveTarget] = useState<GameTeamPlayerModel | null>(null)
   const [addPlayerFormKey, setAddPlayerFormKey] = useState(0)
@@ -260,8 +260,8 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
           onClick={() =>
             generateMutation.mutate({
               // Seeded from the last-*saved* split, not the pending overlay — a player only
-              // counts as fixed once they're actually committed, an unsaved move doesn't un-seed
-              // them. See docs/claude/stage-4.md.
+              // counts as fixed once they're actually committed, an unsaved move doesn't
+              // un-seed them.
               homeTeamSeedIds: (teams.home?.players ?? []).map((player) => player.id),
               awayTeamSeedIds: (teams.away?.players ?? []).map((player) => player.id),
             })

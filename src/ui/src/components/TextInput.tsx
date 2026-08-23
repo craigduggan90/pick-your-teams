@@ -10,8 +10,8 @@ export interface TextInputProps extends Omit<ComponentProps<typeof Input>, 'id'>
 
 // Native date/time picker types always show their own placeholder-shaped content
 // ("dd/mm/yyyy, --:--") even when empty, and their internal rendering (Safari's especially)
-// isn't guaranteed to respect the padding-top trick the floating label overlaps into — see
-// docs/claude/stage-3.md. Forcing these to always render floated sidesteps both problems: the
+// isn't guaranteed to respect the padding-top trick the floating label overlaps into. Forcing
+// these to always render floated sidesteps both problems: the
 // label never sits in the larger unfloated position that was colliding with the native control,
 // and every field still shares the same label styling instead of a different static layout.
 const NATIVE_PICKER_TYPES = new Set(['date', 'time', 'datetime-local', 'month', 'week'])

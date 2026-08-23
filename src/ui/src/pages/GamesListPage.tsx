@@ -14,7 +14,7 @@ import { nextDayBoundary } from '@/lib/format'
 // call usePageTitle/usePageFooterActions itself. Both branches below are components that do, and
 // only one is ever mounted at a time. If this wrapper also called them, its effect would run
 // after — and stomp — whichever branch is actually showing (React runs a child's effects before
-// its parent's on the same commit); see docs/claude/stage-3.md.
+// its parent's on the same commit).
 export function GamesListPage() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [filters, setFilters] = useState<GamesSearchFilters>({})
@@ -47,7 +47,7 @@ function GamesListContent({
   // GamesSearchFilters.startTimeTo is the last-picked, inclusive end date (day @ 00:00); the
   // request needs an exclusive upper bound, so it's rolled forward to the start of the next day
   // only here — never baked into the persisted filter state, or the search form would show the
-  // wrong date (day+1) when reopened. See docs/claude/stage-3.md.
+  // wrong date (day+1) when reopened.
   const gamesQuery = useGames({
     startTimeFrom: filters.startTimeFrom,
     startTimeTo: filters.startTimeTo ? nextDayBoundary(filters.startTimeTo) : undefined,

@@ -12,7 +12,7 @@ import { usePageFooterActions } from '@/hooks/usePageActions'
 import { ApiError } from '@/api/client'
 import { fromDateTimeLocalValue, nextHourStart } from '@/lib/format'
 
-// No diagram exists for game creation (see docs/claude/stage-3.md) — this is a minimal form
+// No diagram exists for game creation — this is a minimal form
 // covering exactly what CreateGameRequestModel needs, styled consistently with the View Game
 // fields, so the rest of the games flow (view/edit/record result/delete) can actually be tested
 // end to end.
