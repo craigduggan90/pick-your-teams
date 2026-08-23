@@ -88,6 +88,14 @@ silently reconciling it.
 - Every raw `<button>` that doesn't go through the shared `Button` component needs its own
   explicit `cursor-pointer` class. Tailwind's Preflight reset sets `cursor: default` on all
   buttons; nothing restores it globally except `Button`'s own base classes.
+- **Any query read from many places (`useSelf` is the reference case — Header, TagGate, and 8
+  pages all call it) needs an explicit `staleTime`, not the TanStack Query default of `0`.**
+  Without one, every route navigation remounts a "stale" query and refetches, which reads as
+  "fetching on every render" even though it's really "on every navigation." `useSelf` sets
+  `staleTime` equal to its `refetchInterval` (`60_000`) — fresh enough within that window to skip
+  refetch-on-mount, refreshed automatically in the background regardless of navigation/focus.
+  Query invalidation (e.g. `useUpdateTag`, `useAcceptInvitation` invalidating `selfQueryKey`)
+  still forces an immediate refetch regardless of `staleTime` — this pattern doesn't fight that.
 
 ## Auth model — not what the diagrams imply
 
@@ -128,6 +136,14 @@ caching — little point inside a Lambda), then resolves it to a `Teams.Api` use
 access token, not a separate M2M credential) on first login. Any failure anywhere in that chain
 denies; there's no partial-success state. `Teams.DevGateway` turns an Allow into the real
 `Teams-User-*` headers and forwards through to `Teams.Api`, unmodified.
+
+**The resolved user *is* cached, per access token** — `Teams.Authoriser/Caching/ICacheClient`
+(`GetOrCreateAsync`; a plain in-memory `CacheClient` implementation for now, deliberately not
+`IDistributedCache` — that's a real decision to make if/when this moves to Redis, not one to
+abstract over prematurely). Only the resolve step is cached, not the signature check above it —
+every request still gets a real, fresh JWT verification. Cache lifetime is
+`min(remaining token lifetime, 15 minutes)` (`Auth/CacheExpiryCalculator`), so a resolved user is
+never served past the point its own token would fail verification anyway.
 
 **The `Scopes` header pattern.** `GET /users/external/{externalId}` and `POST /users` are the two
 endpoints only `Teams.Authoriser` may call, gated by `[RequiresScope(Scopes.Authoriser)]`
@@ -192,9 +208,6 @@ controllable fake identity, not a real Auth0 login, so this still goes through
   even support it yet. Left out of My Account.
 - No client-side guard against inviting a tag who's already a player, already has an Open
   invitation to the same game, or inviting yourself — the backend doesn't validate these either.
-- `Teams.Authoriser` hits `Teams.Api` (and Auth0's JWKS/`/userinfo`) fresh on every single
-  request — no caching. Planned but not built: an `IDistributedCache` (in-memory provider) in
-  front of the user-resolution call specifically.
 
 ## Screen reference — diagram conflicts, resolved
 
