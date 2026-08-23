@@ -2,7 +2,9 @@ using Teams.Core.Exceptions;
 using Teams.Core.Models;
 using Teams.Core.Services.Events;
 using Teams.Core.UseCases.Invitations.CreateInvitations;
+using Teams.Data.Models;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.UnitTests.UseCases.Invitations.CreateInvitations;
 
@@ -107,6 +109,40 @@ public static class CreateInvitationsCommandHandlerTests
                 Arg.Is<IEnumerable<IEvent>>(events => events != null && events.Count() == 2 &&
                     events.OfType<InvitationCreatedEvent>().Any(e => e.UserId == userOne.Id) &&
                     events.OfType<InvitationCreatedEvent>().Any(e => e.UserId == userTwo.Id)),
+                Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldNotCreateInvitationOrPublishEvent_WhenUserAlreadyHasAnOpenInvitationToTheGame()
+        {
+            var game = CreateExistingGame();
+            var userOne = CreateUser("tag-one");
+            var userTwo = CreateUser("tag-two");
+            var existingInvitation = new Invitation(game.Id, userOne.Id, userOne.EmailAddress);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            UsersRepository.GetByTagAsync("tag-one", Arg.Any<CancellationToken>()).Returns(userOne);
+            UsersRepository.GetByTagAsync("tag-two", Arg.Any<CancellationToken>()).Returns(userTwo);
+            InvitationsRepository.GetInvitationsAsync(
+                Arg.Is<string?>(game.Id),
+                Arg.Is<string?>(userOne.Id),
+                Arg.Any<string?>(),
+                Arg.Is<InvitationStatusEnum?>(InvitationStatusEnum.Open),
+                Arg.Any<DateFilter?>(),
+                Arg.Any<PaginationFilter?>(),
+                Arg.Any<CancellationToken>())
+                .Returns([existingInvitation]);
+            var command = new CreateInvitationsCommand(game.Id, ["tag-one", "tag-two"]);
+            var sut = CreateSut();
+
+            await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            await InvitationsRepository.DidNotReceive().CreateAsync(
+                Arg.Is<Invitation>(i => i!.UserId == userOne.Id), Arg.Any<CancellationToken>());
+            await InvitationsRepository.Received(1).CreateAsync(
+                Arg.Is<Invitation>(i => i!.UserId == userTwo.Id), Arg.Any<CancellationToken>());
+            await EventPublisher.Received(1).PublishEventsAsync(
+                Arg.Is<IEnumerable<IEvent>>(events => events != null && events.Count() == 1 &&
+                    events.OfType<InvitationCreatedEvent>().Single().UserId == userTwo.Id),
                 Arg.Any<CancellationToken>());
         }
     }

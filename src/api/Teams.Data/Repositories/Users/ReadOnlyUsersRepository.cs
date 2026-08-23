@@ -16,7 +16,7 @@ public class ReadOnlyUsersRepository(ApiDbContext context)
 
     /// <inheritdoc />
     public async Task<User?> GetByTagAsync(string tag, CancellationToken cancellationToken) =>
-        await Context.Users.SingleOrDefaultAsync(entity => entity.Tag == tag, cancellationToken);
+        await Context.Users.SingleOrDefaultAsync(entity => entity.Tag.ToLower() == tag.ToLower(), cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> GetByExternalIdAsync(string externalId, CancellationToken cancellationToken) =>

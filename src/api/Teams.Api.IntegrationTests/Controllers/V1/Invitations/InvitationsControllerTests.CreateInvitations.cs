@@ -1,7 +1,10 @@
 using System.Net;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Teams.Api.Controllers.V1.Invitations.RequestModels;
 using Teams.Api.Controllers.V1.Invitations.ResponseModels;
 using Teams.Common.Pagination;
+using Teams.Data.Context;
 using Teams.Domain.Entities;
 
 namespace Teams.Api.IntegrationTests.Controllers.V1.Invitations;
@@ -151,6 +154,66 @@ public static partial class InvitationsControllerTests
 
             Assert.NotNull(content);
             Assert.Contains(content.Data, i => i.Game.Id == SeedGame.Id);
+        }
+
+        [Fact]
+        public async Task ShouldReturnCreated_WithInvitationPersisted_WhenTagCasingDiffersFromStoredTag()
+        {
+            var invitee = EntityFactory.CreateUser(id: "case-test-invitee", displayName: "Case Test Invitee");
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                await context.Users.AddAsync(invitee, TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateJsonRequest(
+                HttpMethod.Post, Url, new CreateInvitationsRequestModel(SeedGame.Id, [invitee.Tag.ToUpperInvariant()]));
+            WithActorHeaders(request, Organiser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            var getUrl = WithQuery(Url, ("UserId", invitee.Id), ("PageSize", "100"));
+            var getRequest = CreateRequest(HttpMethod.Get, getUrl);
+            WithActorHeaders(getRequest, invitee);
+            var getResponse = await Client.SendAsync(getRequest, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<PagedList<InvitationModel>>(getResponse, TestContext.Current.CancellationToken);
+
+            Assert.NotNull(content);
+            Assert.Single(content.Data);
+        }
+
+        [Fact]
+        public async Task ShouldReturnCreated_ButNotDuplicateTheInvitation_WhenInviteeAlreadyHasAnOpenInvitationToTheGame()
+        {
+            var invitee = EntityFactory.CreateUser(id: "duplicate-test-invitee", displayName: "Duplicate Test Invitee");
+            var existingInvitation = EntityFactory.CreateInvitation(SeedGame.Id, invitee.Id, invitee.EmailAddress);
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+                await context.Users.AddAsync(invitee, TestContext.Current.CancellationToken);
+                await context.Invitations.AddAsync(existingInvitation, TestContext.Current.CancellationToken);
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            var request = CreateJsonRequest(HttpMethod.Post, Url, new CreateInvitationsRequestModel(SeedGame.Id, [invitee.Tag]));
+            WithActorHeaders(request, Organiser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            var getUrl = WithQuery(Url, ("UserId", invitee.Id), ("PageSize", "100"));
+            var getRequest = CreateRequest(HttpMethod.Get, getUrl);
+            WithActorHeaders(getRequest, invitee);
+            var getResponse = await Client.SendAsync(getRequest, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<PagedList<InvitationModel>>(getResponse, TestContext.Current.CancellationToken);
+
+            Assert.NotNull(content);
+            Assert.Single(content.Data);
+            Assert.Equal(existingInvitation.Id, content.Data.Single().Id);
         }
     }
 }

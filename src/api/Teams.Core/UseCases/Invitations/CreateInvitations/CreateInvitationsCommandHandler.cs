@@ -7,6 +7,7 @@ using Teams.Core.Services;
 using Teams.Core.Services.Events;
 using Teams.Data.Services;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Core.UseCases.Invitations.CreateInvitations;
 
@@ -37,6 +38,14 @@ public class CreateInvitationsCommandHandler(
                 unmappedTags.Add(tag);
                 continue;
             }
+
+            var openInvitations = await uow.Invitations.GetInvitationsAsync(
+                gameId: request.GameId,
+                userId: user.Id,
+                status: InvitationStatusEnum.Open,
+                cancellationToken: cancellationToken);
+            if (openInvitations.Any())
+                continue;
 
             var invitation = await uow.Invitations.CreateAsync(new Invitation(request.GameId, user.Id, user.EmailAddress), cancellationToken);
             events.Add(new InvitationCreatedEvent(invitation.Id, game.Id, user.Id));

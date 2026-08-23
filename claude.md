@@ -74,6 +74,10 @@ silently reconciling it.
 - **`apiFetch` (`api/client.ts`) treats any empty response body as `undefined`, not just a 204.**
   Some endpoints (`CreateInvitations`) return a bare `201` with no body — assuming only 204 is
   empty caused a real bug where a successful request was reported to the user as a generic error.
+- **Tag lookups are case-insensitive on the backend** (`IReadOnlyUsersRepository.GetByTagAsync`,
+  compared via `.ToLower()` since SQLite's default collation is case-sensitive) — this covers both
+  invitation creation and tag-conflict checks on `UpdateUser`. A real bug had invitations silently
+  fail to match a tag that differed only in casing from what the user actually typed.
 - **The confirmation-dialog / bottom-sheet primitive is `Sheet` (`components/Sheet.tsx`), not
   `Modal`.** `Modal` (a centered dialog) was removed and replaced everywhere with `Sheet` (slides
   up from the bottom); same prop shape, drop-in replacement.
@@ -206,8 +210,10 @@ controllable fake identity, not a real Auth0 login, so this still goes through
   /invitations/{id}` already returns everything needed for it).
 - **Mobile number is future state** — `03-my-account.png` shows a field for it; the API may not
   even support it yet. Left out of My Account.
-- No client-side guard against inviting a tag who's already a player, already has an Open
-  invitation to the same game, or inviting yourself — the backend doesn't validate these either.
+- No client-side guard against inviting a tag who's already a player or inviting yourself — the
+  backend doesn't validate these either. (Re-inviting a tag with an existing Open invitation to
+  the same game is handled: the backend silently no-ops that tag rather than creating a duplicate
+  or erroring.)
 
 ## Screen reference — diagram conflicts, resolved
 

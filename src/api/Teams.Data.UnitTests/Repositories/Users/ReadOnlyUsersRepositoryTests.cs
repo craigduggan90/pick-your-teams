@@ -53,6 +53,17 @@ public static class ReadOnlyUsersRepositoryTests
             var actual = await sut.GetByTagAsync(tag, TestContext.Current.CancellationToken);
             Assert.Equivalent(expected, actual, true);
         }
+
+        [Fact]
+        public async Task ShouldReturnEntity_WhenRecordExistsWithDifferentCasing()
+        {
+            const string tag = "TAG-00000001";
+            var expected = Context.Users.Single(u => u.Tag == "tag-00000001");
+
+            var sut = CreateSut();
+            var actual = await sut.GetByTagAsync(tag, TestContext.Current.CancellationToken);
+            Assert.Equivalent(expected, actual, true);
+        }
     }
 
     public class GetByExternalIdAsync : RepositoryTestBase
