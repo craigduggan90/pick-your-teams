@@ -3,8 +3,8 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { generateGameTeams, type GameTeamsModel } from '@/api/games'
 import type { ApiError } from '@/api/client'
 
-// Fixed for v1 — see docs/claude/stage-4.md's decisions log. Configurable "competitiveness" is
-// future scope; no diagram exposes a control for it.
+// Fixed for v1. Configurable "competitiveness" is future scope; no diagram exposes a control
+// for it.
 const DIFFERENTIAL = 200
 
 export interface GenerateTeamsVariables {

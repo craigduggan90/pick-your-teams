@@ -8,9 +8,9 @@ import { usePageFooterActions } from '@/hooks/usePageActions'
 import type { GameStatus } from '@/api/games'
 
 export interface GamesSearchFilters {
-  // Not sent to the API (GetGamesQuery doesn't expose OrganiserId/UserId yet — see
-  // docs/claude/stage-3.md), but still part of the persisted/applied filter state so reopening
-  // the search form shows what was last selected, not a reset toggle.
+  // Not sent to the API (GetGamesQuery doesn't expose OrganiserId/UserId yet), but still part of
+  // the persisted/applied filter state so reopening the search form shows what was last
+  // selected, not a reset toggle.
   organiserOnly?: boolean
   startTimeFrom?: string
   startTimeTo?: string
@@ -63,15 +63,15 @@ function ToggleOption({
   )
 }
 
-// Replaces the games list content in place while open — see docs/claude/stage-3.md: this used to
-// be a fixed full-screen overlay with its own header/footer stacked on top of the real page
+// Replaces the games list content in place while open: this used to be a fixed full-screen
+// overlay with its own header/footer stacked on top of the real page
 // chrome, which just fought the app's actual Header/Footer. This is a plain page swap instead,
 // same as any other routed screen: its own usePageTitle/usePageFooterActions calls, no overlay.
 export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormProps) {
   usePageTitle('Games / Search')
 
   // "Games I'm In" / "Games I've Organised" is visual only — GetGamesQuery doesn't expose
-  // OrganiserId/UserId yet (see docs/claude/stage-3.md), so this toggle can't actually filter.
+  // OrganiserId/UserId yet, so this toggle can't actually filter.
   const [organiserOnly, setOrganiserOnly] = useState(filters.organiserOnly ?? false)
   // Always shown, always defaulted, date-only — nobody's filtering games by time of day, and a
   // native date input already displays its own placeholder mask ("dd/mm/yyyy") even when empty,

@@ -4,7 +4,7 @@
 /*
  * Semantic palette from claude.md's Design Tokens section, mapped onto shadcn/ui's variable
  * slots. Primary (#465775, blue) and Secondary (#EF6F6C, coral) are temporary — explicitly not
- * final, just something to build against for now (see Decisions log in docs/claude/stage-2.md).
+ * final, just something to build against for now.
  * Everything else (Tertiary/Success/Warning/Info/Dark Grey/Light Grey) is still a placeholder —
  * the
  * Excalidraw diagrams only label these roles ("Colour Placeholder") with no real hex values, so

@@ -10,8 +10,8 @@ import { APP_NAME, LOGGED_OUT_QUERY_PARAM } from '@/lib/constants'
 import { GamesListPage } from './GamesListPage'
 
 // A thin switch, same reasoning as GamesListPage: it doesn't call usePageTitle itself, since
-// exactly one of TeamPickerLanding or GamesListPage renders below it, and each owns its own title
-// — see docs/claude/stage-3.md on why a parent calling it too would stomp the child's value.
+// exactly one of TeamPickerLanding or GamesListPage renders below it, and each owns its own
+// title — a parent calling it too would stomp the child's value.
 export function TeamPickerPage() {
   const { isAuthenticated, isLoading } = useAuth0()
 

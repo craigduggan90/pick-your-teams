@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/api/games'
 
 // Diagram labels this "Complete"; the real GameStatusEnum member is "Finished" (there's no
-// separate "Complete" status) — display copy only, see docs/claude/stage-3.md decisions log.
+// separate "Complete" status) — display copy only.
 const STATUS_LABELS: Record<GameStatus, string> = {
   Scheduled: 'Scheduled',
   Finished: 'Finished',
