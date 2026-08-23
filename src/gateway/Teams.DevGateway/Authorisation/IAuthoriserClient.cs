@@ -4,6 +4,6 @@ namespace Teams.DevGateway.Authorisation;
 
 public interface IAuthoriserClient
 {
-    Task<APIGatewayCustomAuthorizerResponse> AuthorizeAsync(
+    Task<APIGatewayCustomAuthorizerV2IamResponse> AuthorizeAsync(
         APIGatewayCustomAuthorizerRequest request, CancellationToken cancellationToken);
 }
