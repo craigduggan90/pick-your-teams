@@ -76,6 +76,22 @@ public static partial class UsersControllerTests
         }
 
         [Fact]
+        public async Task ShouldReturnUnprocessableEntity_WhenEmailIsAlreadyInUse()
+        {
+            var existingUser = SeedUsers[0];
+            var invalidRequest = ValidRequest with { Email = existingUser.EmailAddress };
+
+            var request = CreateJsonRequest(HttpMethod.Post, Url, invalidRequest, scopes: Scopes.Authoriser);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+            Assert.NotNull(problem);
+            Assert.NotEmpty(GetValidationErrors(problem, nameof(CreateUserRequestModel.Email)));
+        }
+
+        [Fact]
         public async Task ShouldReturnCreated_WithUserContent_WhenRequestIsValid()
         {
             var validRequest = ValidRequest;

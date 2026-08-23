@@ -82,4 +82,17 @@ public static class CommandValidationExceptionTests
             Assert.Equal("Tag not available.", error.ErrorMessage);
         }
     }
+
+    public class ForEmailConflict
+    {
+        [Fact]
+        public void ReturnsCommandValidationException_WithSingleErrorOnEmail()
+        {
+            var exception = CommandValidationException.ForEmailConflict();
+
+            var error = Assert.Single(exception.Errors);
+            Assert.Equal("Email", error.PropertyName);
+            Assert.Equal("Email address already in use.", error.ErrorMessage);
+        }
+    }
 }

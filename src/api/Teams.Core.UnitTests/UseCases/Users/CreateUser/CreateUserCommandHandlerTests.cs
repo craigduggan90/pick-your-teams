@@ -38,6 +38,34 @@ public static class CreateUserCommandHandlerTests
         }
 
         [Fact]
+        public async Task ShouldThrowCommandValidationException_WhenEmailIsAlreadyInUse()
+        {
+            var existingUser = new User("someone-else", "someone-else-external-id", ValidCommand.Email, null);
+            UsersRepository.GetByEmailAddressAsync(ValidCommand.Email, Arg.Any<CancellationToken>()).Returns(existingUser);
+            var sut = CreateSut();
+
+            var exception = await Assert.ThrowsAsync<CommandValidationException>(
+                () => sut.HandleAsync(ValidCommand, TestContext.Current.CancellationToken));
+
+            var error = Assert.Single(exception.Errors);
+            Assert.Equal("Email", error.PropertyName);
+        }
+
+        [Fact]
+        public async Task ShouldNotCreateUser_WhenEmailIsAlreadyInUse()
+        {
+            var existingUser = new User("someone-else", "someone-else-external-id", ValidCommand.Email, null);
+            UsersRepository.GetByEmailAddressAsync(ValidCommand.Email, Arg.Any<CancellationToken>()).Returns(existingUser);
+            var sut = CreateSut();
+
+            await Assert.ThrowsAsync<CommandValidationException>(
+                () => sut.HandleAsync(ValidCommand, TestContext.Current.CancellationToken));
+
+            await UsersRepository.DidNotReceive().CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            await UnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
         public async Task ShouldCreateUser_WithRequestValues_WhenValidationSucceeds()
         {
             UsersRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
