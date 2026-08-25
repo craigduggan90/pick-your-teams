@@ -46,6 +46,34 @@ this is a new query method, not a new table/relationship.
 Suggested endpoint home: `GET /users/self/recently-played-with` (self-scoped like `GET
 /users/self`, not nested under `/games/:id`, since the data isn't game-specific).
 
+**Cache this query.** In-memory for now (we're pre-production), but built against .NET's
+`IDistributedCache` so swapping to Redis later is a config change, not a rewrite — use the
+built-in `MemoryDistributedCache` (implements `IDistributedCache` over `IMemoryCache`), not a
+bespoke in-memory store. Wrap it behind a service so the caller never touches serialization:
+
+```csharp
+public interface ICacheClient
+{
+    Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory);
+    Task ExpireAsync(string key);
+}
+```
+
+The implementation owns JSON serialize/deserialize to and from the string `IDistributedCache`
+stores; the consumer just gets a `T` back. Factory is async (`Func<Task<T>>`, not `Func<T>`)
+since the factory here is a database hit.
+
+Note: `Teams.Authoriser` already has an `ICacheClient` (`Teams.Authoriser/Caching`) — but that one
+is deliberately plain in-memory, not `IDistributedCache`-backed (see the "Auth model" section of
+[claude.md](../claude.md)). This is a **new, separate implementation in `Teams.Api`**, same
+interface shape but a different backing store and a different assembly — don't conflate the two
+or try to unify them.
+
+Cache key: something like `recently-played-with:{userId}`. Open question for implementation time,
+not blocking scope: TTL vs explicit invalidation. The underlying data only changes when a game's
+players or result change, so either a modest TTL (15–60 min) or an explicit `ExpireAsync` call at
+that point would work — not worth deciding until it's actually built.
+
 ### Effort 2 — "All" tag search in the main compose form
 
 Independent of Effort 1. A live search-as-you-type suggestion box for the main form's tag rows,
