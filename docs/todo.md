@@ -63,11 +63,11 @@ The implementation owns JSON serialize/deserialize to and from the string `IDist
 stores; the consumer just gets a `T` back. Factory is async (`Func<Task<T>>`, not `Func<T>`)
 since the factory here is a database hit.
 
-Note: `Teams.Authoriser` already has an `ICacheClient` (`Teams.Authoriser/Caching`) — but that one
-is deliberately plain in-memory, not `IDistributedCache`-backed (see the "Auth model" section of
-[claude.md](../claude.md)). This is a **new, separate implementation in `Teams.Api`**, same
-interface shape but a different backing store and a different assembly — don't conflate the two
-or try to unify them.
+`Teams.Authoriser` already has its own `ICacheClient` (`Teams.Authoriser/Caching`, plain
+in-memory, not `IDistributedCache`-backed — see the "Auth model" section of
+[claude.md](../claude.md)). This is a new implementation in `Teams.Api`. `Teams.Authoriser` would
+likely move to this same `IDistributedCache`-backed approach eventually, but how the two share
+code (if at all) is a future problem — clone-and-own for now is fine.
 
 Cache key: something like `recently-played-with:{userId}`. Open question for implementation time,
 not blocking scope: TTL vs explicit invalidation. The underlying data only changes when a game's
