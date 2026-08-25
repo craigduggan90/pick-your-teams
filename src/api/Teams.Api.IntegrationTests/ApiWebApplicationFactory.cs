@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Teams.Api.IntegrationTests.TestHelpers;
 using Teams.Api.IntegrationTests.TestServices;
+using Teams.Core.Services;
 using Teams.Core.Services.Events;
 using Teams.Data.Context;
 
@@ -38,6 +39,9 @@ public class ApiWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveService<IEventPublisher>()
                 .AddSingleton<IEventPublisher, TestEventPublisher>();
+
+            services.RemoveService<ICacheClient>()
+                .AddSingleton<ICacheClient, MockCacheClient>();
         });
     }
 
