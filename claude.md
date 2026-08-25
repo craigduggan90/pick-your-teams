@@ -29,6 +29,13 @@ file). Treat them as the visual reference **except** where this file explicitly 
 see "Screen reference" below. Flag anything that doesn't match the diagrams as you go rather than
 silently reconciling it.
 
+## Scoped-but-not-built work
+
+`docs/todo.md` holds features that have been scoped out in conversation (decisions made,
+alternatives rejected, endpoint shapes agreed) but not yet implemented. Check it before starting
+new feature work, and before re-scoping something from scratch — it may already be settled there.
+Entries are deleted once built; the commit history is the record of what shipped, not that file.
+
 ## Current routes
 
 - `/` — Team Picker: public landing (Log In / Register) when unauthenticated; redirects onward
