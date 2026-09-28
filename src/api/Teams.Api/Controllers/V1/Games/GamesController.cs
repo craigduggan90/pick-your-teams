@@ -104,6 +104,25 @@ public class GamesController(IMediator mediator) : ApiControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id}/copy")]
+    [ProducesResponseType<GameModel>(201)]
+    [ProducesResponseType<ProblemDetails>(403)]
+    [ProducesResponseType<ProblemDetails>(404)]
+    [ProducesResponseType<ProblemDetails>(422)]
+    [SwaggerRequestExample(typeof(CopyGameRequestModel), typeof(CopyGameRequestModelExample))]
+    [SwaggerResponseExample(201, typeof(GameModelExample))]
+    [SwaggerResponseExample(403, typeof(AccessDeniedProblemDetailsExample))]
+    [SwaggerResponseExample(404, typeof(GameNotFoundProblemDetailsExample))]
+    [SwaggerResponseExample(422, typeof(CommandValidationProblemDetailsExample))]
+    public async Task<IActionResult> CopyGame(
+        string id,
+        [FromBody] CopyGameRequestModel body,
+        CancellationToken cancellationToken)
+    {
+        var entity = await mediator.SendAsync(body.ToCommand(id), cancellationToken);
+        return CreatedAtAction(nameof(GetGameById), new { id = entity.Id }, entity.ToModel());
+    }
+
     [HttpPost("{id}/teams/generate")]
     [ProducesResponseType<GameTeamsModel>(200)]
     [ProducesResponseType<ProblemDetails>(404)]

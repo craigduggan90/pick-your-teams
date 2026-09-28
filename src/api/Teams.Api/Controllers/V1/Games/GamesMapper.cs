@@ -1,6 +1,7 @@
 using Teams.Api.Controllers.V1.Games.RequestModels;
 using Teams.Api.Controllers.V1.Games.ResponseModels;
 using Teams.Common.Pagination;
+using Teams.Core.UseCases.Games.CopyGame;
 using Teams.Core.UseCases.Games.CreateGame;
 using Teams.Core.UseCases.Games.GenerateTeams;
 using Teams.Core.UseCases.Games.GetGames;
@@ -100,6 +101,10 @@ public static class GamesMapper
     public static RecordGameResultCommand ToCommand(this RecordResultRequestModel model, string id) => new(
         Id: id,
         Winner: model.Winner);
+
+    public static CopyGameCommand ToCommand(this CopyGameRequestModel model, string id) => new(
+        Id: id,
+        StartTime: model.StartTime);
 
     public static GetGamesQuery ToQuery(this GetGamesRequestModel model) => new(
         model.Location,
