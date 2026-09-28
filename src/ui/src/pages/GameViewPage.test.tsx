@@ -54,6 +54,7 @@ function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?
   const deleteMutate = vi.fn()
   const recordMutate = vi.fn()
   const copyMutate = vi.fn()
+  const copyReset = vi.fn()
   vi.mocked(useUpdateGame).mockReturnValue({
     mutate: updateMutate,
     isPending: false,
@@ -76,13 +77,14 @@ function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?
   } as any)
   vi.mocked(useCopyGame).mockReturnValue({
     mutate: copyMutate,
+    reset: copyReset,
     isPending: false,
     isSuccess: false,
     isError: false,
     error: null,
     ...overrides.copy,
   } as any)
-  return { updateMutate, deleteMutate, recordMutate, copyMutate }
+  return { updateMutate, deleteMutate, recordMutate, copyMutate, copyReset }
 }
 
 function renderPage() {
@@ -264,6 +266,27 @@ describe('GameViewPage', () => {
       await user.click(dialog.getByRole('button', { name: 'Copy Game' }))
 
       expect(copyMutate).toHaveBeenCalledWith({ StartTime: '2026-08-17T20:00:00.000Z' })
+    })
+
+    it('closes the copy modal and resets the mutation once the copy succeeds', () => {
+      const { copyReset } = setUp()
+      vi.mocked(useCopyGame).mockReturnValue({
+        mutate: vi.fn(),
+        reset: copyReset,
+        isPending: false,
+        isSuccess: true,
+        isError: false,
+        error: null,
+        data: { id: 'game-2' },
+      } as any)
+
+      renderPage()
+
+      // Resetting is what stops the effect re-firing (a second toast, a second navigate) on any
+      // later render of this same page - isSuccess otherwise stays true forever after a mutation
+      // succeeds, and copying stays on the same /games/:id route so this component never unmounts.
+      expect(copyReset).toHaveBeenCalled()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
   })
 

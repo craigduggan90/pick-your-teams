@@ -79,11 +79,16 @@ export function GameViewPage() {
   }, [recordResult.isSuccess])
 
   useEffect(() => {
-    if (copyGame.isSuccess) {
+    if (copyGame.isSuccess && copyGame.data) {
       toast.success('Game copied!')
+      setCopyOpen(false)
       navigate(`/games/${copyGame.data.id}`, { replace: true })
+      // Navigating stays on this same route pattern (/games/:id), so this component doesn't
+      // unmount - reset immediately or isSuccess stays true and re-fires this effect on the next
+      // render triggered by anything else (e.g. the new game's own query settling).
+      copyGame.reset()
     }
-  }, [copyGame.isSuccess, copyGame.data, navigate])
+  }, [copyGame, navigate])
 
   useEffect(() => {
     if (copyGame.isError) {
