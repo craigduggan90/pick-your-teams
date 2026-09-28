@@ -114,6 +114,14 @@ export function recordResult(id: string, winner: GameWinner, token: string): Pro
   })
 }
 
+export interface CopyGameRequestModel {
+  StartTime: string
+}
+
+export function copyGame(id: string, body: CopyGameRequestModel, token: string): Promise<GameModel> {
+  return apiFetch<GameModel>(`/v1/games/${id}/copy`, { token, method: 'POST', body })
+}
+
 // Tag is nullable because a Dummy player has no linked User to pull it from.
 export interface GameTeamPlayerModel {
   id: string
