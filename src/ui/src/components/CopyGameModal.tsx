@@ -32,7 +32,7 @@ export function CopyGameModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Copy Game"
-      description="Everything else — location, duration, players and their current ratings — carries over. Players will be unassigned; you can generate or set teams again once the date is set."
+      description="Everything else — location and duration — carries over. Dummy players carry over too (unassigned). Every other player gets re-invited, so they can confirm before joining."
       footer={
         <>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>

@@ -1,6 +1,7 @@
 using Teams.Core.Exceptions;
 using Teams.Core.Models;
 using Teams.Core.UseCases.Games.CopyGame;
+using Teams.Core.UseCases.Invitations.CreateInvitations;
 using Teams.Domain.Entities;
 using Teams.Domain.Enums;
 
@@ -36,7 +37,7 @@ public static class CopyGameCommandHandlerTests
         }
 
         private CopyGameCommandHandler CreateSut() =>
-            new(UnitOfWork, ActorAccessor, new FakeLogger<CopyGameCommandHandler>());
+            new(UnitOfWork, ActorAccessor, EventPublisher, new FakeLogger<CopyGameCommandHandler>());
 
         [Fact]
         public async Task ShouldThrowNotFoundException_WhenGameDoesNotExist()
@@ -103,21 +104,41 @@ public static class CopyGameCommandHandlerTests
         }
 
         [Fact]
-        public async Task ShouldCopyUserPlayer_WithCurrentUserRatingAndUnassignedTeam()
+        public async Task ShouldInviteUserPlayer_RatherThanAddingThemDirectly()
         {
             var game = CreateFinishedGame();
             var user = new User("display-name", "external-id", "user@example.com", null);
-            user.ApplyRatingChange(123);
             AddUserPlayer(game, GameTeamEnum.Home, user);
+            GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+            var command = new CopyGameCommand(game.Id, DateTime.UtcNow);
+            var sut = CreateSut();
+
+            var result = await sut.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            await InvitationsRepository.Received(1).CreateAsync(
+                Arg.Is<Invitation>(i => i!.GameId == result.Id && i.UserId == user.Id && i.EmailAddress == user.EmailAddress),
+                Arg.Any<CancellationToken>());
+            await PlayersRepository.DidNotReceive().CreateAsync(
+                Arg.Is<Player>(p => p!.UserId == user.Id), Arg.Any<CancellationToken>());
+            await EventPublisher.Received(1).PublishEventsAsync(
+                Arg.Is<IEnumerable<InvitationCreatedEvent>>(events => events!.Any(e => e.GameId == result.Id && e.UserId == user.Id)),
+                Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ShouldSkipPlayer_WhenLinkedUserHasBeenDeleted()
+        {
+            var game = CreateFinishedGame();
+            var player = new Player(game.Id, "deleted-user-id", 1000, PlayerTypeEnum.User, GameTeamEnum.Home);
+            game.Players.Add(player);
             GamesRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
             var command = new CopyGameCommand(game.Id, DateTime.UtcNow);
             var sut = CreateSut();
 
             await sut.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            await PlayersRepository.Received(1).CreateAsync(
-                Arg.Is<Player>(p => p!.UserId == user.Id && p.Rating == 1123 && p.Team == GameTeamEnum.None),
-                Arg.Any<CancellationToken>());
+            await InvitationsRepository.DidNotReceive().CreateAsync(Arg.Any<Invitation>(), Arg.Any<CancellationToken>());
+            await PlayersRepository.DidNotReceive().CreateAsync(Arg.Any<Player>(), Arg.Any<CancellationToken>());
         }
 
         [Fact]

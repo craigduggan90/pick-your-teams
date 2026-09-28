@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Teams.Api.Controllers.V1.Games.RequestModels;
 using Teams.Api.Controllers.V1.Games.ResponseModels;
+using Teams.Api.Controllers.V1.Invitations.ResponseModels;
+using Teams.Common.Pagination;
 using Teams.Core.UseCases.Games.CopyGame;
 using Teams.Data.Context;
 using Teams.Domain.Entities;
@@ -159,10 +161,10 @@ public static partial class GamesControllerTests
         }
 
         [Fact]
-        public async Task ShouldCopyPlayers_UnassignedAndWithCurrentRatings()
+        public async Task ShouldCopyDummyPlayersDirectly_WithCurrentRating()
         {
             var organiser = SeedOrganisers[0];
-            var (linkedUser, game) = await SeedFinishedGameWithPlayersAsync(organiser);
+            var (_, game) = await SeedFinishedGameWithPlayersAsync(organiser);
 
             var request = CreateJsonRequest(HttpMethod.Post, $"{Url}/{game.Id}/copy", ValidRequest);
             WithActorHeaders(request, organiser);
@@ -177,13 +179,39 @@ public static partial class GamesControllerTests
             Assert.NotNull(teams);
             Assert.Empty(teams.Home!.Players);
             Assert.Empty(teams.Away!.Players);
-            Assert.Equal(2, teams.Unassigned.Count);
-
-            var copiedUserPlayer = teams.Unassigned.Single(p => p.Tag == linkedUser.Tag);
-            Assert.Equal(linkedUser.Rating, copiedUserPlayer.Rating); // 1123 - the user's current (post-result) rating
-
-            var copiedDummyPlayer = teams.Unassigned.Single(p => p.DisplayName == "Dummy Away Player");
+            var copiedDummyPlayer = Assert.Single(teams.Unassigned);
+            Assert.Equal("Dummy Away Player", copiedDummyPlayer.DisplayName);
             Assert.Equal(880, copiedDummyPlayer.Rating); // 900 + (-20) rating change from the source game
+        }
+
+        [Fact]
+        public async Task ShouldInviteUserPlayers_RatherThanAddingThemDirectly()
+        {
+            var organiser = SeedOrganisers[0];
+            var (linkedUser, game) = await SeedFinishedGameWithPlayersAsync(organiser);
+
+            var request = CreateJsonRequest(HttpMethod.Post, $"{Url}/{game.Id}/copy", ValidRequest);
+            WithActorHeaders(request, organiser);
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var copy = await ReadContentAsync<GameModel>(response, TestContext.Current.CancellationToken);
+            Assert.NotNull(copy);
+
+            var teamsRequest = CreateRequest(HttpMethod.Get, $"{Url}/{copy.Id}/teams");
+            var teamsResponse = await Client.SendAsync(teamsRequest, TestContext.Current.CancellationToken);
+            var teams = await ReadContentAsync<GameTeamsModel>(teamsResponse, TestContext.Current.CancellationToken);
+            Assert.NotNull(teams);
+            Assert.DoesNotContain(teams.Unassigned, p => p.Tag == linkedUser.Tag);
+
+            var invitationsRequest = CreateRequest(HttpMethod.Get, $"api/v1/invitations?GameId={copy.Id}");
+            WithActorHeaders(invitationsRequest, organiser);
+            var invitationsResponse = await Client.SendAsync(invitationsRequest, TestContext.Current.CancellationToken);
+            var invitations = await ReadContentAsync<PagedList<InvitationModel>>(
+                invitationsResponse, TestContext.Current.CancellationToken);
+
+            Assert.NotNull(invitations);
+            var invitation = Assert.Single(invitations.Data);
+            Assert.Equal("Open", invitation.Status);
+            Assert.Equal(linkedUser.Id, invitation.Invitee?.Id);
         }
     }
 }
