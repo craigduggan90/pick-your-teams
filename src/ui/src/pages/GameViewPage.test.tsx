@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { PageTitleProvider } from '@/hooks/usePageTitle'
@@ -9,6 +9,7 @@ import { useSelf } from '@/hooks/useSelf'
 import { useUpdateGame } from '@/hooks/useUpdateGame'
 import { useDeleteGame } from '@/hooks/useDeleteGame'
 import { useRecordResult } from '@/hooks/useRecordResult'
+import { useCopyGame } from '@/hooks/useCopyGame'
 import { GameViewPage } from './GameViewPage'
 import type { GameDetailModel } from '@/api/games'
 
@@ -17,6 +18,7 @@ vi.mock('@/hooks/useSelf')
 vi.mock('@/hooks/useUpdateGame')
 vi.mock('@/hooks/useDeleteGame')
 vi.mock('@/hooks/useRecordResult')
+vi.mock('@/hooks/useCopyGame')
 
 const organiser = { id: 'organiser-1', tag: 'organiser-tag', displayName: 'The Organiser' }
 
@@ -47,10 +49,11 @@ function FooterActionsStub() {
   return <>{useFooterActions()}</>
 }
 
-function mockMutations(overrides: { update?: any; del?: any; record?: any } = {}) {
+function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?: any } = {}) {
   const updateMutate = vi.fn()
   const deleteMutate = vi.fn()
   const recordMutate = vi.fn()
+  const copyMutate = vi.fn()
   vi.mocked(useUpdateGame).mockReturnValue({
     mutate: updateMutate,
     isPending: false,
@@ -71,7 +74,15 @@ function mockMutations(overrides: { update?: any; del?: any; record?: any } = {}
     isSuccess: false,
     ...overrides.record,
   } as any)
-  return { updateMutate, deleteMutate, recordMutate }
+  vi.mocked(useCopyGame).mockReturnValue({
+    mutate: copyMutate,
+    isPending: false,
+    isSuccess: false,
+    isError: false,
+    error: null,
+    ...overrides.copy,
+  } as any)
+  return { updateMutate, deleteMutate, recordMutate, copyMutate }
 }
 
 function renderPage() {
@@ -135,6 +146,7 @@ describe('GameViewPage', () => {
       expect(screen.getByRole('button', { name: 'Record Result' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Copy Game' })).not.toBeInTheDocument()
     })
 
     it('navigates to the invites screen via View Invites', async () => {
@@ -213,24 +225,45 @@ describe('GameViewPage', () => {
   })
 
   describe('finished game', () => {
-    it('shows the winner banner, View Teams, and Delete Game but no Save', () => {
+    function setUp() {
       vi.mocked(useGame).mockReturnValue({
         isPending: false,
         isError: false,
         data: finishedGame,
       } as any)
       vi.mocked(useSelf).mockReturnValue({ isPending: false, data: { id: 'organiser-1' } } as any)
-      mockMutations()
+      return mockMutations()
+    }
+
+    it('shows the winner banner, View Teams, Copy Game and Delete Game but no Save', () => {
+      setUp()
 
       renderPage()
 
       expect(screen.getByText('Winner: Home Team!')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Teams' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Invites' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Copy Game' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.getByLabelText('Location')).toBeDisabled()
+    })
+
+    it('opens the copy modal, defaulting Start Time to a week after the source game', async () => {
+      const { copyMutate } = setUp()
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Copy Game' }))
+      const dialog = within(screen.getByRole('dialog'))
+
+      // sourceGame.startTime is 2026-08-10T20:00:00.000Z - one week on is the pre-filled default.
+      expect(dialog.getByLabelText('Start Time')).toHaveValue('2026-08-17T20:00')
+
+      await user.click(dialog.getByRole('button', { name: 'Copy Game' }))
+
+      expect(copyMutate).toHaveBeenCalledWith({ StartTime: '2026-08-17T20:00:00.000Z' })
     })
   })
 

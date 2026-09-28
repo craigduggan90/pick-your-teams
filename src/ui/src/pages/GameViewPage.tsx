@@ -5,6 +5,7 @@ import { TextInput } from '@/components/TextInput'
 import { GameStatusBadge } from '@/components/GameStatusBadge'
 import { Sheet } from '@/components/Sheet'
 import { RecordResultModal } from '@/components/RecordResultModal'
+import { CopyGameModal } from '@/components/CopyGameModal'
 import { Loading } from '@/components/Loading'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { toast } from '@/components/Toast'
@@ -13,6 +14,7 @@ import { useSelf } from '@/hooks/useSelf'
 import { useUpdateGame } from '@/hooks/useUpdateGame'
 import { useDeleteGame } from '@/hooks/useDeleteGame'
 import { useRecordResult } from '@/hooks/useRecordResult'
+import { useCopyGame } from '@/hooks/useCopyGame'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
 import { ApiError } from '@/api/client'
@@ -27,12 +29,14 @@ export function GameViewPage() {
   const updateGame = useUpdateGame(id ?? '')
   const deleteGame = useDeleteGame(id ?? '')
   const recordResult = useRecordResult(id ?? '')
+  const copyGame = useCopyGame(id ?? '')
 
   const [location, setLocation] = useState('')
   const [startTime, setStartTime] = useState('')
   const [duration, setDuration] = useState('')
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [recordResultOpen, setRecordResultOpen] = useState(false)
+  const [copyOpen, setCopyOpen] = useState(false)
 
   const game = gameQuery.data
 
@@ -73,6 +77,23 @@ export function GameViewPage() {
       setRecordResultOpen(false)
     }
   }, [recordResult.isSuccess])
+
+  useEffect(() => {
+    if (copyGame.isSuccess) {
+      toast.success('Game copied!')
+      navigate(`/games/${copyGame.data.id}`, { replace: true })
+    }
+  }, [copyGame.isSuccess, copyGame.data, navigate])
+
+  useEffect(() => {
+    if (copyGame.isError) {
+      const message =
+        copyGame.error instanceof ApiError
+          ? (copyGame.error.problem.detail ?? copyGame.error.message)
+          : 'Something went wrong copying this game.'
+      toast.error(message)
+    }
+  }, [copyGame.isError, copyGame.error])
 
   const isOrganiser = Boolean(
     game?.organiser && selfQuery.data && game.organiser.id === selfQuery.data.id,
@@ -171,6 +192,11 @@ export function GameViewPage() {
             Record Result
           </Button>
         )}
+        {isOrganiser && game.status === 'Finished' && (
+          <Button variant="outline" onClick={() => setCopyOpen(true)}>
+            Copy Game
+          </Button>
+        )}
         {isOrganiser && (
           <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
             Delete Game
@@ -204,6 +230,14 @@ export function GameViewPage() {
         onOpenChange={setRecordResultOpen}
         onConfirm={(winner) => recordResult.mutate(winner)}
         isPending={recordResult.isPending}
+      />
+
+      <CopyGameModal
+        open={copyOpen}
+        onOpenChange={setCopyOpen}
+        sourceStartTime={game.startTime}
+        onConfirm={(newStartTime) => copyGame.mutate({ StartTime: fromDateTimeLocalValue(newStartTime) })}
+        isPending={copyGame.isPending}
       />
     </div>
   )

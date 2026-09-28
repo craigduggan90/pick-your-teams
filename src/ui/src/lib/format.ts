@@ -54,6 +54,14 @@ export function nextHourStart(): string {
   return toDateTimeLocalValue(date.toISOString())
 }
 
+/** Same time of day, one week on (UTC), as a datetime-local value — the sensible default when
+ * copying a game, since most copied games are the next occurrence of a recurring weekly slot. */
+export function oneWeekAfter(iso: string): string {
+  const date = new Date(iso)
+  date.setUTCDate(date.getUTCDate() + 7)
+  return toDateTimeLocalValue(date.toISOString())
+}
+
 /** "2026-08-20", for use inside a plain date input. */
 export function toDateValue(iso: string): string {
   return toDateTimeLocalValue(iso).slice(0, 10)
