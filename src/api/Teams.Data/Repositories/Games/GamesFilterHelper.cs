@@ -56,4 +56,9 @@ public static class GamesFilterHelper
         => value is null
             ? queryable
             : queryable.Where(game => game.Players.Any(player => player.UserId == value));
+
+    public static IQueryable<Game> ApplyOrganiserOrPlayerIdFilter(this IQueryable<Game> queryable, string? value)
+        => value is null
+            ? queryable
+            : queryable.Where(game => game.OrganiserId == value || game.Players.Any(player => player.UserId == value));
 }

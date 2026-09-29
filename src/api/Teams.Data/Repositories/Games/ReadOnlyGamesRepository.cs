@@ -27,6 +27,7 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
         GameStatusEnum? status = null,
         string? organiserId = null,
         string? userId = null,
+        string? organiserOrPlayerId = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default)
@@ -40,6 +41,7 @@ public class ReadOnlyGamesRepository(ApiDbContext context) : RepositoryBase(cont
             .ApplyStatusFilter(status)
             .ApplyOrganiserIdFilter(organiserId)
             .ApplyUserIdFilter(userId)
+            .ApplyOrganiserOrPlayerIdFilter(organiserOrPlayerId)
             .ApplyBaseEntityDateFilters(dateFilter)
             .ApplyCursor(pagination?.Cursor)
             .ApplyPagination(pagination?.PageSize ?? Constants.DefaultPageSize)

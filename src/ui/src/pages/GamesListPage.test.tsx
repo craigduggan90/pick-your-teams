@@ -208,13 +208,25 @@ describe('GamesListPage', () => {
     expect((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)).toBe(15)
   })
 
-  it('remembers the organiser toggle selection the next time the search form is opened', async () => {
+  it('scopes the initial, unsearched list to Both ownership and the default date range', () => {
+    mockEmptyGames()
+
+    renderPage()
+
+    const [initialParams] = vi.mocked(useGames).mock.calls[0]
+    expect(initialParams.ownership).toBe('Both')
+    expect(initialParams.startTimeFrom).toBeDefined()
+    expect(initialParams.startTimeTo).toBeDefined()
+  })
+
+  it('remembers the ownership selection the next time the search form is opened', async () => {
     mockEmptyGames()
     const user = userEvent.setup()
 
     renderPage()
     await user.click(screen.getByRole('button', { name: 'Search' }))
-    await user.click(screen.getByRole('button', { name: "Games I've Organised" }))
+    // Both start checked (the default); unchecking "Games I'm In" leaves only Organising checked.
+    await user.click(screen.getByRole('button', { name: "Games I'm In" }))
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
     await user.click(screen.getByRole('button', { name: 'Search' }))
@@ -223,5 +235,6 @@ describe('GamesListPage', () => {
       'aria-pressed',
       'true',
     )
+    expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'false')
   })
 })

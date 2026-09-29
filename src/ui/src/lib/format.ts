@@ -91,3 +91,20 @@ export function nextDayBoundary(iso: string): string {
   date.setUTCDate(date.getUTCDate() + 1)
   return date.toISOString()
 }
+
+/** Today at UTC midnight — the default "Game Start From" for both the search form and the
+ * games list's initial, unsearched load, so the two stay in sync. */
+export function defaultStartTimeFrom(): string {
+  const date = new Date()
+  date.setUTCHours(0, 0, 0, 0)
+  return date.toISOString()
+}
+
+/** Fourteen days from today at UTC midnight — the default "Game Start To" for both the search
+ * form and the games list's initial, unsearched load, so the two stay in sync. */
+export function defaultStartTimeTo(): string {
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() + 14)
+  date.setUTCHours(0, 0, 0, 0)
+  return date.toISOString()
+}

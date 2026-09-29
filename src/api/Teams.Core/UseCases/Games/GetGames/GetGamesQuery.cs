@@ -12,6 +12,7 @@ public record GetGamesQuery(
     int? DurationTo,
     int? TeamSize,
     GameStatusEnum? Status,
+    GameOwnershipEnum? Ownership,
     DateTime? CreatedFrom,
     DateTime? CreatedTo,
     DateTime? ModifiedFrom,

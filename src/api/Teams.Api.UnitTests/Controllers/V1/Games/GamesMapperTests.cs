@@ -428,6 +428,32 @@ public static class GamesMapperTests
             Assert.Null(result.Status);
         }
 
+        [Theory]
+        [InlineData("Organising", GameOwnershipEnum.Organising)]
+        [InlineData("playing", GameOwnershipEnum.Playing)]
+        [InlineData("BOTH", GameOwnershipEnum.Both)]
+        public void ParsesOwnershipCaseInsensitively_WhenValid(string ownership, GameOwnershipEnum expected)
+        {
+            var model = new GetGamesRequestModel(Ownership: ownership);
+
+            var result = model.ToQuery();
+
+            Assert.Equal(expected, result.Ownership);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("NotARealOwnership")]
+        public void SetsOwnershipToNull_WhenInvalidOrMissing(string? ownership)
+        {
+            var model = new GetGamesRequestModel(Ownership: ownership);
+
+            var result = model.ToQuery();
+
+            Assert.Null(result.Ownership);
+        }
+
         [Fact]
         public void SetsCursorToNull_WhenCursorIsNull()
         {

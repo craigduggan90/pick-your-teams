@@ -76,18 +76,90 @@ describe('GamesSearchForm', () => {
     expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ teamSize: 5 }))
   })
 
-  it('pre-selects "Games I\'ve Organised" when it was last applied, and re-applies it', async () => {
-    const user = userEvent.setup()
-    const { onApply } = renderForm({ filters: { organiserOnly: true } })
+  describe('ownership checkboxes', () => {
+    it('defaults to both checked (Both) when no ownership was previously applied', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm()
 
-    expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    )
+      expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
 
-    await user.click(screen.getByRole('button', { name: 'Apply' }))
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
 
-    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ organiserOnly: true }))
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Both' }))
+    })
+
+    it('pre-checks only "Games I\'ve Organised" when Organising was last applied, and re-applies it', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm({ filters: { ownership: 'Organising' } })
+
+      expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'false')
+      expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Organising' }))
+    })
+
+    it('pre-checks only "Games I\'m In" when Playing was last applied, and re-applies it', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm({ filters: { ownership: 'Playing' } })
+
+      expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Playing' }))
+    })
+
+    it('unchecking one from the default (both checked) leaves just the other checked', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm()
+
+      await user.click(screen.getByRole('button', { name: "Games I'm In" }))
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Organising' }))
+    })
+
+    it('checking the other one from a single-checked state results in Both', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm({ filters: { ownership: 'Playing' } })
+
+      await user.click(screen.getByRole('button', { name: "Games I've Organised" }))
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Both' }))
+    })
+
+    it('unchecking the only checked one flips to the other instead of leaving neither selected', async () => {
+      const user = userEvent.setup()
+      const { onApply } = renderForm({ filters: { ownership: 'Playing' } })
+
+      // "Games I'm In" is the only one checked - clicking it again must not clear the filter
+      // entirely, since that's not a state this filter can express.
+      await user.click(screen.getByRole('button', { name: "Games I'm In" }))
+
+      expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'false')
+      expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+      expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Organising' }))
+    })
   })
 
   describe('Game Start From/To defaults', () => {

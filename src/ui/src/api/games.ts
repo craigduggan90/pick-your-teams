@@ -8,6 +8,8 @@ export interface GameOrganiserModel {
 
 export type GameStatus = 'Scheduled' | 'Finished'
 
+export type GameOwnership = 'Organising' | 'Playing' | 'Both'
+
 // "None" is a draw, not "no result yet" — the API only ever returns/accepts this once a result
 // has been recorded (see RecordResultRequestModelExample.NoWinnerExample, labeled "Draw").
 export type GameWinner = 'Home' | 'Away' | 'None'
@@ -41,6 +43,7 @@ export interface GetGamesParams {
   startTimeTo?: string
   teamSize?: number
   status?: GameStatus
+  ownership?: GameOwnership
   pageSize?: number
   cursor?: string
 }
@@ -54,6 +57,7 @@ function toQueryString(params: GetGamesParams): string {
     ['StartTimeTo', params.startTimeTo],
     ['TeamSize', params.teamSize],
     ['Status', params.status],
+    ['Ownership', params.ownership],
     ['PageSize', params.pageSize],
     ['Cursor', params.cursor],
   ]

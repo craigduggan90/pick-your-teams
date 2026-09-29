@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Teams.Api.Controllers.V1.Games.ResponseModels;
 using Teams.Common.Pagination;
+using Teams.Data.Context;
 using Teams.Domain.Enums;
 
 namespace Teams.Api.IntegrationTests.Controllers.V1.Games;
@@ -9,6 +11,16 @@ public static partial class GamesControllerTests
 {
     public class GetGames(ApiWebApplicationFactory factory) : GamesControllerTestsBase(factory)
     {
+        private async Task SeedPlayerAsync(string gameId, string userId)
+        {
+            await using var scope = Factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+            var player = EntityFactory.CreatePlayer(gameId, userId: userId, type: PlayerTypeEnum.User);
+            await context.Players.AddAsync(player, TestContext.Current.CancellationToken);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
         [Fact]
         public async Task ShouldReturnBadRequest_WhenVersionIsUnsupported()
         {
@@ -263,6 +275,84 @@ public static partial class GamesControllerTests
             Assert.NotNull(content);
             Assert.Equal(5, content.Data.Count);
             Assert.Equal(5, content.Count);
+        }
+
+        [Fact]
+        public async Task ShouldReturnPreconditionRequired_WhenOwnershipProvidedWithoutActorHeaders()
+        {
+            var url = WithQuery(Url, ("Ownership", nameof(GameOwnershipEnum.Both)));
+            var request = CreateRequest(HttpMethod.Get, url);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var problem = await ReadProblemDetailsAsync(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.PreconditionRequired, response.StatusCode);
+            Assert.NotNull(problem);
+            Assert.Equal("'Teams-User-Id' header value is required.", problem.Detail);
+        }
+
+        [Fact]
+        public async Task ShouldReturnOk_WithPagedList_FilteredByOwnership_WhenOrganising()
+        {
+            var actor = SeedOrganisers[0];
+            // organiser-000 organises every 5th seeded game (index % 5 == 0): games 0, 5, 10, 15, 20, 25.
+            var organisedGameIds = SeedGames.Where(g => g.OrganiserId == actor.Id).Select(g => g.Id).ToArray();
+            // Also a player (not organiser) in someone else's game - Organising must not include this one.
+            var playedOnlyGame = SeedGames.First(g => g.OrganiserId != actor.Id);
+            await SeedPlayerAsync(playedOnlyGame.Id, actor.Id);
+
+            var url = WithQuery(Url, ("Ownership", nameof(GameOwnershipEnum.Organising)), ("PageSize", "100"));
+            var request = CreateRequest(HttpMethod.Get, url);
+            WithActorHeaders(request, actor);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<PagedList<GameModel>>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal(organisedGameIds.OrderBy(id => id), content.Data.Select(g => g.Id).OrderBy(id => id));
+        }
+
+        [Fact]
+        public async Task ShouldReturnOk_WithPagedList_FilteredByOwnership_WhenPlaying()
+        {
+            var actor = SeedOrganisers[0];
+            var organisedGame = SeedGames.First(g => g.OrganiserId == actor.Id);
+            var playedGame = SeedGames.First(g => g.OrganiserId != actor.Id);
+            await SeedPlayerAsync(playedGame.Id, actor.Id);
+
+            var url = WithQuery(Url, ("Ownership", nameof(GameOwnershipEnum.Playing)), ("PageSize", "100"));
+            var request = CreateRequest(HttpMethod.Get, url);
+            WithActorHeaders(request, actor);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<PagedList<GameModel>>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal([playedGame.Id], content.Data.Select(g => g.Id));
+            Assert.DoesNotContain(organisedGame.Id, content.Data.Select(g => g.Id));
+        }
+
+        [Fact]
+        public async Task ShouldReturnOk_WithPagedList_FilteredByOwnership_WhenBoth()
+        {
+            var actor = SeedOrganisers[0];
+            var organisedGameIds = SeedGames.Where(g => g.OrganiserId == actor.Id).Select(g => g.Id).ToArray();
+            var playedGame = SeedGames.First(g => g.OrganiserId != actor.Id);
+            await SeedPlayerAsync(playedGame.Id, actor.Id);
+            var expectedIds = organisedGameIds.Append(playedGame.Id).Distinct().OrderBy(id => id);
+
+            var url = WithQuery(Url, ("Ownership", nameof(GameOwnershipEnum.Both)), ("PageSize", "100"));
+            var request = CreateRequest(HttpMethod.Get, url);
+            WithActorHeaders(request, actor);
+
+            var response = await Client.SendAsync(request, TestContext.Current.CancellationToken);
+            var content = await ReadContentAsync<PagedList<GameModel>>(response, TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(content);
+            Assert.Equal(expectedIds, content.Data.Select(g => g.Id).OrderBy(id => id));
         }
     }
 }
