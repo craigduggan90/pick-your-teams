@@ -37,8 +37,11 @@ function Auth0ProviderWithNavigate({ children }: { children: ReactNode }) {
       authorizationParams={{
         redirect_uri: window.location.origin,
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        scope: 'openid profile email offline_access',
       }}
-      cacheLocation="memory"
+      cacheLocation="localstorage"
+      useRefreshTokens
+      useRefreshTokensFallback
       onRedirectCallback={onRedirectCallback}
     >
       {children}
