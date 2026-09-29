@@ -1,5 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using Teams.Api.Controllers.V1.Users.ResponseModels;
+using Teams.Data.Context;
 using Teams.Domain.Entities;
+using Teams.Domain.Enums;
 
 namespace Teams.Api.IntegrationTests.Controllers.V1.Games;
 
@@ -7,6 +12,30 @@ public static partial class GamesControllerTests
 {
     public class DeleteGame(ApiWebApplicationFactory factory) : GamesControllerTestsBase(factory)
     {
+        private async Task<Invitation> SeedOpenInvitationAsync(string gameId, User invitee)
+        {
+            await using var scope = Factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+            var invitation = EntityFactory.CreateInvitation(gameId, invitee.Id, invitee.EmailAddress);
+            await context.Invitations.AddAsync(invitation, TestContext.Current.CancellationToken);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            return invitation;
+        }
+
+        private async Task<Invitation> GetInvitationDirectlyAsync(string id)
+        {
+            await using var scope = Factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+            // IgnoreQueryFilters: the point of this fetch is to check the invitation's own Status
+            // after its game is soft-deleted - going through the normal repository would apply
+            // Game's query filter to the Include and silently 404 an invitation that still exists.
+            return await context.Invitations.IgnoreQueryFilters().SingleAsync(
+                entity => entity.Id == id, TestContext.Current.CancellationToken);
+        }
+
         [Fact]
         public async Task ShouldReturnBadRequest_WhenVersionIsUnsupported()
         {
@@ -122,6 +151,36 @@ public static partial class GamesControllerTests
             var getResponse = await Client.SendAsync(getRequest, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task ShouldFailOpenInvitationsForTheGame_SoThePendingInvitationsCountDropsAfterDelete()
+        {
+            var existingGame = SeedGames[0];
+            var organiser = SeedOrganisers.Single(u => u.Id == existingGame.OrganiserId);
+            var invitee = SeedOrganisers.First(u => u.Id != existingGame.OrganiserId);
+            var invitation = await SeedOpenInvitationAsync(existingGame.Id, invitee);
+
+            var selfRequestBefore = CreateRequest(HttpMethod.Get, "api/v1/users/self");
+            WithActorHeaders(selfRequestBefore, invitee);
+            var selfResponseBefore = await Client.SendAsync(selfRequestBefore, TestContext.Current.CancellationToken);
+            var selfContentBefore = await ReadContentAsync<UserDetailModel>(selfResponseBefore, TestContext.Current.CancellationToken);
+            Assert.Equal(1, selfContentBefore!.PendingInvitations);
+
+            var deleteRequest = CreateRequest(HttpMethod.Delete, $"{Url}/{existingGame.Id}");
+            WithActorHeaders(deleteRequest, organiser);
+            var deleteResponse = await Client.SendAsync(deleteRequest, TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+            var selfRequestAfter = CreateRequest(HttpMethod.Get, "api/v1/users/self");
+            WithActorHeaders(selfRequestAfter, invitee);
+            var selfResponseAfter = await Client.SendAsync(selfRequestAfter, TestContext.Current.CancellationToken);
+            var selfContentAfter = await ReadContentAsync<UserDetailModel>(selfResponseAfter, TestContext.Current.CancellationToken);
+            Assert.Equal(0, selfContentAfter!.PendingInvitations);
+
+            var invitationAfter = await GetInvitationDirectlyAsync(invitation.Id);
+            Assert.Equal(InvitationStatusEnum.Failed, invitationAfter.Status);
+            Assert.Equal("Game was deleted.", invitationAfter.ErrorMessage);
         }
     }
 }

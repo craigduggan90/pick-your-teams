@@ -124,9 +124,18 @@ Auth0 bearer token (`apiFetch` always sets `Authorization: Bearer <token>`).
 
 Practical implications:
 
-- Use standard `auth0-react` — PKCE, in-memory access token (`cacheLocation: "memory"`, chosen
-  deliberately for XSS resistance over the convenience of `localstorage`), `Authorization: Bearer`
-  on every API call. No session cookie, no custom auth server.
+- Use standard `auth0-react` — PKCE, `Authorization: Bearer` on every API call, no session cookie,
+  no custom auth server. Tokens persist via `cacheLocation: "localstorage"` with
+  `useRefreshTokens`/`useRefreshTokensFallback` and an `offline_access` scope, so a page reload or
+  a fresh `npm run dev` doesn't force a re-login. This was originally `cacheLocation: "memory"`
+  (no persistence at all) for stronger XSS resistance; switched because memory-only didn't even
+  deliver on that in practice — a full reload wipes the token, and the SDK's fallback (a hidden
+  iframe re-checking Auth0's own SSO cookie) silently fails once third-party cookies are blocked,
+  which is now the default in most browsers, so it forced a real interactive Auth0/Google login on
+  nearly every page load. Refresh Token Rotation on the Auth0 application (plus "Allow Offline
+  Access" on the API matching `VITE_AUTH0_AUDIENCE`, dashboard-side, not in this repo) keeps each
+  refresh token single-use with reuse detection, which is what makes `localstorage` an acceptable
+  trade rather than a plain regression.
 - "Not logged in" is handled entirely client-side — a route guard (`RequireAuth`/
   `RequireAuthAndTag`) blocks navigation before any API call happens. There's no server-side
   redirect to design around; API Gateway can't issue one.
