@@ -76,9 +76,15 @@ describe('GamesSearchForm', () => {
     expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ teamSize: 5 }))
   })
 
+  it('defaults to "Both" when no ownership was previously applied', () => {
+    renderForm()
+
+    expect(screen.getByRole('button', { name: 'Both' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('pre-selects "Games I\'ve Organised" when it was last applied, and re-applies it', async () => {
     const user = userEvent.setup()
-    const { onApply } = renderForm({ filters: { organiserOnly: true } })
+    const { onApply } = renderForm({ filters: { ownership: 'Organising' } })
 
     expect(screen.getByRole('button', { name: "Games I've Organised" })).toHaveAttribute(
       'aria-pressed',
@@ -87,7 +93,17 @@ describe('GamesSearchForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
-    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ organiserOnly: true }))
+    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Organising' }))
+  })
+
+  it('applies "Games I\'m In" when selected', async () => {
+    const user = userEvent.setup()
+    const { onApply } = renderForm()
+
+    await user.click(screen.getByRole('button', { name: "Games I'm In" }))
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ ownership: 'Playing' }))
   })
 
   describe('Game Start From/To defaults', () => {

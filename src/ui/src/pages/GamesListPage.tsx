@@ -8,7 +8,18 @@ import { GamesSearchForm, type GamesSearchFilters } from '@/components/GamesSear
 import { useGames } from '@/hooks/useGames'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
-import { nextDayBoundary } from '@/lib/format'
+import { nextDayBoundary, defaultStartTimeFrom, defaultStartTimeTo } from '@/lib/format'
+
+// Same defaults GamesSearchForm applies when opened fresh - seeding the initial, unsearched load
+// with them too means the first thing a user sees is already scoped to their own games in the
+// near future, not every game in the system.
+function defaultFilters(): GamesSearchFilters {
+  return {
+    ownership: 'Both',
+    startTimeFrom: defaultStartTimeFrom(),
+    startTimeTo: defaultStartTimeTo(),
+  }
+}
 
 // A thin switch between two mutually-exclusive "pages" sharing this route — deliberately doesn't
 // call usePageTitle/usePageFooterActions itself. Both branches below are components that do, and
@@ -17,7 +28,7 @@ import { nextDayBoundary } from '@/lib/format'
 // its parent's on the same commit).
 export function GamesListPage() {
   const [searchOpen, setSearchOpen] = useState(false)
-  const [filters, setFilters] = useState<GamesSearchFilters>({})
+  const [filters, setFilters] = useState<GamesSearchFilters>(defaultFilters)
 
   if (searchOpen) {
     return (
@@ -53,6 +64,7 @@ function GamesListContent({
     startTimeTo: filters.startTimeTo ? nextDayBoundary(filters.startTimeTo) : undefined,
     teamSize: filters.teamSize,
     status: filters.status,
+    ownership: filters.ownership,
   })
   const games = gamesQuery.data?.pages.flatMap((page) => page.data) ?? []
 

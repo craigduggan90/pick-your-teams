@@ -22,13 +22,17 @@ describe('games api', () => {
   it('getGames builds a PascalCase query string from the given filters', async () => {
     vi.mocked(apiFetch).mockResolvedValue({ data: [], cursor: null, count: 0 })
 
-    await getGames({ status: 'Scheduled', teamSize: 5, pageSize: 20, cursor: 'abc' }, 'token123')
+    await getGames(
+      { status: 'Scheduled', teamSize: 5, ownership: 'Both', pageSize: 20, cursor: 'abc' },
+      'token123',
+    )
 
     const [path] = vi.mocked(apiFetch).mock.calls[0]
     expect(path).toContain('/v1/games?')
     const query = new URLSearchParams(path.split('?')[1])
     expect(query.get('Status')).toBe('Scheduled')
     expect(query.get('TeamSize')).toBe('5')
+    expect(query.get('Ownership')).toBe('Both')
     expect(query.get('PageSize')).toBe('20')
     expect(query.get('Cursor')).toBe('abc')
   })

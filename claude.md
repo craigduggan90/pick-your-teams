@@ -254,10 +254,10 @@ controllable fake identity, not a real Auth0 login, so this still goes through
 ## Workflow
 
 - One branch per unit of work, branched off the latest `main`.
-- **A backend-only change gets its own branch, separate from any frontend work that depends on
-  it, merged first.** (e.g. `backend/stage4-prep-changes`, `backend/stage6-invitee-field`.) Keeps
-  the backend PR reviewable on its own, and means a dependent frontend branch only ever builds
-  against a merged, real API contract — never speculative shared history.
+- A small backend change with a dependent frontend piece can go in one PR together (e.g. exposing
+  a new query filter and wiring up the UI that uses it) — splitting into backend-first/
+  frontend-second across two PRs was the norm during the original staged build (each stage's
+  backend prep merged before its frontend), but isn't a hard rule for small follow-on work.
 - Commit in small, logical chunks rather than one commit at the end.
 - **Before pushing any backend change, run both `dotnet format --verify-no-changes` and a full
   `dotnet build` from `src/api`** (add `--exclude ./Teams.Data/Context/Migrations/` to the format

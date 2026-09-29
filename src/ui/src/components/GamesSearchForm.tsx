@@ -2,16 +2,13 @@ import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
 import { cn } from '@/lib/utils'
-import { toDateValue, fromDateValue } from '@/lib/format'
+import { toDateValue, fromDateValue, defaultStartTimeFrom, defaultStartTimeTo } from '@/lib/format'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
-import type { GameStatus } from '@/api/games'
+import type { GameOwnership, GameStatus } from '@/api/games'
 
 export interface GamesSearchFilters {
-  // Not sent to the API (GetGamesQuery doesn't expose OrganiserId/UserId yet), but still part of
-  // the persisted/applied filter state so reopening the search form shows what was last
-  // selected, not a reset toggle.
-  organiserOnly?: boolean
+  ownership?: GameOwnership
   startTimeFrom?: string
   startTimeTo?: string
   teamSize?: number
@@ -22,19 +19,6 @@ export interface GamesSearchFormProps {
   filters: GamesSearchFilters
   onApply: (filters: GamesSearchFilters) => void
   onCancel: () => void
-}
-
-function defaultStartTimeFrom(): string {
-  const date = new Date()
-  date.setUTCHours(0, 0, 0, 0)
-  return date.toISOString()
-}
-
-function defaultStartTimeTo(): string {
-  const date = new Date()
-  date.setUTCDate(date.getUTCDate() + 14)
-  date.setUTCHours(0, 0, 0, 0)
-  return date.toISOString()
 }
 
 function ToggleOption({
@@ -70,9 +54,7 @@ function ToggleOption({
 export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormProps) {
   usePageTitle('Games / Search')
 
-  // "Games I'm In" / "Games I've Organised" is visual only — GetGamesQuery doesn't expose
-  // OrganiserId/UserId yet, so this toggle can't actually filter.
-  const [organiserOnly, setOrganiserOnly] = useState(filters.organiserOnly ?? false)
+  const [ownership, setOwnership] = useState<GameOwnership>(filters.ownership ?? 'Both')
   // Always shown, always defaulted, date-only — nobody's filtering games by time of day, and a
   // native date input already displays its own placeholder mask ("dd/mm/yyyy") even when empty,
   // so an enable/disable checkbox on top of that just adds a step without adding clarity.
@@ -83,7 +65,7 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
 
   const handleApply = () => {
     onApply({
-      organiserOnly,
+      ownership,
       startTimeFrom: startFrom,
       startTimeTo: startTo,
       teamSize: teamSize ? Number(teamSize) : undefined,
@@ -105,16 +87,13 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-4">
       <div className="flex gap-2">
-        <ToggleOption
-          label="Games I'm In"
-          active={!organiserOnly}
-          onClick={() => setOrganiserOnly(false)}
-        />
+        <ToggleOption label="Games I'm In" active={ownership === 'Playing'} onClick={() => setOwnership('Playing')} />
         <ToggleOption
           label="Games I've Organised"
-          active={organiserOnly}
-          onClick={() => setOrganiserOnly(true)}
+          active={ownership === 'Organising'}
+          onClick={() => setOwnership('Organising')}
         />
+        <ToggleOption label="Both" active={ownership === 'Both'} onClick={() => setOwnership('Both')} />
       </div>
 
       <div className="flex flex-col gap-4">

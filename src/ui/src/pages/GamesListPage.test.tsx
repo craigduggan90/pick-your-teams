@@ -208,6 +208,17 @@ describe('GamesListPage', () => {
     expect((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)).toBe(15)
   })
 
+  it('scopes the initial, unsearched list to Both ownership and the default date range', () => {
+    mockEmptyGames()
+
+    renderPage()
+
+    const [initialParams] = vi.mocked(useGames).mock.calls[0]
+    expect(initialParams.ownership).toBe('Both')
+    expect(initialParams.startTimeFrom).toBeDefined()
+    expect(initialParams.startTimeTo).toBeDefined()
+  })
+
   it('remembers the organiser toggle selection the next time the search form is opened', async () => {
     mockEmptyGames()
     const user = userEvent.setup()

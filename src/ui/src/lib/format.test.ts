@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  defaultStartTimeFrom,
+  defaultStartTimeTo,
   formatGameDateTime,
   fromDateTimeLocalValue,
   fromDateValue,
@@ -51,6 +53,25 @@ describe('nextDayBoundary', () => {
 
   it('rolls over the month/year when needed', () => {
     expect(nextDayBoundary('2026-12-31T00:00:00.000Z')).toBe('2027-01-01T00:00:00.000Z')
+  })
+})
+
+describe('defaultStartTimeFrom / defaultStartTimeTo', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-20T14:23:00.000Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('defaults From to today at UTC midnight', () => {
+    expect(defaultStartTimeFrom()).toBe('2026-08-20T00:00:00.000Z')
+  })
+
+  it('defaults To to fourteen days out at UTC midnight', () => {
+    expect(defaultStartTimeTo()).toBe('2026-09-03T00:00:00.000Z')
   })
 })
 
