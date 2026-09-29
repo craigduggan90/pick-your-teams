@@ -54,7 +54,32 @@ function ToggleOption({
 export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormProps) {
   usePageTitle('Games / Search')
 
-  const [ownership, setOwnership] = useState<GameOwnership>(filters.ownership ?? 'Both')
+  // Each toggle is an independent checkbox (Playing/Organising), not a mutually-exclusive group -
+  // "Both" just means both are checked. The one rule: at least one must stay checked. Unchecking
+  // the only one currently checked flips it to the *other* one instead of leaving neither
+  // selected, since an empty selection isn't a state this filter can express (nor one anybody
+  // wants - it'd just be a confusing way to show every game again).
+  const initialOwnership = filters.ownership ?? 'Both'
+  const [playing, setPlaying] = useState(initialOwnership !== 'Organising')
+  const [organising, setOrganising] = useState(initialOwnership !== 'Playing')
+
+  function toggle(which: 'playing' | 'organising') {
+    if (which === 'playing') {
+      if (playing && !organising) {
+        setPlaying(false)
+        setOrganising(true)
+      } else {
+        setPlaying(!playing)
+      }
+    } else {
+      if (organising && !playing) {
+        setOrganising(false)
+        setPlaying(true)
+      } else {
+        setOrganising(!organising)
+      }
+    }
+  }
   // Always shown, always defaulted, date-only — nobody's filtering games by time of day, and a
   // native date input already displays its own placeholder mask ("dd/mm/yyyy") even when empty,
   // so an enable/disable checkbox on top of that just adds a step without adding clarity.
@@ -64,6 +89,7 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
   const [status, setStatus] = useState<GameStatus | undefined>(filters.status)
 
   const handleApply = () => {
+    const ownership: GameOwnership = playing && organising ? 'Both' : playing ? 'Playing' : 'Organising'
     onApply({
       ownership,
       startTimeFrom: startFrom,
@@ -87,13 +113,8 @@ export function GamesSearchForm({ filters, onApply, onCancel }: GamesSearchFormP
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-4">
       <div className="flex gap-2">
-        <ToggleOption label="Games I'm In" active={ownership === 'Playing'} onClick={() => setOwnership('Playing')} />
-        <ToggleOption
-          label="Games I've Organised"
-          active={ownership === 'Organising'}
-          onClick={() => setOwnership('Organising')}
-        />
-        <ToggleOption label="Both" active={ownership === 'Both'} onClick={() => setOwnership('Both')} />
+        <ToggleOption label="Games I'm In" active={playing} onClick={() => toggle('playing')} />
+        <ToggleOption label="Games I've Organised" active={organising} onClick={() => toggle('organising')} />
       </div>
 
       <div className="flex flex-col gap-4">

@@ -219,13 +219,14 @@ describe('GamesListPage', () => {
     expect(initialParams.startTimeTo).toBeDefined()
   })
 
-  it('remembers the organiser toggle selection the next time the search form is opened', async () => {
+  it('remembers the ownership selection the next time the search form is opened', async () => {
     mockEmptyGames()
     const user = userEvent.setup()
 
     renderPage()
     await user.click(screen.getByRole('button', { name: 'Search' }))
-    await user.click(screen.getByRole('button', { name: "Games I've Organised" }))
+    // Both start checked (the default); unchecking "Games I'm In" leaves only Organising checked.
+    await user.click(screen.getByRole('button', { name: "Games I'm In" }))
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
     await user.click(screen.getByRole('button', { name: 'Search' }))
@@ -234,5 +235,6 @@ describe('GamesListPage', () => {
       'aria-pressed',
       'true',
     )
+    expect(screen.getByRole('button', { name: "Games I'm In" })).toHaveAttribute('aria-pressed', 'false')
   })
 })
