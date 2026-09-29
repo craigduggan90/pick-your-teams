@@ -1,3 +1,4 @@
+using Teams.Core.Models;
 using Teams.Core.UseCases.Games.GetGames;
 using Teams.Data.Models;
 using Teams.Domain.Entities;
@@ -9,7 +10,7 @@ public static class GetGamesQueryHandlerTests
 {
     public class HandleAsync : UseCaseTestBase<GetGamesQuery>
     {
-        private GetGamesQueryHandler CreateSut() => new(GamesRepository);
+        private GetGamesQueryHandler CreateSut() => new(GamesRepository, ActorAccessor);
 
         [Fact]
         public async Task ShouldForwardAllFilters_ToRepository()
@@ -29,6 +30,7 @@ public static class GetGamesQueryHandlerTests
                 DurationTo: 90,
                 TeamSize: 5,
                 Status: status,
+                Ownership: null,
                 CreatedFrom: createdFrom,
                 CreatedTo: createdTo,
                 ModifiedFrom: modifiedFrom,
@@ -45,12 +47,61 @@ public static class GetGamesQueryHandlerTests
                 duration: new RangeFilter<int>(30, 90),
                 teamSize: 5,
                 status: status,
+                organiserId: null,
+                userId: null,
+                organiserOrPlayerId: null,
                 dateFilter: new DateFilter(
                     new RangeFilter<DateTime>(createdFrom, createdTo),
                     new RangeFilter<DateTime>(modifiedFrom, modifiedTo)),
                 pagination: new PaginationFilter(42, 10),
                 cancellationToken: Arg.Any<CancellationToken>());
         }
+
+        [Theory]
+        [InlineData(GameOwnershipEnum.Organising)]
+        [InlineData(GameOwnershipEnum.Playing)]
+        [InlineData(GameOwnershipEnum.Both)]
+        public async Task ShouldResolveOwnership_AgainstTheActorsOwnId_NeverAClientSuppliedOne(GameOwnershipEnum ownership)
+        {
+            ActorAccessor.Current.Returns(new Actor("actor-id", "actor-tag", "actor-display-name"));
+            var query = CreateQuery(ownership);
+            var sut = CreateSut();
+
+            await sut.HandleAsync(query, TestContext.Current.CancellationToken);
+
+            var expectedOrganiserId = ownership == GameOwnershipEnum.Organising ? "actor-id" : null;
+            var expectedUserId = ownership == GameOwnershipEnum.Playing ? "actor-id" : null;
+            var expectedOrganiserOrPlayerId = ownership == GameOwnershipEnum.Both ? "actor-id" : null;
+
+            await GamesRepository.Received(1).GetAsync(
+                location: Arg.Any<string?>(),
+                startTime: Arg.Any<RangeFilter<DateTime>?>(),
+                duration: Arg.Any<RangeFilter<int>?>(),
+                teamSize: Arg.Any<int?>(),
+                status: Arg.Any<GameStatusEnum?>(),
+                organiserId: expectedOrganiserId,
+                userId: expectedUserId,
+                organiserOrPlayerId: expectedOrganiserOrPlayerId,
+                dateFilter: Arg.Any<DateFilter?>(),
+                pagination: Arg.Any<PaginationFilter?>(),
+                cancellationToken: Arg.Any<CancellationToken>());
+        }
+
+        private static GetGamesQuery CreateQuery(GameOwnershipEnum? ownership) => new(
+            Location: null,
+            StartTimeFrom: null,
+            StartTimeTo: null,
+            DurationFrom: null,
+            DurationTo: null,
+            TeamSize: null,
+            Status: null,
+            Ownership: ownership,
+            CreatedFrom: null,
+            CreatedTo: null,
+            ModifiedFrom: null,
+            ModifiedTo: null,
+            PageSize: null,
+            Cursor: null);
 
         [Fact]
         public async Task ShouldReturnEntities_AsReadOnlyCollection()
@@ -65,23 +116,13 @@ public static class GetGamesQueryHandlerTests
                 duration: Arg.Any<RangeFilter<int>?>(),
                 teamSize: Arg.Any<int?>(),
                 status: Arg.Any<GameStatusEnum?>(),
+                organiserId: Arg.Any<string?>(),
+                userId: Arg.Any<string?>(),
+                organiserOrPlayerId: Arg.Any<string?>(),
                 dateFilter: Arg.Any<DateFilter?>(),
                 pagination: Arg.Any<PaginationFilter?>(),
                 cancellationToken: Arg.Any<CancellationToken>()).Returns(entities);
-            var query = new GetGamesQuery(
-                Location: null,
-                StartTimeFrom: null,
-                StartTimeTo: null,
-                DurationFrom: null,
-                DurationTo: null,
-                TeamSize: null,
-                Status: null,
-                CreatedFrom: null,
-                CreatedTo: null,
-                ModifiedFrom: null,
-                ModifiedTo: null,
-                PageSize: null,
-                Cursor: null);
+            var query = CreateQuery(ownership: null);
             var sut = CreateSut();
 
             var result = await sut.HandleAsync(query, TestContext.Current.CancellationToken);
@@ -98,23 +139,13 @@ public static class GetGamesQueryHandlerTests
                 duration: Arg.Any<RangeFilter<int>?>(),
                 teamSize: Arg.Any<int?>(),
                 status: Arg.Any<GameStatusEnum?>(),
+                organiserId: Arg.Any<string?>(),
+                userId: Arg.Any<string?>(),
+                organiserOrPlayerId: Arg.Any<string?>(),
                 dateFilter: Arg.Any<DateFilter?>(),
                 pagination: Arg.Any<PaginationFilter?>(),
                 cancellationToken: Arg.Any<CancellationToken>()).Returns([]);
-            var query = new GetGamesQuery(
-                Location: null,
-                StartTimeFrom: null,
-                StartTimeTo: null,
-                DurationFrom: null,
-                DurationTo: null,
-                TeamSize: null,
-                Status: null,
-                CreatedFrom: null,
-                CreatedTo: null,
-                ModifiedFrom: null,
-                ModifiedTo: null,
-                PageSize: null,
-                Cursor: null);
+            var query = CreateQuery(ownership: null);
             var sut = CreateSut();
 
             var result = await sut.HandleAsync(query, TestContext.Current.CancellationToken);

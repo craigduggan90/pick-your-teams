@@ -18,6 +18,7 @@ public interface IReadOnlyGamesRepository : IReadOnlyRepository<Game>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="organiserId">Limit results to records organised by the user with this identifier.</param>
     /// <param name="userId">Limit results to records in which this user is a player.</param>
+    /// <param name="organiserOrPlayerId">Limit results to records organised by, or in which this user is a player.</param>
     Task<IEnumerable<Game>> GetAsync(
         string? location = null,
         RangeFilter<DateTime>? startTime = null,
@@ -26,6 +27,7 @@ public interface IReadOnlyGamesRepository : IReadOnlyRepository<Game>
         GameStatusEnum? status = null,
         string? organiserId = null,
         string? userId = null,
+        string? organiserOrPlayerId = null,
         DateFilter? dateFilter = null,
         PaginationFilter? pagination = null,
         CancellationToken cancellationToken = default);

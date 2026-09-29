@@ -103,6 +103,14 @@ silently reconciling it.
   refetch-on-mount, refreshed automatically in the background regardless of navigation/focus.
   Query invalidation (e.g. `useUpdateTag`, `useAcceptInvitation` invalidating `selfQueryKey`)
   still forces an immediate refetch regardless of `staleTime` — this pattern doesn't fight that.
+- **Games list ownership filtering is a semantic `Ownership` param (`Organising`/`Playing`/`Both`),
+  not raw `OrganiserId`/`UserId` passthrough.** `GetGamesQueryHandler` resolves it against
+  `actor.Current.Id` server-side — the client can never ask for another user's organised/played
+  games through this filter, since there's no legitimate use case for that here. `Ownership` is
+  the only thing in `GetGames` that touches `IActorAccessor`; every other filter still works with
+  no actor headers at all, so a plain unfiltered browse stays possible. `Both` is a genuine OR at
+  the DB layer (`ApplyOrganiserOrPlayerIdFilter`), not `organiserId == userId == actor.Id` ANDed
+  together, which would wrongly require being both organiser and player on the same game.
 
 ## Auth model — not what the diagrams imply
 
@@ -203,9 +211,6 @@ controllable fake identity, not a real Auth0 login, so this still goes through
 
 ## Known gaps — deliberate, don't block on these
 
-- `GetGamesQuery` doesn't expose `OrganiserId`/`UserId` yet even though the repository already
-  supports both as flat params — the Games list's "Games I'm In" / "Games I've Organised" toggle
-  is built but non-functional until the backend gap closes.
 - Pagination is forward-cursor-only, no true "previous page" — lists use a "Load More" button.
 - `DeletePlayer` already supports self-removal (organiser-or-self), but no UI control exists for a
   player to remove themselves from a game they're in.

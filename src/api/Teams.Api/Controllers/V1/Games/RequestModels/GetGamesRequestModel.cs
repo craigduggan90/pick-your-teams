@@ -8,6 +8,7 @@ public record GetGamesRequestModel(
     int? DurationTo = null,
     int? TeamSize = null,
     string? Status = null,
+    string? Ownership = null,
     DateTime? CreatedFrom = null,
     DateTime? CreatedTo = null,
     DateTime? ModifiedFrom = null,
