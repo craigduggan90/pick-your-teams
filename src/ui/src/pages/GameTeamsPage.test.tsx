@@ -11,6 +11,7 @@ import { useSetGameTeams } from '@/hooks/useSetGameTeams'
 import { useGenerateGameTeams } from '@/hooks/useGenerateGameTeams'
 import { useCreateDummyPlayer } from '@/hooks/useCreateDummyPlayer'
 import { useDeletePlayer } from '@/hooks/useDeletePlayer'
+import { useRecordResult } from '@/hooks/useRecordResult'
 import { GameTeamsPage } from './GameTeamsPage'
 import type { GameDetailModel, GameTeamsModel } from '@/api/games'
 import { ApiError } from '@/api/client'
@@ -24,6 +25,7 @@ vi.mock('@/hooks/useSetGameTeams')
 vi.mock('@/hooks/useGenerateGameTeams')
 vi.mock('@/hooks/useCreateDummyPlayer')
 vi.mock('@/hooks/useDeletePlayer')
+vi.mock('@/hooks/useRecordResult')
 
 const organiser = { id: 'organiser-1', tag: 'organiser-tag', displayName: 'The Organiser' }
 
@@ -66,12 +68,14 @@ function mockMutations(
     generate?: object
     createDummy?: object
     deletePlayer?: object
+    recordResult?: object
   } = {},
 ) {
   const setTeamsMutate = vi.fn()
   const generateMutate = vi.fn()
   const createDummyMutate = vi.fn()
   const deleteMutate = vi.fn()
+  const recordResultMutate = vi.fn()
   vi.mocked(useSetGameTeams).mockReturnValue({
     mutate: setTeamsMutate,
     isPending: false,
@@ -105,7 +109,15 @@ function mockMutations(
     error: null,
     ...overrides.deletePlayer,
   } as any)
-  return { setTeamsMutate, generateMutate, createDummyMutate, deleteMutate }
+  vi.mocked(useRecordResult).mockReturnValue({
+    mutate: recordResultMutate,
+    isPending: false,
+    isSuccess: false,
+    isError: false,
+    error: null,
+    ...overrides.recordResult,
+  } as any)
+  return { setTeamsMutate, generateMutate, createDummyMutate, deleteMutate, recordResultMutate }
 }
 
 function setUp(game: GameDetailModel, selfId: string, teams: GameTeamsModel = teamsFixture) {
@@ -175,6 +187,7 @@ describe('GameTeamsPage', () => {
       expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Generate' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     })
 
@@ -208,6 +221,7 @@ describe('GameTeamsPage', () => {
 
       expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
     })
 
     it('Game Details still offers Manage Game, since this viewer is the organiser', async () => {
@@ -233,6 +247,19 @@ describe('GameTeamsPage', () => {
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Invite Players' })).toBeEnabled()
       expect(screen.getByRole('button', { name: 'Add Non-User Player' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Record Result' })).toBeInTheDocument()
+    })
+
+    it('opens the record result modal and confirms a winner', async () => {
+      const { recordResultMutate } = setUp(scheduledGame, 'organiser-1')
+      const user = userEvent.setup()
+      renderPage()
+
+      await user.click(screen.getByRole('button', { name: 'Record Result' }))
+      await user.click(screen.getByRole('button', { name: 'Home Team' }))
+      await user.click(screen.getByRole('button', { name: 'Confirm' }))
+
+      expect(recordResultMutate).toHaveBeenCalledWith('Home')
     })
 
     it('Invite Players navigates to the invite screen', async () => {

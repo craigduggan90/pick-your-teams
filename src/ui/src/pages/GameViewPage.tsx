@@ -4,7 +4,6 @@ import { Button } from '@/components/Button'
 import { TextInput } from '@/components/TextInput'
 import { GameStatusBadge } from '@/components/GameStatusBadge'
 import { Sheet } from '@/components/Sheet'
-import { RecordResultModal } from '@/components/RecordResultModal'
 import { CopyGameModal } from '@/components/CopyGameModal'
 import { Loading } from '@/components/Loading'
 import { ErrorMessage } from '@/components/ErrorMessage'
@@ -13,7 +12,6 @@ import { useGame } from '@/hooks/useGame'
 import { useSelf } from '@/hooks/useSelf'
 import { useUpdateGame } from '@/hooks/useUpdateGame'
 import { useDeleteGame } from '@/hooks/useDeleteGame'
-import { useRecordResult } from '@/hooks/useRecordResult'
 import { useCopyGame } from '@/hooks/useCopyGame'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
@@ -28,14 +26,12 @@ export function GameViewPage() {
   const selfQuery = useSelf()
   const updateGame = useUpdateGame(id ?? '')
   const deleteGame = useDeleteGame(id ?? '')
-  const recordResult = useRecordResult(id ?? '')
   const copyGame = useCopyGame(id ?? '')
 
   const [location, setLocation] = useState('')
   const [startTime, setStartTime] = useState('')
   const [duration, setDuration] = useState('')
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [recordResultOpen, setRecordResultOpen] = useState(false)
   const [copyOpen, setCopyOpen] = useState(false)
 
   const game = gameQuery.data
@@ -70,13 +66,6 @@ export function GameViewPage() {
       navigate('/', { replace: true })
     }
   }, [deleteGame.isSuccess, navigate])
-
-  useEffect(() => {
-    if (recordResult.isSuccess) {
-      toast.success('Result recorded!')
-      setRecordResultOpen(false)
-    }
-  }, [recordResult.isSuccess])
 
   useEffect(() => {
     if (copyGame.isSuccess && copyGame.data) {
@@ -192,11 +181,6 @@ export function GameViewPage() {
             View Invites
           </Button>
         )}
-        {isOrganiser && isScheduled && (
-          <Button variant="outline" onClick={() => setRecordResultOpen(true)}>
-            Record Result
-          </Button>
-        )}
         {isOrganiser && game.status === 'Finished' && (
           <Button variant="outline" onClick={() => setCopyOpen(true)}>
             Copy Game
@@ -228,13 +212,6 @@ export function GameViewPage() {
             </Button>
           </>
         }
-      />
-
-      <RecordResultModal
-        open={recordResultOpen}
-        onOpenChange={setRecordResultOpen}
-        onConfirm={(winner) => recordResult.mutate(winner)}
-        isPending={recordResult.isPending}
       />
 
       <CopyGameModal

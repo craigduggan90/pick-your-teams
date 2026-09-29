@@ -7,6 +7,7 @@ import { TeamRosterSection } from '@/components/TeamRosterSection'
 import { RemovePlayerModal } from '@/components/RemovePlayerModal'
 import { AddNonUserPlayerForm } from '@/components/AddNonUserPlayerForm'
 import { GameDetailsSheet } from '@/components/GameDetailsSheet'
+import { RecordResultModal } from '@/components/RecordResultModal'
 import { toast } from '@/components/Toast'
 import { useGame } from '@/hooks/useGame'
 import { useSelf } from '@/hooks/useSelf'
@@ -15,6 +16,7 @@ import { useSetGameTeams } from '@/hooks/useSetGameTeams'
 import { useGenerateGameTeams } from '@/hooks/useGenerateGameTeams'
 import { useCreateDummyPlayer } from '@/hooks/useCreateDummyPlayer'
 import { useDeletePlayer } from '@/hooks/useDeletePlayer'
+import { useRecordResult } from '@/hooks/useRecordResult'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { usePageFooterActions } from '@/hooks/usePageActions'
 import { ApiError } from '@/api/client'
@@ -114,11 +116,13 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
   const [overlay, setOverlay] = useState<Record<string, RosterTeam>>({})
   const [removeTarget, setRemoveTarget] = useState<GameTeamPlayerModel | null>(null)
   const [addPlayerFormKey, setAddPlayerFormKey] = useState(0)
+  const [recordResultOpen, setRecordResultOpen] = useState(false)
 
   const setTeamsMutation = useSetGameTeams(gameId)
   const generateMutation = useGenerateGameTeams(gameId)
   const createDummyMutation = useCreateDummyPlayer(gameId)
   const deleteMutation = useDeletePlayer(gameId)
+  const recordResultMutation = useRecordResult(gameId)
 
   useEffect(() => {
     if (setTeamsMutation.isSuccess) {
@@ -174,6 +178,13 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
       toast.error(apiErrorMessage(createDummyMutation.error, 'Something went wrong adding this player.'))
     }
   }, [createDummyMutation.isError, createDummyMutation.error])
+
+  useEffect(() => {
+    if (recordResultMutation.isSuccess) {
+      toast.success('Result recorded!')
+      setRecordResultOpen(false)
+    }
+  }, [recordResultMutation.isSuccess])
 
   const homePlayers: GameTeamPlayerModel[] = []
   const awayPlayers: GameTeamPlayerModel[] = []
@@ -232,6 +243,9 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
       </Button>
       <Button variant="outline" onClick={() => setDetailsOpen(true)}>
         Game Details
+      </Button>
+      <Button variant="outline" onClick={() => setRecordResultOpen(true)}>
+        Record Result
       </Button>
       <Button
         variant="primary"
@@ -328,6 +342,13 @@ function EditTeamsView({ gameId, game, teams, isOrganiser }: TeamsViewProps) {
         game={game}
         showManageLink={isOrganiser}
         onManage={() => navigate(`/games/${gameId}`)}
+      />
+
+      <RecordResultModal
+        open={recordResultOpen}
+        onOpenChange={setRecordResultOpen}
+        onConfirm={(winner) => recordResultMutation.mutate(winner)}
+        isPending={recordResultMutation.isPending}
       />
     </div>
   )

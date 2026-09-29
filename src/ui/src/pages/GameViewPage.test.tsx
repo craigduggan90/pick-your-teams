@@ -8,7 +8,6 @@ import { useGame } from '@/hooks/useGame'
 import { useSelf } from '@/hooks/useSelf'
 import { useUpdateGame } from '@/hooks/useUpdateGame'
 import { useDeleteGame } from '@/hooks/useDeleteGame'
-import { useRecordResult } from '@/hooks/useRecordResult'
 import { useCopyGame } from '@/hooks/useCopyGame'
 import { GameViewPage } from './GameViewPage'
 import type { GameDetailModel } from '@/api/games'
@@ -17,7 +16,6 @@ vi.mock('@/hooks/useGame')
 vi.mock('@/hooks/useSelf')
 vi.mock('@/hooks/useUpdateGame')
 vi.mock('@/hooks/useDeleteGame')
-vi.mock('@/hooks/useRecordResult')
 vi.mock('@/hooks/useCopyGame')
 
 const organiser = { id: 'organiser-1', tag: 'organiser-tag', displayName: 'The Organiser' }
@@ -49,10 +47,9 @@ function FooterActionsStub() {
   return <>{useFooterActions()}</>
 }
 
-function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?: any } = {}) {
+function mockMutations(overrides: { update?: any; del?: any; copy?: any } = {}) {
   const updateMutate = vi.fn()
   const deleteMutate = vi.fn()
-  const recordMutate = vi.fn()
   const copyMutate = vi.fn()
   const copyReset = vi.fn()
   vi.mocked(useUpdateGame).mockReturnValue({
@@ -69,12 +66,6 @@ function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?
     isSuccess: false,
     ...overrides.del,
   } as any)
-  vi.mocked(useRecordResult).mockReturnValue({
-    mutate: recordMutate,
-    isPending: false,
-    isSuccess: false,
-    ...overrides.record,
-  } as any)
   vi.mocked(useCopyGame).mockReturnValue({
     mutate: copyMutate,
     reset: copyReset,
@@ -84,7 +75,7 @@ function mockMutations(overrides: { update?: any; del?: any; record?: any; copy?
     error: null,
     ...overrides.copy,
   } as any)
-  return { updateMutate, deleteMutate, recordMutate, copyMutate, copyReset }
+  return { updateMutate, deleteMutate, copyMutate, copyReset }
 }
 
 function renderPage() {
@@ -145,7 +136,6 @@ describe('GameViewPage', () => {
       expect(screen.getByLabelText('Duration')).toBeEnabled()
       expect(screen.getByRole('button', { name: 'Manage Teams' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Invites' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Record Result' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Copy Game' })).not.toBeInTheDocument()
@@ -173,18 +163,6 @@ describe('GameViewPage', () => {
       expect(updateMutate).toHaveBeenCalledWith(
         expect.objectContaining({ Location: 'New Location', Duration: 60 }),
       )
-    })
-
-    it('opens the record result modal and confirms a winner', async () => {
-      const { recordMutate } = setUp()
-      const user = userEvent.setup()
-      renderPage()
-
-      await user.click(screen.getByRole('button', { name: 'Record Result' }))
-      await user.click(screen.getByRole('button', { name: 'Home Team' }))
-      await user.click(screen.getByRole('button', { name: 'Confirm' }))
-
-      expect(recordMutate).toHaveBeenCalledWith('Home')
     })
 
     it('opens the delete confirmation and deletes on confirm', async () => {
@@ -220,7 +198,6 @@ describe('GameViewPage', () => {
       expect(screen.queryByRole('button', { name: 'Manage Teams' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'View Teams' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'View Invites' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Delete Game' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
     })
@@ -248,7 +225,6 @@ describe('GameViewPage', () => {
       expect(screen.getByRole('button', { name: 'Copy Game' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Delete Game' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Record Result' })).not.toBeInTheDocument()
       expect(screen.getByLabelText('Location')).toBeDisabled()
     })
 
