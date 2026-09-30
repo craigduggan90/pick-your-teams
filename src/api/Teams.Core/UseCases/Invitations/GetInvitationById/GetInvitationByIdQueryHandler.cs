@@ -1,4 +1,4 @@
-using Teams.Core.CQRS;
+using Beans.Requestable;
 using Teams.Core.Exceptions;
 using Teams.Core.Services;
 using Teams.Data.Repositories.Invitations;

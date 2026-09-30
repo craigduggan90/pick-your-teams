@@ -1,3 +1,4 @@
+using Beans.Requestable;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -6,7 +7,6 @@ using Teams.Api.Controllers.V1.Invitations.RequestModels;
 using Teams.Api.Controllers.V1.Invitations.ResponseModels;
 using Teams.Common.Pagination;
 using Teams.Common.Providers.Identifiers;
-using Teams.Core.CQRS;
 using Teams.Core.UseCases.Invitations.AcceptInvitation;
 using Teams.Core.UseCases.Invitations.CreateInvitations;
 using Teams.Core.UseCases.Invitations.DeclineInvitation;

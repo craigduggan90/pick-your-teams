@@ -1,3 +1,4 @@
+using Beans.Requestable;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using Teams.Api.Attributes;
@@ -9,7 +10,6 @@ using Teams.Api.Controllers.V1.Users.ResponseModels;
 using Teams.Api.Infrastructure;
 using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 using Teams.Common.Pagination;
-using Teams.Core.CQRS;
 using Teams.Core.UseCases.Users.DeleteUser;
 using Teams.Core.UseCases.Users.GetSelf;
 using Teams.Core.UseCases.Users.GetUserByExternalId;

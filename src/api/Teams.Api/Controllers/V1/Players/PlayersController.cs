@@ -1,3 +1,4 @@
+using Beans.Requestable;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using Teams.Api.Controllers.V1.Abstract;
@@ -7,7 +8,6 @@ using Teams.Api.Controllers.V1.Players.ResponseModel;
 using Teams.Api.Controllers.V1.Shared;
 using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 using Teams.Common.Pagination;
-using Teams.Core.CQRS;
 using Teams.Core.UseCases.Players.DeletePlayer;
 using Teams.Core.UseCases.Players.GetPlayerById;
 using Teams.Domain.Extensions;

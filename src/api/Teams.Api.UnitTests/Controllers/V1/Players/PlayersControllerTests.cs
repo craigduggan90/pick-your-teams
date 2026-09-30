@@ -1,3 +1,4 @@
+using Beans.Requestable;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -6,7 +7,6 @@ using Teams.Api.Controllers.V1.Players.RequestModels;
 using Teams.Api.Controllers.V1.Players.ResponseModel;
 using Teams.Common.Pagination;
 using Teams.Common.Providers.Identifiers;
-using Teams.Core.CQRS;
 using Teams.Core.UseCases.Players.CreateDummyPlayer;
 using Teams.Core.UseCases.Players.CreatePlayer;
 using Teams.Core.UseCases.Players.DeletePlayer;
