@@ -1,5 +1,5 @@
+using Beans.Requestable;
 using FluentValidation;
-using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
 using Teams.Data.Repositories.Games;
 using Teams.Domain.Entities;

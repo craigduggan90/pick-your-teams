@@ -1,4 +1,4 @@
-using Teams.Core.CQRS;
+using Beans.Requestable;
 using Teams.Domain.Entities;
 
 namespace Teams.Core.UseCases.Users.CreateUser;

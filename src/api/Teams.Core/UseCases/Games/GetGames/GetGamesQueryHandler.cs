@@ -1,4 +1,4 @@
-using Teams.Core.CQRS;
+using Beans.Requestable;
 using Teams.Data.Models;
 using Teams.Data.Repositories.Games;
 using Teams.Domain.Entities;

@@ -1,4 +1,4 @@
-using Teams.Core.CQRS;
+using Beans.Requestable;
 using Teams.Domain.Models;
 
 namespace Teams.Core.UseCases.Games.GenerateTeams;

@@ -1,3 +1,4 @@
+using Beans.Requestable;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using Teams.Api.Controllers.V1.Abstract;
@@ -7,7 +8,6 @@ using Teams.Api.Controllers.V1.Invitations.ResponseModels;
 using Teams.Api.Controllers.V1.Shared;
 using Teams.Api.Infrastructure.Swagger.Examples.V1.Common;
 using Teams.Common.Pagination;
-using Teams.Core.CQRS;
 using Teams.Core.UseCases.Invitations.AcceptInvitation;
 using Teams.Core.UseCases.Invitations.DeclineInvitation;
 using Teams.Core.UseCases.Invitations.GetInvitationById;

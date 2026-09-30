@@ -1,6 +1,6 @@
+using Beans.Requestable;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using Teams.Core.CQRS;
 using Teams.Core.Exceptions;
 using Teams.Core.Services;
 using Teams.Data.Services;
